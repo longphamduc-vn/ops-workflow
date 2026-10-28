@@ -1,0 +1,89 @@
+version: "1.0"
+name: equipment-status-lookup
+description: Look up equipment status from the EMS and aggregate it
+
+connectors:
+  ems:
+    type: nexacro
+    base_url: https://ems.company.local
+    format: ssv
+    allowed_services: [/eqp/selectEqpList.do, /eqp/selectEqpDetail.do]
+    auth:
+      type: form_login
+      login_url: /login.do
+      username: ${secrets.EMS_USER}
+      password: ${secrets.EMS_PASS}
+      session_ttl: 20m
+    limits: { max_concurrent: 3, min_interval: 200ms }
+
+trigger: { type: cron, cron: "*/15 * * * *", timezone: Asia/Ho_Chi_Minh }
+
+inputs:
+  site_code: { type: string, required: true }
+
+defaults:
+  timeout: 30s
+  retry: { max_attempts: 3, backoff: exponential, delay: 2s, on: [timeout, network] }
+
+steps:
+  - id: list_equipment
+    type: call
+    with:
+      connector: ems
+      operation: /eqp/selectEqpList.do
+      in_datasets:
+        dsCond: [{ SITE_CD: "${inputs.site_code}", USE_YN: "Y" }]
+      out_datasets: [dsList]
+    outputs:
+      items: "$.dsList"
+
+  - id: get_detail
+    type: foreach
+    needs: [list_equipment]
+    with:
+      items: "${steps.list_equipment.outputs.items}"
+      concurrency: 3
+      on_item_error: skip
+      step:
+        type: call
+        with:
+          connector: ems
+          operation: /eqp/selectEqpDetail.do
+          in_datasets:
+            dsCond: [{ EQP_ID: "${item.EQP_ID}" }]
+          out_datasets: [dsDetail]
+
+  - id: normalize
+    type: transform
+    needs: [get_detail]
+    with:
+      engine: jmespath
+      input: "${steps.get_detail.outputs}"
+      expression: |
+        [].{equipment_id: dsDetail[0].EQP_ID, name: dsDetail[0].EQP_NM,
+            status: dsDetail[0].STATUS_CD, updated_at: dsDetail[0].UPD_DT}
+      mappings:
+        status: { "01": running, "02": stopped, "99": fault }
+
+  - id: save
+    type: db_upsert
+    needs: [normalize]
+    with:
+      table: equipment_status
+      key: [equipment_id]
+      rows: "${steps.normalize.outputs}"
+
+  - id: alert_fault
+    type: notify
+    needs: [normalize]
+    if: "any(steps.normalize.outputs, status == 'fault')"
+    with:
+      channel: "#ops-alerts"
+      message: "Faulty equipment detected at ${inputs.site_code}"
+
+on_error: { strategy: continue }
+
+publish:
+  dataset: equipment_status
+  source: "${steps.normalize.outputs}"
+  event: equipment.status.updated

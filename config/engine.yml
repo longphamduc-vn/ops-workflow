@@ -1,0 +1,11 @@
+engine:
+  env: development
+  database_url: sqlite+aiosqlite:///opsflow.db
+  log_level: INFO
+  worker_concurrency: 5
+  secret_provider: env
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  auth_type: api_key

@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpsflowWorkflow",
+  "type": "object",
+  "required": ["version", "name", "trigger", "steps"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "connectors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string" },
+          "base_url": { "type": "string" },
+          "format": { "type": "string", "enum": ["ssv", "xml", "json"] },
+          "allowed_services": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "auth": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "login_url": { "type": "string" },
+              "username": { "type": "string" },
+              "password": { "type": "string" },
+              "session_ttl": { "type": "string" }
+            }
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "max_concurrent": { "type": "integer", "minimum": 1 },
+              "min_interval": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["manual", "cron", "webhook", "event"] },
+        "cron": { "type": "string" },
+        "timezone": { "type": "string" },
+        "path": { "type": "string" }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "enum": ["string", "number", "boolean", "list", "object"] },
+          "required": { "type": "boolean" },
+          "default": {},
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "timeout": { "type": "string" },
+        "retry": {
+          "type": "object",
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1 },
+            "backoff": { "type": "string", "enum": ["fixed", "exponential"] },
+            "delay": { "type": "string" },
+            "on": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["timeout", "network", "auth", "business", "validation", "internal"] }
+            }
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["call", "transform", "foreach", "join", "db_upsert", "notify", "approval"]
+          },
+          "needs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "if": { "type": "string" },
+          "run_if": {
+            "type": "string",
+            "enum": ["all_success", "all_success_or_skipped", "failure", "always"]
+          },
+          "with": { "type": "object" },
+          "outputs": { "type": "object" },
+          "timeout": { "type": "string" },
+          "retry": { "type": "object" },
+          "continue_on_error": { "type": "boolean" },
+          "idempotent": { "type": "boolean" }
+        }
+      }
+    },
+    "on_error": {
+      "type": "object",
+      "properties": {
+        "strategy": { "type": "string", "enum": ["stop", "continue", "rollback"] }
+      }
+    },
+    "publish": {
+      "type": "object",
+      "required": ["dataset", "source"],
+      "properties": {
+        "dataset": { "type": "string" },
+        "source": { "type": "string" },
+        "event": { "type": "string" },
+        "event_if": { "type": "string" }
+      }
+    }
+  }
+}
