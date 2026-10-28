@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Dataset id="dsCond">
+        <ColumnInfo>
+            <Column id="EQP_ID" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="EQP_ID">EQP001</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>

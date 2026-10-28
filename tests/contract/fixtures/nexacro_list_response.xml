@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">0</Parameter>
+        <Parameter id="ErrorMsg" type="string">SUCCESS</Parameter>
+    </Parameters>
+    <Dataset id="dsList">
+        <ColumnInfo>
+            <Column id="EQP_ID" type="STRING" size="256"/>
+            <Column id="SITE_CD" type="STRING" size="256"/>
+            <Column id="USE_YN" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="EQP_ID">EQP001</Col>
+                <Col id="SITE_CD">SITE_HANOI</Col>
+                <Col id="USE_YN">Y</Col>
+            </Row>
+            <Row>
+                <Col id="EQP_ID">EQP002</Col>
+                <Col id="SITE_CD">SITE_HANOI</Col>
+                <Col id="USE_YN">Y</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>

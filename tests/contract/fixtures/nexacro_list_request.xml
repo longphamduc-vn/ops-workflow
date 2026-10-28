@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Dataset id="dsCond">
+        <ColumnInfo>
+            <Column id="SITE_CD" type="STRING" size="256"/>
+            <Column id="USE_YN" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="SITE_CD">SITE_HANOI</Col>
+                <Col id="USE_YN">Y</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>

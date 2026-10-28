@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">0</Parameter>
+        <Parameter id="ErrorMsg" type="string">SUCCESS</Parameter>
+    </Parameters>
+    <Dataset id="dsDetail">
+        <ColumnInfo>
+            <Column id="EQP_ID" type="STRING" size="256"/>
+            <Column id="EQP_NM" type="STRING" size="256"/>
+            <Column id="STATUS_CD" type="STRING" size="256"/>
+            <Column id="UPD_DT" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="EQP_ID">EQP001</Col>
+                <Col id="EQP_NM">Main Pump</Col>
+                <Col id="STATUS_CD">01</Col>
+                <Col id="UPD_DT">2026-10-28 08:00:00</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>

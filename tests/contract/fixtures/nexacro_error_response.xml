@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">-100</Parameter>
+        <Parameter id="ErrorMsg" type="string">Database connection failure on legacy EMS</Parameter>
+    </Parameters>
+</Root>
