@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from opsflow.api.routes import datasets, health, runs, webhooks, workflows
+from opsflow.api.routes import datasets, health, metrics, runs, webhooks, workflows
 from opsflow.core.errors import OpsflowError
 from opsflow.core.parser import load_workflow_from_file
 from opsflow.read_models.storage import ReadModelStorage
@@ -112,6 +112,7 @@ def create_app() -> FastAPI:
     app.include_router(runs.router)
     app.include_router(datasets.router)
     app.include_router(webhooks.router)
+    app.include_router(metrics.router)
 
     return app
 

@@ -3,12 +3,14 @@
 import asyncio
 import uuid
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Any
 
 from opsflow.core.context import Context
 from opsflow.core.dag import DAG
 from opsflow.core.executor import StepExecutor
 from opsflow.core.models import Result, StepConfig, WorkflowDefinition
+from opsflow.metrics import GLOBAL_METRICS
 from opsflow.steps.base import Step
 from opsflow.steps.registry import create_step
 from opsflow.store.repository import RunRepository
@@ -44,6 +46,7 @@ class WorkflowScheduler:
         final_status is 'success' or 'failed'.
         """
         active_run_id = run_id or f"run_{uuid.uuid4().hex[:16]}"
+        run_start_time = datetime.now(UTC)
         effective_inputs = inputs or {}
 
         # 1. Initialize context with connectors
@@ -160,6 +163,15 @@ class WorkflowScheduler:
                                 outputs=res.data,
                                 error=err_dict,
                             )
+                        st_status = ctx.step_statuses.get(st.id, "failed")
+                        err_kind = res.error.kind if res.error else None
+                        GLOBAL_METRICS.record_step(
+                            self.workflow.name,
+                            st.id,
+                            st_status,
+                            res.meta.get("latency_ms", 0) / 1000.0,
+                            error_kind=err_kind,
+                        )
                         return res
 
                 running_tasks[step.id] = asyncio.create_task(_run_step())
@@ -212,4 +224,6 @@ class WorkflowScheduler:
                 error=err_summary,
             )
 
+        duration_sec = (datetime.now(UTC) - run_start_time).total_seconds()
+        GLOBAL_METRICS.record_run(self.workflow.name, final_status, duration_sec)
         return active_run_id, final_status, ctx

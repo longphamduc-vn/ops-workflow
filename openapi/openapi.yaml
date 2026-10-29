@@ -384,6 +384,20 @@ paths:
       security:
       - APIKeyHeader: []
       - HTTPBearer: []
+  /metrics:
+    get:
+      tags:
+      - Metrics
+      summary: Prometheus metrics
+      description: Expose engine runtime metrics for Prometheus scraping.
+      operationId: get_metrics_metrics_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     DatasetQueryResponse:
