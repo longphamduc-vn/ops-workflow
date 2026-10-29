@@ -1,6 +1,5 @@
 """Read models storage: exposes stable queryable datasets for consumers."""
 
-import uuid
 from datetime import UTC, datetime
 from typing import Any
 
@@ -54,8 +53,8 @@ class ReadModelStorage:
         now = datetime.now(UTC)
         count = 0
         async with self.session_factory() as session:
-            for row in row_list:
-                rec_id = f"rec_{uuid.uuid4().hex[:16]}"
+            for idx, row in enumerate(row_list):
+                rec_id = f"rec_{int(now.timestamp() * 1000):016d}_{idx:06d}"
                 db_record = PublishedRecordModel(
                     id=rec_id,
                     dataset=dataset,

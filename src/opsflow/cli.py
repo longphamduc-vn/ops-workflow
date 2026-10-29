@@ -54,7 +54,9 @@ def validate(
                 err=True,
             )
             if err.suggestion:
-                typer.secho(f"    Suggested fix: {err.suggestion}", fg=typer.colors.YELLOW, err=True)
+                typer.secho(
+                    f"    Suggested fix: {err.suggestion}", fg=typer.colors.YELLOW, err=True
+                )
         sys.exit(1)
 
     typer.secho(f"[OK] Workflow '{wf.name}' is valid.", fg=typer.colors.GREEN, bold=True)
@@ -68,6 +70,7 @@ def api(
 ) -> None:
     """Start the public REST API server."""
     import uvicorn
+
     typer.echo(f"Starting Opsflow API server on {host}:{port}...")
     uvicorn.run("opsflow.api.main:app", host=host, port=port, reload=reload)
 

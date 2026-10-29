@@ -28,7 +28,9 @@ class RunRecord(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    steps: Mapped[list["StepRunRecord"]] = relationship("StepRunRecord", back_populates="run", cascade="all, delete-orphan")
+    steps: Mapped[list["StepRunRecord"]] = relationship(
+        "StepRunRecord", back_populates="run", cascade="all, delete-orphan"
+    )
 
 
 class StepRunRecord(Base):
@@ -37,7 +39,9 @@ class StepRunRecord(Base):
     __tablename__ = "step_runs"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    run_id: Mapped[str] = mapped_column(String(64), ForeignKey("runs.id"), index=True, nullable=False)
+    run_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("runs.id"), index=True, nullable=False
+    )
     step_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
     attempt: Mapped[int] = mapped_column(Integer, default=1)

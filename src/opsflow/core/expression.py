@@ -186,7 +186,9 @@ class ExpressionEvaluator:
         }
 
         # Check for predicate pattern like: any(steps.normalize.outputs, status == 'fault')
-        predicate_match = re.match(r"any\((.+?),\s*([a-zA-Z0-9_]+)\s*==\s*['\"](.+?)['\"]\)", condition.strip())
+        predicate_match = re.match(
+            r"any\((.+?),\s*([a-zA-Z0-9_]+)\s*==\s*['\"](.+?)['\"]\)", condition.strip()
+        )
         if predicate_match:
             collection_expr = predicate_match.group(1).strip()
             field_name = predicate_match.group(2).strip()

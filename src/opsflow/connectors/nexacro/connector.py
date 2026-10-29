@@ -126,7 +126,11 @@ class NexacroConnector(Connector):
         req_params = params.get("params") or {}
 
         payload = serialize_xml(parameters=req_params, datasets=in_datasets)
-        url = operation if operation.startswith("http") else f"{self.base_url}/{operation.lstrip('/')}"
+        url = (
+            operation
+            if operation.startswith("http")
+            else f"{self.base_url}/{operation.lstrip('/')}"
+        )
 
         start_t = time.monotonic()
         try:

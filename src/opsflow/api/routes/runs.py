@@ -39,7 +39,11 @@ async def get_run_status(
     )
 
 
-@router.get("/{run_id}/steps", response_model=list[StepRunResponse], summary="Get per-step execution details")
+@router.get(
+    "/{run_id}/steps",
+    response_model=list[StepRunResponse],
+    summary="Get per-step execution details",
+)
 async def get_run_steps(
     run_id: str,
     _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:read"))],

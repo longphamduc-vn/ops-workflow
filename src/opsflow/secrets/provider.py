@@ -33,7 +33,9 @@ class EnvSecretProvider(SecretProvider):
         env_key = f"{self.prefix}{key}"
         val = os.getenv(env_key)
         if val is None:
-            raise SecretNotFoundError(f"Secret '{key}' not found in environment (checked {env_key})")
+            raise SecretNotFoundError(
+                f"Secret '{key}' not found in environment (checked {env_key})"
+            )
         if val:
             self._cached_values.add(val)
         return val

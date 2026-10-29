@@ -65,8 +65,14 @@ class HttpConnector(Connector):
             if elapsed < self.min_interval_sec:
                 await asyncio.sleep(self.min_interval_sec - elapsed)
 
-            method = params.get("method", "POST" if params.get("json") or params.get("in_datasets") else "GET").upper()
-            url = operation if operation.startswith("http") else f"{self.base_url}/{operation.lstrip('/')}"
+            method = params.get(
+                "method", "POST" if params.get("json") or params.get("in_datasets") else "GET"
+            ).upper()
+            url = (
+                operation
+                if operation.startswith("http")
+                else f"{self.base_url}/{operation.lstrip('/')}"
+            )
             json_body = params.get("json") or params.get("in_datasets")
             query_params = params.get("query_params")
 

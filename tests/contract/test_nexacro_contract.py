@@ -125,7 +125,9 @@ async def test_nexacro_in_body_error_detection() -> None:
 async def test_nexacro_auto_relogin_on_session_expiry() -> None:
     base_url = "https://ems.company.local"
     login_xml = (FIXTURES_DIR / "nexacro_login_response.xml").read_text(encoding="utf-8")
-    expired_xml = (FIXTURES_DIR / "nexacro_session_expired_response.xml").read_text(encoding="utf-8")
+    expired_xml = (FIXTURES_DIR / "nexacro_session_expired_response.xml").read_text(
+        encoding="utf-8"
+    )
     list_xml = (FIXTURES_DIR / "nexacro_list_response.xml").read_text(encoding="utf-8")
 
     # Login route

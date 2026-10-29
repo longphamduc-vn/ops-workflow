@@ -68,12 +68,15 @@ class WorkflowScheduler:
         if self.repository:
             existing_run = await self.repository.get_run(active_run_id)
             if not existing_run:
-                await self.repository.create_run(active_run_id, self.workflow.name, effective_inputs)
+                await self.repository.create_run(
+                    active_run_id, self.workflow.name, effective_inputs
+                )
             await self.repository.update_run_status(active_run_id, "running")
 
         # 4. Schedule step executions
         completed_steps: set[str] = {
-            s.id for s in self.workflow.steps
+            s.id
+            for s in self.workflow.steps
             if ctx.step_statuses.get(s.id) in ("success", "skipped")
         }
         failed_steps: set[str] = set()
@@ -91,13 +94,16 @@ class WorkflowScheduler:
             # Find ready steps whose dependencies have all completed or failed
             ready_steps = []
             for step in self.workflow.steps:
-                if step.id in completed_steps or step.id in failed_steps or step.id in running_tasks:
+                if (
+                    step.id in completed_steps
+                    or step.id in failed_steps
+                    or step.id in running_tasks
+                ):
                     continue
 
                 # Check if all dependencies have finished
                 deps_finished = all(
-                    dep in completed_steps or dep in failed_steps
-                    for dep in step.needs
+                    dep in completed_steps or dep in failed_steps for dep in step.needs
                 )
                 if deps_finished:
                     # If any dependency failed and strategy is 'continue', check if step can run
@@ -126,9 +132,7 @@ class WorkflowScheduler:
                     step_factory=self.step_factory,
                 )
 
-                async def _run_step(
-                    st: StepConfig = step, ex: StepExecutor = executor
-                ) -> Result:
+                async def _run_step(st: StepConfig = step, ex: StepExecutor = executor) -> Result:
                     async with semaphore:
                         # Persist running status before execution
                         if self.repository:

@@ -13,7 +13,9 @@ from opsflow.core.models import ErrorInfo, Result, RetryConfig, StepConfig
 class FlakyStepRunner:
     type = "flaky"
 
-    def __init__(self, fail_times: int = 1, error_kind: str = "network", retryable: bool = True) -> None:
+    def __init__(
+        self, fail_times: int = 1, error_kind: str = "network", retryable: bool = True
+    ) -> None:
         self.fail_times = fail_times
         self.calls = 0
         self.error_kind = error_kind

@@ -67,6 +67,7 @@ async def get_current_consumer(
 
 def require_scope(required_scope: str) -> Callable[..., Any]:
     """Dependency factory checking that consumer has the required permission scope."""
+
     async def _scope_checker(
         consumer: Annotated[AuthenticatedConsumer, Depends(get_current_consumer)],
     ) -> AuthenticatedConsumer:

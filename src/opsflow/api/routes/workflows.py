@@ -181,9 +181,7 @@ async def start_workflow_run(
             if final_status == "success" and wf.publish:
                 pub_data = ctx.step_outputs.get("normalize") or ctx.interpolate(wf.publish.source)
                 if pub_data:
-                    await read_models.save_published_dataset(
-                        wf.publish.dataset, run_id, pub_data
-                    )
+                    await read_models.save_published_dataset(wf.publish.dataset, run_id, pub_data)
             return StartRunResponse(
                 run_id=completed_run_id,
                 workflow_name=wf.name,
@@ -194,9 +192,7 @@ async def start_workflow_run(
             pass  # Fallback to returning accepted run while continuing in background
 
     # Launch execution asynchronously
-    background_tasks.add_task(
-        _execute_and_publish, wf, repo, read_models, run_id, payload.inputs
-    )
+    background_tasks.add_task(_execute_and_publish, wf, repo, read_models, run_id, payload.inputs)
 
     return StartRunResponse(
         run_id=run_id,

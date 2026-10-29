@@ -11,9 +11,11 @@ _CONNECTOR_REGISTRY: dict[str, type[Connector]] = {}
 
 def register_connector(connector_type: str) -> Callable[[type[Connector]], type[Connector]]:
     """Decorator to register a connector implementation class."""
+
     def decorator(cls: type[Connector]) -> type[Connector]:
         _CONNECTOR_REGISTRY[connector_type] = cls
         return cls
+
     return decorator
 
 

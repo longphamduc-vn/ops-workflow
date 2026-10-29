@@ -10,9 +10,11 @@ _STEP_REGISTRY: dict[str, type[Step]] = {}
 
 def register_step(step_type: str) -> Callable[[type[Step]], type[Step]]:
     """Decorator to register a step implementation class."""
+
     def decorator(cls: type[Step]) -> type[Step]:
         _STEP_REGISTRY[step_type] = cls
         return cls
+
     return decorator
 
 
