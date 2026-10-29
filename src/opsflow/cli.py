@@ -49,15 +49,27 @@ def validate(
         for err in errors:
             rule_info = f" (Rule {err.rule_number})" if err.rule_number else ""
             typer.secho(
-                f"  • [{err.field_path}]{rule_info}: {err.message}", fg=typer.colors.RED, err=True
+                f"  • [{err.field_path}]{rule_info}: {err.message}",
+                fg=typer.colors.RED,
+                err=True,
             )
             if err.suggestion:
-                typer.secho(
-                    f"    Suggested fix: {err.suggestion}", fg=typer.colors.YELLOW, err=True
-                )
+                typer.secho(f"    Suggested fix: {err.suggestion}", fg=typer.colors.YELLOW, err=True)
         sys.exit(1)
 
     typer.secho(f"[OK] Workflow '{wf.name}' is valid.", fg=typer.colors.GREEN, bold=True)
+
+
+@app.command()
+def api(
+    host: Annotated[str, typer.Option(help="Host to bind API server")] = "0.0.0.0",
+    port: Annotated[int, typer.Option(help="Port to listen on")] = 8000,
+    reload: Annotated[bool, typer.Option(help="Enable auto-reload for development")] = False,
+) -> None:
+    """Start the public REST API server."""
+    import uvicorn
+    typer.echo(f"Starting Opsflow API server on {host}:{port}...")
+    uvicorn.run("opsflow.api.main:app", host=host, port=port, reload=reload)
 
 
 @app.command()

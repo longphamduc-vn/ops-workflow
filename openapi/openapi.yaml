@@ -1,0 +1,713 @@
+openapi: 3.1.0
+info:
+  title: Opsflow Workflow Engine API
+  description: Public REST API for triggering operational automations, monitoring
+    runs, and querying published datasets.
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Liveness probe
+      description: Check service liveness (unauthenticated).
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Health Check Health Get
+  /ready:
+    get:
+      tags:
+      - Health
+      summary: Readiness probe
+      description: Check service readiness (unauthenticated).
+      operationId: readiness_check_ready_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Readiness Check Ready Get
+  /api/v1/workflows:
+    get:
+      tags:
+      - Workflows
+      summary: List workflows
+      description: List all registered workflows and their input schemas.
+      operationId: list_workflows_api_v1_workflows_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/WorkflowSummary'
+                type: array
+                title: Response List Workflows Api V1 Workflows Get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+  /api/v1/workflows/{name}:
+    get:
+      tags:
+      - Workflows
+      summary: Get workflow metadata
+      description: Retrieve detailed metadata for a specific workflow (excluding secrets).
+      operationId: get_workflow_api_v1_workflows__name__get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDetail'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/workflows/{name}/runs:
+    post:
+      tags:
+      - Workflows
+      summary: Start a workflow run
+      description: Trigger a new asynchronous workflow run with idempotency protection.
+      operationId: start_workflow_run_api_v1_workflows__name__runs_post
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Name
+      - name: wait
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Wait up to seconds for completion
+          title: Wait
+        description: Wait up to seconds for completion
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartRunRequest'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/runs/{run_id}:
+    get:
+      tags:
+      - Runs
+      summary: Get run status
+      description: Retrieve run status, execution timestamps, and summary.
+      operationId: get_run_status_api_v1_runs__run_id__get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunStatusResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/runs/{run_id}/steps:
+    get:
+      tags:
+      - Runs
+      summary: Get per-step execution details
+      description: Retrieve per-step execution status, latency, and error diagnostics.
+      operationId: get_run_steps_api_v1_runs__run_id__steps_get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StepRunResponse'
+                title: Response Get Run Steps Api V1 Runs  Run Id  Steps Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/runs/{run_id}/result:
+    get:
+      tags:
+      - Runs
+      summary: Get final published run result
+      description: Retrieve final published outputs for a successful workflow run.
+      operationId: get_run_result_api_v1_runs__run_id__result_get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Run Result Api V1 Runs  Run Id  Result Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/runs/{run_id}/cancel:
+    post:
+      tags:
+      - Runs
+      summary: Cancel a running run
+      description: Cancel an active or pending workflow run.
+      operationId: cancel_run_api_v1_runs__run_id__cancel_post
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                title: Response Cancel Run Api V1 Runs  Run Id  Cancel Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/datasets/{dataset}:
+    get:
+      tags:
+      - Datasets
+      summary: Query a published dataset
+      description: Query a stable published read model dataset with cursor pagination.
+      operationId: query_dataset_api_v1_datasets__dataset__get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Dataset
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          description: Page size limit
+          default: 50
+          title: Limit
+        description: Page size limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Pagination cursor
+          title: Cursor
+        description: Pagination cursor
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetQueryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/datasets/{dataset}/schema:
+    get:
+      tags:
+      - Datasets
+      summary: Get published dataset schema
+      description: Retrieve column names and data types for a published dataset.
+      operationId: get_dataset_schema_api_v1_datasets__dataset__schema_get
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+      parameters:
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Dataset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Dataset Schema Api V1 Datasets  Dataset  Schema
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/webhooks/subscriptions:
+    post:
+      tags:
+      - Webhooks
+      summary: Register a webhook subscription
+      description: Register a consumer endpoint to receive signed event notifications.
+      operationId: create_webhook_subscription_api_v1_webhooks_subscriptions_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - APIKeyHeader: []
+      - HTTPBearer: []
+components:
+  schemas:
+    DatasetQueryResponse:
+      properties:
+        dataset:
+          type: string
+          title: Dataset
+        items:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - dataset
+      - items
+      - count
+      title: DatasetQueryResponse
+      description: Paginated result set for a published dataset query.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InputParamSchema:
+      properties:
+        type:
+          type: string
+          title: Type
+        required:
+          type: boolean
+          title: Required
+          default: false
+        default:
+          title: Default
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - type
+      title: InputParamSchema
+      description: Schema describing an accepted workflow input parameter.
+    RunStatusResponse:
+      properties:
+        run_id:
+          type: string
+          title: Run Id
+        workflow_name:
+          type: string
+          title: Workflow Name
+        status:
+          type: string
+          title: Status
+        inputs:
+          additionalProperties: true
+          type: object
+          title: Inputs
+        outputs:
+          additionalProperties: true
+          type: object
+          title: Outputs
+        error:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Error
+        created_at:
+          type: string
+          title: Created At
+        started_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Started At
+        completed_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Completed At
+      type: object
+      required:
+      - run_id
+      - workflow_name
+      - status
+      - created_at
+      title: RunStatusResponse
+      description: Execution status and metadata for a run.
+    StartRunRequest:
+      properties:
+        inputs:
+          additionalProperties: true
+          type: object
+          title: Inputs
+        idempotency_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency Key
+      type: object
+      title: StartRunRequest
+      description: Payload to trigger a new workflow run.
+    StartRunResponse:
+      properties:
+        run_id:
+          type: string
+          title: Run Id
+        workflow_name:
+          type: string
+          title: Workflow Name
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: string
+          title: Created At
+      type: object
+      required:
+      - run_id
+      - workflow_name
+      - status
+      - created_at
+      title: StartRunResponse
+      description: Response returned upon accepting a workflow run (HTTP 202).
+    StepRunResponse:
+      properties:
+        step_id:
+          type: string
+          title: Step Id
+        status:
+          type: string
+          title: Status
+        attempt:
+          type: integer
+          title: Attempt
+        latency_ms:
+          type: integer
+          title: Latency Ms
+        started_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Started At
+        completed_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Completed At
+        error:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - step_id
+      - status
+      - attempt
+      - latency_ms
+      title: StepRunResponse
+      description: Execution status and logs for a single workflow step.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WebhookSubscriptionRequest:
+      properties:
+        target_url:
+          type: string
+          title: Target Url
+        event_types:
+          items:
+            type: string
+          type: array
+          title: Event Types
+        secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Secret
+      type: object
+      required:
+      - target_url
+      title: WebhookSubscriptionRequest
+      description: Request to register an outbound webhook consumer.
+    WebhookSubscriptionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        target_url:
+          type: string
+          title: Target Url
+        event_types:
+          items:
+            type: string
+          type: array
+          title: Event Types
+        created_at:
+          type: string
+          title: Created At
+      type: object
+      required:
+      - id
+      - target_url
+      - event_types
+      - created_at
+      title: WebhookSubscriptionResponse
+      description: Registration confirmation for an outbound webhook.
+    WorkflowDetail:
+      properties:
+        name:
+          type: string
+          title: Name
+        version:
+          type: string
+          title: Version
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        trigger:
+          additionalProperties: true
+          type: object
+          title: Trigger
+        inputs:
+          additionalProperties:
+            $ref: '#/components/schemas/InputParamSchema'
+          type: object
+          title: Inputs
+        env:
+          additionalProperties:
+            type: string
+          type: object
+          title: Env
+        steps_count:
+          type: integer
+          title: Steps Count
+        publish_dataset:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Publish Dataset
+      type: object
+      required:
+      - name
+      - version
+      - trigger
+      - steps_count
+      title: WorkflowDetail
+      description: Detailed metadata for a specific workflow.
+    WorkflowSummary:
+      properties:
+        name:
+          type: string
+          title: Name
+        version:
+          type: string
+          title: Version
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        trigger_type:
+          type: string
+          title: Trigger Type
+        inputs:
+          additionalProperties:
+            $ref: '#/components/schemas/InputParamSchema'
+          type: object
+          title: Inputs
+      type: object
+      required:
+      - name
+      - version
+      - trigger_type
+      title: WorkflowSummary
+      description: Summary of a registered workflow.
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    HTTPBearer:
+      type: http
+      scheme: bearer
