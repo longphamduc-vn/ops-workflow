@@ -175,7 +175,7 @@ steps:
         ds_Search:
           - inventoryItemId: ""
             organizationId: "${inputs.organization_id}"
-            invItemList: "${steps.normalize_target_stock.outputs[0].inventory_item_id}"
+            invItemList: "${steps.normalize_target_stock.outputs.0.inventory_item_id}"
       out_datasets:
         - ds_Rtn
     outputs:
@@ -198,7 +198,7 @@ steps:
       in_datasets:
         ds_Input:
           - organizationId: "${inputs.organization_id}"
-            inventoryItemId: "${steps.normalize_target_stock.outputs[0].inventory_item_id}"
+            inventoryItemId: "${steps.normalize_target_stock.outputs.0.inventory_item_id}"
       out_datasets:
         - ds_Item
         - ds_Inv
