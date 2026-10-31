@@ -1,0 +1,160 @@
+### ==============================================================================
+### Opsflow Workflow Engine (Component 1) - REST API & Workflow Execution
+###
+### Can be executed directly with:
+### - VS Code REST Client extension (Ctrl+Alt+R / Cmd+Alt+R)
+### - IntelliJ / JetBrains HTTP Client
+### - HTTPie / curl
+###
+### Default Port: 8000
+### Simulated EMS Port: 9000
+### ==============================================================================
+
+@baseUrl = http://localhost:8000
+@emsSimUrl = http://localhost:9000
+@apiKey = admin_key
+@jsonContentType = application/json
+@orgId = 28753
+@alertChannel = #ops-alerts
+
+### ------------------------------------------------------------------------------
+### 0. HEALTH, READINESS & PROMETHEUS METRICS
+### ------------------------------------------------------------------------------
+
+### 0.1 Health Check (Liveness Probe)
+GET {{baseUrl}}/health
+
+### 0.2 Readiness Probe
+GET {{baseUrl}}/ready
+
+### 0.3 Prometheus Metrics Exposition
+GET {{baseUrl}}/metrics
+
+
+### ------------------------------------------------------------------------------
+### 1. WORKFLOW DISCOVERY & INSPECTION
+### ------------------------------------------------------------------------------
+
+### 1.1 List All Registered Workflows
+GET {{baseUrl}}/api/v1/workflows
+X-API-Key: {{apiKey}}
+
+### 1.2 Inspect 'spare-parts-inventory-audit' Metadata & Schema
+GET {{baseUrl}}/api/v1/workflows/spare-parts-inventory-audit
+X-API-Key: {{apiKey}}
+
+### 1.3 Inspect 'spare-parts-inventory-sync' Metadata & Schema
+GET {{baseUrl}}/api/v1/workflows/spare-parts-inventory-sync
+X-API-Key: {{apiKey}}
+
+
+### ------------------------------------------------------------------------------
+### 2. TRIGGER WORKFLOW RUNS
+### ------------------------------------------------------------------------------
+
+### 2.1 Run 'spare-parts-inventory-audit' (Synchronous wait for 5 seconds)
+# Calls EMS simulator to fetch stock list, iterates foreach item to retrieve 3 datasets,
+# merges records with join, persists to SQLite and publishes dataset.
+# @name triggerAuditSync
+POST {{baseUrl}}/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "alert_channel": "{{alertChannel}}"
+  }
+}
+
+### 2.2 Run 'spare-parts-inventory-audit' with Idempotency-Key
+# Safe for automated retry triggers - duplicate requests return the same run ID
+POST {{baseUrl}}/api/v1/workflows/spare-parts-inventory-audit/runs
+X-API-Key: {{apiKey}}
+Idempotency-Key: manual-trigger-uuid-001
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "alert_channel": "{{alertChannel}}"
+  }
+}
+
+### 2.3 Run 'spare-parts-inventory-sync' (Direct Stock Status Sync)
+# @name triggerStockSync
+POST {{baseUrl}}/api/v1/workflows/spare-parts-inventory-sync/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}"
+  }
+}
+
+
+### ------------------------------------------------------------------------------
+### 3. RUN STATUS & PER-STEP EXECUTION DIAGNOSTICS
+### ------------------------------------------------------------------------------
+
+### 3.1 Get Run Status (Replace run_id with value from trigger response)
+@activeRunId = {{triggerAuditSync.response.body.run_id}}
+GET {{baseUrl}}/api/v1/runs/{{activeRunId}}
+X-API-Key: {{apiKey}}
+
+### 3.2 Get Per-Step Execution Details (Latency, Attempts, Step Statuses)
+GET {{baseUrl}}/api/v1/runs/{{activeRunId}}/steps
+X-API-Key: {{apiKey}}
+
+### 3.3 Cancel In-Progress Run
+POST {{baseUrl}}/api/v1/runs/{{activeRunId}}/cancel
+X-API-Key: {{apiKey}}
+
+
+### ------------------------------------------------------------------------------
+### 4. QUERY PUBLISHED READ-MODEL DATASETS
+### ------------------------------------------------------------------------------
+
+### 4.1 Query 'spare_parts_audit_dataset' (Cursor-paginated items)
+GET {{baseUrl}}/api/v1/datasets/spare_parts_audit_dataset?limit=10
+X-API-Key: {{apiKey}}
+
+### 4.2 Query 'spare_parts_audit_dataset' Schema (Inferred column types)
+GET {{baseUrl}}/api/v1/datasets/spare_parts_audit_dataset/schema
+X-API-Key: {{apiKey}}
+
+### 4.3 Query 'spare_parts_inventory' (Stock Status sync dataset)
+GET {{baseUrl}}/api/v1/datasets/spare_parts_inventory?limit=5
+X-API-Key: {{apiKey}}
+
+
+### ------------------------------------------------------------------------------
+### 5. WEBHOOK SUBSCRIPTIONS
+### ------------------------------------------------------------------------------
+
+### 5.1 List Active Webhook Subscriptions
+GET {{baseUrl}}/api/v1/webhooks/subscriptions
+X-API-Key: {{apiKey}}
+
+### 5.2 Register Outbound Webhook Subscription
+POST {{baseUrl}}/api/v1/webhooks/subscriptions
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "target_url": "https://webhook.site/test-receiver",
+  "event_types": ["spare_parts.audit.completed"],
+  "secret": "my-webhook-hmac-secret"
+}
+
+
+### ------------------------------------------------------------------------------
+### 6. EMS SIMULATION PLATFORM VERIFICATION (CROSS-CHECK)
+### ------------------------------------------------------------------------------
+
+### 6.1 Check EMS Simulator Health
+GET {{emsSimUrl}}/health
+
+### 6.2 View Execution Logs on EMS Simulator (Verify calls from opsflow)
+GET {{emsSimUrl}}/admin/logs?limit=10

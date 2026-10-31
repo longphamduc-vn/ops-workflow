@@ -15,6 +15,26 @@ router = APIRouter(prefix="/api/v1/webhooks", tags=["Webhooks"])
 WEBHOOK_SUBSCRIPTIONS: list[dict[str, Any]] = []
 
 
+@router.get(
+    "/subscriptions",
+    response_model=list[WebhookSubscriptionResponse],
+    summary="List active webhook subscriptions",
+)
+async def list_webhook_subscriptions(
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("workflows:read"))],
+) -> list[WebhookSubscriptionResponse]:
+    """List all registered webhook subscriptions."""
+    return [
+        WebhookSubscriptionResponse(
+            id=str(r["id"]),
+            target_url=str(r["target_url"]),
+            event_types=list(r["event_types"]),
+            created_at=str(r["created_at"]),
+        )
+        for r in WEBHOOK_SUBSCRIPTIONS
+    ]
+
+
 @router.post(
     "/subscriptions",
     status_code=status.HTTP_201_CREATED,
