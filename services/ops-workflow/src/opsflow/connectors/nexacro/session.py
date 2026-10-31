@@ -8,6 +8,32 @@ from opsflow.connectors.nexacro.codec_xml import deserialize_xml, serialize_xml
 from opsflow.core.errors import OpsflowError
 
 
+def _safe_cookies_dict(cookies: Any) -> dict[str, str]:
+    """Safely extract cookies to a dict without raising CookieConflict on duplicate cookie names."""
+    if not cookies:
+        return {}
+    res: dict[str, str] = {}
+    jar = getattr(cookies, "jar", None)
+    if jar is not None:
+        for c in jar:
+            res[c.name] = c.value
+    elif isinstance(cookies, dict):
+        return dict(cookies)
+    return res
+
+
+def _get_cookie_val(cookies: Any, name: str) -> str | None:
+    """Safely get cookie value by name without raising CookieConflict."""
+    if not cookies:
+        return None
+    jar = getattr(cookies, "jar", None)
+    if jar is not None:
+        for c in jar:
+            if c.name == name:
+                return c.value
+    return None
+
+
 def parse_ttl_seconds(ttl: str | int | float | None) -> float:
     """Parse session TTL duration string like '20m', '1h', '600s' into seconds."""
     if ttl is None:
@@ -83,7 +109,7 @@ class NexacroSession:
             method="POST",
             url=full_login_url,
             headers=headers,
-            cookies=dict(self.client.cookies),
+            cookies=_safe_cookies_dict(self.client.cookies),
             body=login_payload,
         )
 
@@ -133,6 +159,6 @@ class NexacroSession:
                 f"Nexacro login rejected on {full_login_url} with ErrorCode '{error_code}': {err_msg}"
             )
 
-        self.session_id = params.get("SESSION_ID") or response.cookies.get("JSESSIONID")
+        self.session_id = params.get("SESSION_ID") or _get_cookie_val(response.cookies, "JSESSIONID")
         self.cookies.update(response.cookies)
         self.authenticated_at = time.monotonic()

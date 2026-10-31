@@ -13,7 +13,7 @@ from simpleeval import SimpleEval  # type: ignore[import-untyped]
 from opsflow.core.errors import ExpressionError
 from opsflow.secrets.provider import get_secret_provider
 
-EXPR_PATTERN = re.compile(r"\$\{([a-zA-Z0-9_.]+)\}")
+EXPR_PATTERN = re.compile(r"\$\{([a-zA-Z0-9_.\[\]]+)\}")
 
 
 def _resolve_dotted_path(root: Any, path: Sequence[str]) -> Any:
@@ -59,7 +59,10 @@ class ExpressionEvaluator:
 
     def _resolve_variable(self, expr: str) -> Any:
         """Resolve a variable from allowed namespaces: inputs, env, secrets, steps, item, run."""
-        parts = expr.split(".")
+        normalized_expr = expr.replace("[", ".").replace("]", "")
+        parts = [p for p in normalized_expr.split(".") if p]
+        if not parts:
+            return None
         namespace = parts[0]
 
         if namespace == "inputs":

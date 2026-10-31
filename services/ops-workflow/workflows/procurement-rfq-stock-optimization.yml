@@ -10,6 +10,7 @@ connectors:
     verify_ssl: false
     follow_redirects: true
     allowed_services:
+      - /emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn
       - /emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn
       - /emscom/popupNav/retrieveItem.lgdn
       - /emscom/popupNav/retrieveItemPoStatusList.lgdn
@@ -66,7 +67,7 @@ steps:
     type: call
     with:
       connector: ems
-      operation: /emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn
+      operation: /emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn
       params:
         _ems_userId: "${inputs.user_id}"
         _ems_organizationId: "${inputs.organization_id}"

@@ -16,6 +16,20 @@ from opsflow.core.models import ErrorInfo, Result
 ErrorKind = Literal["timeout", "network", "auth", "business", "validation", "internal"]
 
 
+def _safe_cookies_dict(cookies: Any) -> dict[str, str]:
+    """Safely extract cookies to a dict without raising CookieConflict on duplicate cookie names."""
+    if not cookies:
+        return {}
+    res: dict[str, str] = {}
+    jar = getattr(cookies, "jar", None)
+    if jar is not None:
+        for c in jar:
+            res[c.name] = c.value
+    elif isinstance(cookies, dict):
+        return dict(cookies)
+    return res
+
+
 @register_connector("nexacro")
 class NexacroConnector(Connector):
     """Connector for legacy Nexacro EMS applications with read-only security invariants."""
@@ -158,7 +172,7 @@ class NexacroConnector(Connector):
             method="POST",
             url=url,
             headers=headers,
-            cookies=dict(self.client.cookies),
+            cookies=_safe_cookies_dict(self.client.cookies),
             body=payload,
         )
 

@@ -184,7 +184,7 @@ async def test_procurement_rfq_stock_optimization_workflow() -> None:
     base_url = "http://localhost:9000"
 
     # Mock all 4 Nexacro endpoints
-    respx.post(f"{base_url}/emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn").respond(
+    respx.post(f"{base_url}/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn").respond(
         status_code=200,
         content=TARGET_STOCK_XML.encode("utf-8"),
         headers={"Content-Type": "application/xml; charset=UTF-8"},
@@ -217,6 +217,7 @@ async def test_procurement_rfq_stock_optimization_workflow() -> None:
         base_url=base_url,
         format="xml",
         allowed_services=[
+            "/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn",
             "/emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn",
             "/emscom/popupNav/retrieveItem.lgdn",
             "/emscom/popupNav/retrieveItemPoStatusList.lgdn",
