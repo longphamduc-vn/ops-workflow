@@ -1,0 +1,31 @@
+id: spare_parts.item_detail.retrieve
+name: Retrieve Item Info Detail
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_Input
+    schema: spare_parts.ds_Input.schema
+execution:
+  type: handler
+  handler: inventory.retrieve_item_detail
+  fixture_id: fixture.spare_parts.item_detail.retrieve
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_Item
+    schema: spare_parts.ds_Item.schema
+  - name: ds_Inv
+    schema: spare_parts.ds_Inv.schema
+  - name: ds_Summary
+    schema: spare_parts.ds_Summary.schema

@@ -1,0 +1,63 @@
+version: "1.0"
+name: spare-parts-inventory-sync
+description: Sync spare parts stock status and inventory details from EMS simulation platform
+
+connectors:
+  ems_sim:
+    type: nexacro
+    base_url: http://localhost:9000
+    format: xml
+    allowed_services:
+      - /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+      - /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+    limits:
+      max_concurrent: 3
+      min_interval: 100ms
+
+trigger:
+  type: manual
+
+inputs:
+  organization_id:
+    type: string
+    default: "28753"
+
+steps:
+  - id: fetch_stock_status
+    type: call
+    with:
+      connector: ems_sim
+      operation: /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+      params:
+        _ems_userId: "658359"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "EN"
+      in_datasets:
+        ds_search:
+          - organizationId: "${inputs.organization_id}"
+      out_datasets:
+        - ds_result
+    outputs:
+      stock_list: "$.ds_result"
+
+  - id: normalize_stock
+    type: transform
+    needs: [fetch_stock_status]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_stock_status.outputs.stock_list}"
+      expression: |
+        [].{item_code: itemName, description: itemDescription, inventory_item_id: inventoryItemId, onhand_qty: onhandQuantity, available_qty: availableQuantity}
+
+  - id: save_to_db
+    type: db_upsert
+    needs: [normalize_stock]
+    with:
+      table: spare_parts_inventory
+      key: [item_code]
+      rows: "${steps.normalize_stock.outputs}"
+
+publish:
+  dataset: spare_parts_inventory
+  source: "${steps.normalize_stock.outputs}"
+  event: spare_parts.inventory.synced

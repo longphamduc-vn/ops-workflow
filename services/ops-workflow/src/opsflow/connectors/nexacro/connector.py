@@ -84,7 +84,7 @@ class NexacroConnector(Connector):
 
         async with self._semaphore:
             # Automatic authentication on first call or TTL expiration
-            if self.session.is_expired():
+            if self.auth_config and self.session.is_expired():
                 try:
                     await self.session.authenticate()
                     self.client.cookies.update(self.session.cookies)
@@ -161,10 +161,11 @@ class NexacroConnector(Connector):
 
             # In-body error detection (Section 6.3)
             resp_params, datasets = deserialize_xml(response.text)
-            error_code = resp_params.get("ErrorCode", "0")
-            error_msg = resp_params.get("ErrorMsg", "OK")
+            error_code = resp_params.get("ErrorCode") or resp_params.get("errorCode", "0")
+            error_msg = resp_params.get("ErrorMsg") or resp_params.get("errorMsg", "OK")
 
-            if error_code != "0":
+            # Nexacro & EMS convention: "0" and "1" represent successful executions
+            if str(error_code) not in ("0", "1"):
                 # Determine if error is authentication/session related
                 is_auth_error = (
                     error_code in ("-9999", "-9000", "SESSION_TIMEOUT", "AUTH_FAIL")

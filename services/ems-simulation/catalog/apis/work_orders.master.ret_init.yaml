@@ -1,0 +1,31 @@
+id: work_orders.master.ret_init
+name: Work Order Master Init
+domain: work_orders
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emscom/woMasterNav/WoMasterRetInit.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_info
+    schema: work_orders.ds_info.schema
+execution:
+  type: handler
+  handler: workorder.master_init
+  fixture_id: fixture.work_orders.master.ret_init
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_wo
+    schema: work_orders.ds_wo.schema
+  - name: ds_step
+    schema: work_orders.ds_step.schema
+  - name: ds_spAttachFile
+    schema: work_orders.ds_spAttachFile.schema

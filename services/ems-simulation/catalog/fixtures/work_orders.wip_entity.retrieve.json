@@ -1,0 +1,31 @@
+{
+  "id": "fixture.work_orders.wip_entity.retrieve",
+  "api_id": "work_orders.wip_entity.retrieve",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_output": {
+        "cols": [
+          "wipEntityName",
+          "wipEntityId",
+          "workOrderType",
+          "workOrderTypeDesc",
+          "userDefinedStatusId",
+          "statusTypeDisp"
+        ],
+        "count": 1,
+        "rows": []
+      }
+    }
+  }
+}

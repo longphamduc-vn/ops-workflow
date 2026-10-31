@@ -1,0 +1,91 @@
+id: common.code.list.empty
+api_id: common.code.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_output0:
+      cols:
+      - comCode
+      - comCodeDesc
+      - detailDesc
+      count: 0
+      rows: []
+    ds_output1:
+      cols:
+      - comCode
+      - comCodeDesc
+      - systemStatus
+      count: 0
+      rows: []
+    ds_output2:
+      cols:
+      - comCode
+      - comCodeDesc
+      count: 0
+      rows: []
+    ds_output3:
+      cols:
+      - comCode
+      - comCodeDesc
+      count: 0
+      rows: []
+    ds_output4:
+      cols:
+      - comCode
+      - comCodeDesc
+      - detailDesc
+      count: 0
+      rows: []
+    ds_output5:
+      cols:
+      - comCode
+      - comCodeDesc
+      count: 0
+      rows: []
+    ds_output6:
+      cols:
+      - comCode
+      - comCodeDesc
+      - data2Code
+      - data3Code
+      - data4Code
+      - data5Code
+      - attribute2
+      - attribute3
+      - attribute4
+      - attribute5
+      - field1Code
+      - field2Code
+      - field3Code
+      - field4Code
+      - field5Code
+      - field6Code
+      - field7Code
+      - field8Code
+      - field9Code
+      - field10Code
+      - field1Desc
+      - field2Desc
+      - field3Desc
+      - field4Desc
+      - field5Desc
+      - field6Desc
+      - field7Desc
+      - field8Desc
+      - field9Desc
+      - field10Desc
+      count: 0
+      rows: []
+    ds_output7:
+      cols:
+      - comCode
+      - comCodeDesc
+      count: 0
+      rows: []

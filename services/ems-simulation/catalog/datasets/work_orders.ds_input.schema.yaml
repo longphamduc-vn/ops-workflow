@@ -1,0 +1,6 @@
+id: work_orders.ds_input.schema
+name: ds_input Dataset Schema
+version: 1.0.0
+columns:
+- name: wipEntityId
+  type: string

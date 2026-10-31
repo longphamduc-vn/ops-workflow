@@ -1,0 +1,22 @@
+id: work_orders.wip_entity.retrieve.empty
+api_id: work_orders.wip_entity.retrieve
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_output:
+      cols:
+      - wipEntityName
+      - wipEntityId
+      - workOrderType
+      - workOrderTypeDesc
+      - userDefinedStatusId
+      - statusTypeDisp
+      count: 0
+      rows: []

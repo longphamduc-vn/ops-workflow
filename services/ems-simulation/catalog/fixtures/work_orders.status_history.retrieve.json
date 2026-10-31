@@ -1,0 +1,63 @@
+{
+  "id": "fixture.work_orders.status_history.retrieve",
+  "api_id": "work_orders.status_history.retrieve",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_list": {
+        "cols": [
+          "wipEntityId",
+          "historyId",
+          "organizationId",
+          "commentText",
+          "createdBy",
+          "creationDate",
+          "lastUpdatedBy",
+          "lastUpdateDate",
+          "lastUpdateLogin",
+          "pendingFlag",
+          "status",
+          "lastUpdatedByName",
+          "fileCnt"
+        ],
+        "count": 2,
+        "rows": [
+          [
+            "337389615",
+            "147648093",
+            "28753",
+            "PR Return에 따른 WO 취소 처리(Pr No:144603.1",
+            "구매담당자:Bui Nguyen Tu Le",
+            "사유:Wrong Purchaser)",
+            "1102",
+            "20261028084356000",
+            "1102",
+            "20261028084356000",
+            "-1",
+            "N",
+            "Cancelled",
+            "EMS System / 설비/환경 AX 팀",
+            "0"
+          ]
+        ]
+      },
+      "ds_input": {
+        "cols": [
+          "historyId"
+        ],
+        "count": 1,
+        "rows": []
+      }
+    }
+  }
+}

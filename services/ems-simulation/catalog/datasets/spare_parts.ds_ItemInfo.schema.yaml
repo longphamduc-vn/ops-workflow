@@ -1,0 +1,12 @@
+id: spare_parts.ds_ItemInfo.schema
+name: ds_ItemInfo Dataset Schema
+version: 1.0.0
+columns:
+- name: item
+  type: string
+- name: itemDesc
+  type: string
+- name: inventoryItemId
+  type: string
+- name: remark
+  type: string

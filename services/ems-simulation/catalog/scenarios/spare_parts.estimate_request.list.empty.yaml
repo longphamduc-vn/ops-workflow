@@ -1,0 +1,79 @@
+id: spare_parts.estimate_request.list.empty
+api_id: spare_parts.estimate_request.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_list:
+      cols:
+      - checked
+      - prvNo
+      - filePrvNo
+      - estimateRequestDate
+      - contact
+      - factory
+      - emNo
+      - emNoDesc
+      - budgetDept
+      - budgetDepartmentCode
+      - workOrder
+      - woType
+      - requestComment
+      - item
+      - itemDescription
+      - serialNumber
+      - supplier
+      - poOwnership
+      - requestQty
+      - preRfqRequestNo
+      - requestorName
+      - preEstimateStatus
+      - estimatingPrNo
+      - estimateNo
+      - estimateStatus
+      - estimateDate
+      - reqSupplierBidDate
+      - estimateCost
+      - prNo
+      - prDate
+      - prQty
+      - prAmount
+      - prApproves
+      - poNo
+      - poDate
+      - poQuanity
+      - itemCost
+      - poAmount
+      - poCreatedBy
+      - poSupplierName
+      - prSuggester
+      - canRequestNo
+      - canReqUrlAddr
+      - wipEntityId
+      - requestMasterId
+      - canRequestMasterId
+      - instanceId
+      - approveDate
+      - woDesc
+      - woStatus
+      - auctionHeaderId
+      - bidNumber
+      - itemType
+      - progressStatusCode
+      - inventoryItemId
+      - operationSeqNum
+      - attachment
+      - sscsAttachment
+      - currencyCode
+      - domesticUnitPrice
+      - ponStatus
+      - purchaser
+      - krPurchaser
+      count: 0
+      rows: []

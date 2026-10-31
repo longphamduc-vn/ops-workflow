@@ -1,0 +1,182 @@
+{
+  "id": "fixture.common.code.list",
+  "api_id": "common.code.list",
+  "match": {
+    "params": {
+      "statementName": "retrieveWoType:retrieveWoStatusType:retrieveSystemYesNo:retrieveActivitySource:retrieveActivityType:retrievePmCancelReason:retrievePmCancelDetailReason:retrieveNewWoOrg:",
+      "comboCnt": "8",
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_output0": {
+        "cols": [
+          "comCode",
+          "comCodeDesc",
+          "detailDesc"
+        ],
+        "count": 25,
+        "rows": [
+          [
+            "",
+            "-Select-",
+            ""
+          ]
+        ]
+      },
+      "ds_output1": {
+        "cols": [
+          "comCode",
+          "comCodeDesc",
+          "systemStatus"
+        ],
+        "count": 15,
+        "rows": [
+          [
+            "",
+            "-Select-",
+            ""
+          ]
+        ]
+      },
+      "ds_output2": {
+        "cols": [
+          "comCode",
+          "comCodeDesc"
+        ],
+        "count": 3,
+        "rows": [
+          [
+            "",
+            "-Select-"
+          ]
+        ]
+      },
+      "ds_output3": {
+        "cols": [
+          "comCode",
+          "comCodeDesc"
+        ],
+        "count": 4,
+        "rows": [
+          [
+            "",
+            "-Select-"
+          ]
+        ]
+      },
+      "ds_output4": {
+        "cols": [
+          "comCode",
+          "comCodeDesc",
+          "detailDesc"
+        ],
+        "count": 5,
+        "rows": [
+          [
+            "",
+            "-Select-",
+            ""
+          ]
+        ]
+      },
+      "ds_output5": {
+        "cols": [
+          "comCode",
+          "comCodeDesc"
+        ],
+        "count": 3,
+        "rows": [
+          [
+            "",
+            "-Select-"
+          ]
+        ]
+      },
+      "ds_output6": {
+        "cols": [
+          "comCode",
+          "comCodeDesc",
+          "data2Code",
+          "data3Code",
+          "data4Code",
+          "data5Code",
+          "attribute2",
+          "attribute3",
+          "attribute4",
+          "attribute5",
+          "field1Code",
+          "field2Code",
+          "field3Code",
+          "field4Code",
+          "field5Code",
+          "field6Code",
+          "field7Code",
+          "field8Code",
+          "field9Code",
+          "field10Code",
+          "field1Desc",
+          "field2Desc",
+          "field3Desc",
+          "field4Desc",
+          "field5Desc",
+          "field6Desc",
+          "field7Desc",
+          "field8Desc",
+          "field9Desc",
+          "field10Desc"
+        ],
+        "count": 16,
+        "rows": [
+          [
+            "",
+            "-Select-",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      "ds_output7": {
+        "cols": [
+          "comCode",
+          "comCodeDesc"
+        ],
+        "count": 1,
+        "rows": []
+      }
+    }
+  }
+}

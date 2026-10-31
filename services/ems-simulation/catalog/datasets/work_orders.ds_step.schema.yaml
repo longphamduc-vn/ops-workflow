@@ -1,0 +1,14 @@
+id: work_orders.ds_step.schema
+name: ds_step Dataset Schema
+version: 1.0.0
+columns:
+- name: x_return_status
+  type: string
+- name: xReturnFlag1
+  type: string
+- name: xReturnFlag2
+  type: string
+- name: xReturnFlag3
+  type: string
+- name: xReturnFlag4
+  type: string

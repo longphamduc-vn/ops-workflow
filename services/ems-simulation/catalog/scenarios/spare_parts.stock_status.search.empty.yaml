@@ -1,0 +1,54 @@
+id: spare_parts.stock_status.search.empty
+api_id: spare_parts.stock_status.search
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_result:
+      cols:
+      - itemName
+      - organizationId
+      - inventoryItemId
+      - itemDescription
+      - itemStatus
+      - uomCode
+      - maker
+      - catalogGroupName
+      - itemSpec
+      - model
+      - supplierId
+      - supplierName
+      - tqUserQty
+      - tqSafetyStockQty
+      - tqUserFlag
+      - disuseFlag
+      - publicFlag
+      - periodicFlag
+      - inventoryDepartmentCode
+      - stockDepartment
+      - itemTypeName
+      - onhandQuantity
+      - allocatedQuantity
+      - availableQuantity
+      - plannerCode
+      - unitPriceNew
+      - unitPriceReb
+      - unitPriceUnl
+      - fdmUrl
+      - fdmFlag
+      - timelyPurchaseDate
+      - repairRequestQty
+      - waitRepairQty
+      - itemToolTipText
+      - invToolTipText
+      - redFlag
+      - availableTransferQtyAll
+      - poOptTarget
+      count: 0
+      rows: []

@@ -21,5 +21,28 @@ services:
       timeout: 5s
       retries: 3
 
+  ems-simulation:
+    build:
+      context: ./services/ems-simulation
+      dockerfile: Dockerfile
+    container_name: ems-simulator
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - EMS_SIM_HOST=0.0.0.0
+      - EMS_SIM_PORT=9000
+      - EMS_SIM_DATABASE_URL=sqlite+aiosqlite:///ems_simulation.db
+      - EMS_SIM_LOG_LEVEL=INFO
+    volumes:
+      - ./services/ems-simulation/catalog:/app/catalog
+      - ems-sim-data:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
 volumes:
   opsflow-data:
+  ems-sim-data:

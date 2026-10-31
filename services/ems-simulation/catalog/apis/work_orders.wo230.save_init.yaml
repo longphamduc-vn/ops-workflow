@@ -1,0 +1,37 @@
+id: work_orders.wo230.save_init
+name: Work Order Save Init
+domain: work_orders
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsworkorder/wo20/wo230Nav/WO230WoSaveInit.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_info
+    schema: work_orders.ds_info.schema
+execution:
+  type: handler
+  handler: workorder.save_init
+  fixture_id: fixture.work_orders.wo230.save_init
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_init
+    schema: work_orders.ds_init.schema
+  - name: ds_oplist
+    schema: work_orders.ds_oplist.schema
+  - name: ds_mtlist
+    schema: work_orders.ds_mtlist.schema
+  - name: ds_poChangeFlag
+    schema: work_orders.ds_poChangeFlag.schema
+  - name: ds_poInfoFlag
+    schema: work_orders.ds_poInfoFlag.schema
+  - name: ds_spAttachFile
+    schema: work_orders.ds_spAttachFile.schema

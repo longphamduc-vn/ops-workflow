@@ -1,0 +1,29 @@
+id: spare_parts.estimate_request.list
+name: Estimate Request List
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp101/sp120Nav/RetEstimateRequestList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_Search
+    schema: spare_parts.ds_Search.schema
+  - name: ds_ItemInfo
+    schema: spare_parts.ds_ItemInfo.schema
+execution:
+  type: handler
+  handler: inventory.estimate_request_list
+  fixture_id: fixture.spare_parts.estimate_request.list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_list
+    schema: spare_parts.ds_list.schema

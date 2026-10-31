@@ -1,0 +1,48 @@
+id: spare_parts.ds_Item.schema
+name: ds_Item Dataset Schema
+version: 1.0.0
+columns:
+- name: item
+  type: string
+- name: description
+  type: string
+- name: uomCode
+  type: string
+- name: maker
+  type: string
+- name: catalogGroup
+  type: string
+- name: makerPart
+  type: string
+- name: onhandQuantity
+  type: string
+- name: allocatedQuantity
+  type: string
+- name: availableQuantity
+  type: string
+- name: vendorName
+  type: string
+- name: unitPricePo
+  type: string
+- name: unitPriceSp
+  type: string
+- name: unitPriceSpr
+  type: string
+- name: itemStatus
+  type: string
+- name: fdmUrl
+  type: string
+- name: stopPo
+  type: string
+- name: stopPoDesc
+  type: string
+- name: stopPoRequestor
+  type: string
+- name: implementedDate
+  type: string
+- name: alterItem
+  type: string
+- name: minOrderQty
+  type: string
+- name: waitRepairQty
+  type: string

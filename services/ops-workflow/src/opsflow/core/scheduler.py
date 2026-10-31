@@ -28,7 +28,22 @@ class WorkflowScheduler:
         step_factory: Callable[[str], Step] | None = None,
     ) -> None:
         self.workflow = workflow
-        self.connectors = connectors or {}
+        if connectors is not None:
+            self.connectors = connectors
+        else:
+            self.connectors = {}
+            if workflow.connectors:
+                from opsflow.connectors.registry import create_connector
+
+                for conn_name, conn_cfg in workflow.connectors.items():
+                    try:
+                        cfg_dict = conn_cfg.model_dump()
+                        c_type = cfg_dict.pop("type", "http")
+                        self.connectors[conn_name] = create_connector(
+                            c_type, name=conn_name, config=cfg_dict
+                        )
+                    except Exception:
+                        pass
         self.repository = repository
         self.max_concurrency = max_concurrency
         self.step_factory = step_factory or create_step
@@ -47,7 +62,12 @@ class WorkflowScheduler:
         """
         active_run_id = run_id or f"run_{uuid.uuid4().hex[:16]}"
         run_start_time = datetime.now(UTC)
-        effective_inputs = inputs or {}
+        effective_inputs: dict[str, Any] = {}
+        for inp_name, inp_cfg in self.workflow.inputs.items():
+            if inp_cfg.default is not None:
+                effective_inputs[inp_name] = inp_cfg.default
+        if inputs:
+            effective_inputs.update(inputs)
 
         # 1. Initialize context with connectors
         ctx = Context(

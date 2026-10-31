@@ -1,0 +1,108 @@
+id: stock_management.target_stock.search_335.empty
+api_id: stock_management.target_stock.search_335
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_StockInfomation:
+      cols:
+      - spRmi
+      - sprRmi
+      - spUrl
+      - sprUrl
+      - insertFlag
+      - item
+      - itemDescription
+      - model
+      - maker
+      - issueTeam
+      - itemCost
+      - issueFlag
+      - issueQty
+      - issueCount
+      - onhandQty
+      - targetQty
+      - optimizedLogicBmQty
+      - optimizedLogicQty
+      - optimizedLogicRpBmQty
+      - optimizedLogicRpQty
+      - orderBufDay
+      - orderBufBmDay
+      - orderBufRpDay
+      - orderBufRpBmDay
+      - logicQty
+      - userQty
+      - userQtyOrg
+      - targetApplyTypeCode
+      - targetApplyType
+      - oneTimeUserQty
+      - oneTimeUserQtyOrg
+      - oneTimeTeamCode
+      - oneTimeTeam
+      - disuseFlag
+      - disuseSprFlag
+      - minOrderQty
+      - manager
+      - publicFlag
+      - firstAssignFlag
+      - periodicFlag
+      - changeComment
+      - managerId
+      - fullLeadTime
+      - basisDays
+      - registFlag
+      - registDate
+      - uom
+      - amount
+      - fullLeadTimeFlag
+      - itemStatus
+      - creationDate
+      - lastUpdateDate
+      - lastUpdatedBy
+      - organizationId
+      - inventoryItemId
+      - safetryStockQty
+      - userFlag
+      - userFlagOrg
+      - managementContactName
+      - chk
+      - privFlag
+      - optimizeFlag
+      - safetyQty
+      - safetyQtyOrg
+      - userCheckFlag
+      - requestorName
+      - partsUseTypeCode
+      - purchaseRequisitionQty
+      - oneTimeSpStatus
+      - repairRequestQtyOrg
+      - repairRequestQty
+      - oneTimeSprStatus
+      - repairTransferFlag
+      - dueDays
+      - dueBasisDays
+      - interlockFlag
+      - targetDept
+      - targetDeptDesc
+      - outputQuantity
+      - alarmBasisQty
+      - alarmFlag
+      - minFlag
+      - userEnteredFlag
+      - bufferStockFlag
+      - holdReasonContent
+      - repairTypeShortName
+      - inventoryQty
+      - orgCode
+      - excludeFlag
+      - exceptionTypeName
+      - exceptionFlag
+      - exceptionReasonDesc
+      count: 0
+      rows: []

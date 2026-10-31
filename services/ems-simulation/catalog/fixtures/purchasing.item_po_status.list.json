@@ -1,0 +1,58 @@
+{
+  "id": "fixture.purchasing.item_po_status.list",
+  "api_id": "purchasing.item_po_status.list",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_Rtn": {
+        "cols": [
+          "item",
+          "disuseInventoryFlag",
+          "inventoryItemStatusCode",
+          "agingInterlockFlag",
+          "unitPriceStatusCode",
+          "buyerId",
+          "unitPriceFlag",
+          "stopPoFlag",
+          "transferQty",
+          "transferFlag",
+          "applyFlag",
+          "waitRepairQty",
+          "waitRepairFlag",
+          "poOptTargetFlag",
+          "qltyMgtTargetFlag"
+        ],
+        "count": 12,
+        "rows": [
+          [
+            "QDAB03583",
+            "Y",
+            "Active",
+            "N",
+            "UP004",
+            "1403074",
+            "N",
+            "N",
+            "1",
+            "Y",
+            "N",
+            "0",
+            "N",
+            "N",
+            "N"
+          ]
+        ]
+      }
+    }
+  }
+}

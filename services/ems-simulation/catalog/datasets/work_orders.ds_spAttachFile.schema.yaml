@@ -1,0 +1,6 @@
+id: work_orders.ds_spAttachFile.schema
+name: ds_spAttachFile Dataset Schema
+version: 1.0.0
+columns:
+- name: attachFileCnt
+  type: string

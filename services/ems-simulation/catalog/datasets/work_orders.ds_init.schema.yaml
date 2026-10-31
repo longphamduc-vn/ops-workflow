@@ -1,0 +1,20 @@
+id: work_orders.ds_init.schema
+name: ds_init Dataset Schema
+version: 1.0.0
+columns:
+- name: safetyFlag
+  type: string
+- name: emrgIssueFlag
+  type: string
+- name: useAllocationFlag
+  type: string
+- name: useQCodeFlag
+  type: string
+- name: checkMessage
+  type: string
+- name: activityTotManCnt
+  type: string
+- name: wipEntityId
+  type: string
+- name: organizationId
+  type: string

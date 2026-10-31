@@ -1,0 +1,72 @@
+id: purchasing.item.popup_retrieve.empty
+api_id: purchasing.item.popup_retrieve
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_List:
+      cols:
+      - uniqueNo
+      - itemType
+      - item
+      - itemDescription
+      - primaryUomCode
+      - itemCost
+      - buyerName
+      - itemStatus
+      - catalogGroup
+      - specification
+      - unificationFlag
+      - poOwnership
+      - rebSnFlag
+      - buyItemType
+      - buyItemTypeCode
+      - inventoryItemId
+      - organizationId
+      - buyerId
+      - onhandQuantity
+      - availableQuantity
+      - commonFlag
+      - chkFlag
+      - timelyPurchaseDate
+      - onhandQty
+      - poWaitingQty
+      - waitRepairQty
+      - availableTransferQtyAll
+      - poInterlockFlag
+      - notReceivingQty
+      - poOptTargetFlag
+      - orgMaskCnt
+      - waitRepairFlag
+      - qltyMgtTargetFlag
+      - poType
+      - poTypeCode
+      - itemCategoryCode
+      - itemCategoryDesc
+      - itemCatalogGroupId
+      - modelName
+      - makerName
+      count: 0
+      rows: []
+    ds_Search:
+      cols:
+      - item
+      - itemDescription
+      - makerPart
+      - itemType
+      - exceptionType
+      - itemCategoryId
+      - maker
+      - organizationId
+      - enabledFlag
+      - issuePartsInvId
+      - itemExclType
+      - raeFlag
+      count: 0
+      rows: []

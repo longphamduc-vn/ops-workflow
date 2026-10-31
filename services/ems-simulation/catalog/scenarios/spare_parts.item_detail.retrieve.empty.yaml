@@ -1,0 +1,87 @@
+id: spare_parts.item_detail.retrieve.empty
+api_id: spare_parts.item_detail.retrieve
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_Item:
+      cols:
+      - item
+      - description
+      - uomCode
+      - maker
+      - catalogGroup
+      - makerPart
+      - onhandQuantity
+      - allocatedQuantity
+      - availableQuantity
+      - vendorName
+      - unitPricePo
+      - unitPriceSp
+      - unitPriceSpr
+      - itemStatus
+      - fdmUrl
+      - stopPo
+      - stopPoDesc
+      - stopPoRequestor
+      - implementedDate
+      - alterItem
+      - minOrderQty
+      - waitRepairQty
+      count: 0
+      rows: []
+    ds_Inv:
+      cols:
+      - buyItemType
+      - priceRegStatus
+      - reviewQty
+      - targetQty
+      - logicQty
+      - userQty
+      - safetyStockQty
+      - userFlag
+      - requestQty
+      - poWaitingQty
+      - notReceivingQty
+      - overFlag
+      - overQty
+      - onhandQty
+      - otherSiteOnHandQty
+      - disuseFlag
+      - mtbfDay
+      - fullLeadTimeNew
+      - optimizedLogicBmQty
+      - optimizedLogicQty
+      - oneTimeUserQty
+      - oneTimeTeamCode
+      - oneTimeTeam
+      - targetApplyTypeCode
+      - targetApplyType
+      - type
+      - requestDate
+      - userCheckFlag
+      - repairTransferFlag
+      - oneTimeSpStatus
+      - repairRequestQty
+      - oneTimeSprStatus
+      - holdReasonContent
+      count: 0
+      rows: []
+    ds_Summary:
+      cols:
+      - monthAvgUsage2y
+      - monthAvgUsage1y
+      - monthAvgUsage3m
+      - lastMonthIssueQty
+      - thisMonthIssueQty
+      - onceAvgIssueQty
+      - onceMaxIssueQty
+      - onceMinIssueQty
+      count: 0
+      rows: []

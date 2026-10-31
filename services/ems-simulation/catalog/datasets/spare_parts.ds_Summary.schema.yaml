@@ -1,0 +1,20 @@
+id: spare_parts.ds_Summary.schema
+name: ds_Summary Dataset Schema
+version: 1.0.0
+columns:
+- name: monthAvgUsage2y
+  type: string
+- name: monthAvgUsage1y
+  type: string
+- name: monthAvgUsage3m
+  type: string
+- name: lastMonthIssueQty
+  type: string
+- name: thisMonthIssueQty
+  type: string
+- name: onceAvgIssueQty
+  type: string
+- name: onceMaxIssueQty
+  type: string
+- name: onceMinIssueQty
+  type: string

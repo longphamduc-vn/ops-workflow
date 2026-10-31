@@ -1,0 +1,172 @@
+{
+  "id": "fixture.spare_parts.item_detail.retrieve",
+  "api_id": "spare_parts.item_detail.retrieve",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_Item": {
+        "cols": [
+          "item",
+          "description",
+          "uomCode",
+          "maker",
+          "catalogGroup",
+          "makerPart",
+          "onhandQuantity",
+          "allocatedQuantity",
+          "availableQuantity",
+          "vendorName",
+          "unitPricePo",
+          "unitPriceSp",
+          "unitPriceSpr",
+          "itemStatus",
+          "fdmUrl",
+          "stopPo",
+          "stopPoDesc",
+          "stopPoRequestor",
+          "implementedDate",
+          "alterItem",
+          "minOrderQty",
+          "waitRepairQty"
+        ],
+        "count": 1,
+        "rows": [
+          [
+            "QCAB10960",
+            "LM Guide(Set) ** SR15W2UUMF+1300LMF",
+            "THK CO.",
+            "LTD",
+            "Block Size:M24*W34*L57*K18.2",
+            "Seal Symbol:UU",
+            "A Species Of Preload Pressure:NORMAL",
+            "Precision Mark Of Classification:NORMAL",
+            "The Number Of Shaft:",
+            "Special Specification:",
+            "Free Combination:",
+            "",
+            "EA",
+            "THK CO.",
+            "LTD",
+            "Q4.LM Guide(Set)",
+            "SR15W2UUMF+1300LMF",
+            "0",
+            "0",
+            "0",
+            "",
+            "",
+            "0",
+            "0",
+            "StopPO",
+            "http://fdm.lgdisplay.com:8008/Windchill/extcore/jsp/lgdfdm/drawing/qcodeDrawing.jsp?oid=VR:wt.part.WTPart:3680021",
+            "Unused code for 2 years",
+            "",
+            "****",
+            "20180125051113000",
+            "",
+            "",
+            "0"
+          ]
+        ]
+      },
+      "ds_Inv": {
+        "cols": [
+          "buyItemType",
+          "priceRegStatus",
+          "reviewQty",
+          "targetQty",
+          "logicQty",
+          "userQty",
+          "safetyStockQty",
+          "userFlag",
+          "requestQty",
+          "poWaitingQty",
+          "notReceivingQty",
+          "overFlag",
+          "overQty",
+          "onhandQty",
+          "otherSiteOnHandQty",
+          "disuseFlag",
+          "mtbfDay",
+          "fullLeadTimeNew",
+          "optimizedLogicBmQty",
+          "optimizedLogicQty",
+          "oneTimeUserQty",
+          "oneTimeTeamCode",
+          "oneTimeTeam",
+          "targetApplyTypeCode",
+          "targetApplyType",
+          "type",
+          "requestDate",
+          "userCheckFlag",
+          "repairTransferFlag",
+          "oneTimeSpStatus",
+          "repairRequestQty",
+          "oneTimeSprStatus",
+          "holdReasonContent"
+        ],
+        "count": 1,
+        "rows": [
+          [
+            "Invidual Management",
+            "None Price",
+            "",
+            "0",
+            "0",
+            "0",
+            "0",
+            "N",
+            "",
+            "0",
+            "0",
+            "N",
+            "0",
+            "0",
+            "1",
+            "N",
+            "0",
+            "50",
+            "1",
+            "1",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Current",
+            "2026-10-31 13:44",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      "ds_Summary": {
+        "cols": [
+          "monthAvgUsage2y",
+          "monthAvgUsage1y",
+          "monthAvgUsage3m",
+          "lastMonthIssueQty",
+          "thisMonthIssueQty",
+          "onceAvgIssueQty",
+          "onceMaxIssueQty",
+          "onceMinIssueQty"
+        ],
+        "count": 1,
+        "rows": []
+      }
+    }
+  }
+}

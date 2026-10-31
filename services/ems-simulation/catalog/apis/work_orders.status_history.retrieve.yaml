@@ -1,0 +1,29 @@
+id: work_orders.status_history.retrieve
+name: Retrieve Work Order Status History
+domain: work_orders
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsworkorder/wo50/wo580Nav/statusHistory.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_info
+    schema: work_orders.ds_info.schema
+execution:
+  type: handler
+  handler: workorder.status_history
+  fixture_id: fixture.work_orders.status_history.retrieve
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_list
+    schema: work_orders.ds_list.schema
+  - name: ds_input
+    schema: work_orders.ds_input.schema

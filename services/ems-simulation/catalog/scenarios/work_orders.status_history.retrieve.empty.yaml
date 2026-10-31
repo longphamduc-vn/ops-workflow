@@ -1,0 +1,34 @@
+id: work_orders.status_history.retrieve.empty
+api_id: work_orders.status_history.retrieve
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_list:
+      cols:
+      - wipEntityId
+      - historyId
+      - organizationId
+      - commentText
+      - createdBy
+      - creationDate
+      - lastUpdatedBy
+      - lastUpdateDate
+      - lastUpdateLogin
+      - pendingFlag
+      - status
+      - lastUpdatedByName
+      - fileCnt
+      count: 0
+      rows: []
+    ds_input:
+      cols:
+      - historyId
+      count: 0
+      rows: []

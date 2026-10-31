@@ -1,0 +1,200 @@
+{
+  "organizations": [
+    {
+      "id": "28753",
+      "code": "A13",
+      "name": "Display Module Plant 1",
+      "description": "Main EMS Organization"
+    }
+  ],
+  "users": [
+    {
+      "id": "658359",
+      "username": "ops_user",
+      "name": "Pham Duc Long",
+      "language": "EN",
+      "organizationId": "28753"
+    }
+  ],
+  "items": [
+    {
+      "item": "QCAB10960",
+      "itemDescription": "LM Guide(Set) ** SR15W2UUMF+1300LMF",
+      "maker": "Block Size:M24*W34*L57*K18.2",
+      "model": "Precision Mark Of Classification:NORMAL",
+      "inventoryItemId": "387152",
+      "organizationId": "28753",
+      "uom": "LTD",
+      "status": "THK CO."
+    },
+    {
+      "item": "QDAA48611",
+      "itemDescription": "Cable Duct ** SL-022-55R-B92-1694L",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "[QDAA48611][PRE-RFQ]RFQ",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC13053",
+      "itemDescription": "Hose/Tube ** TU0604BU3-100",
+      "maker": "Diameter:6㎜",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SMC CORPORATION",
+      "status": "0"
+    },
+    {
+      "item": "QCAC33821",
+      "itemDescription": "Signal Cable ** HW0471485-A",
+      "maker": "Cross Section Diameter:20㎜",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "YASKAWA ELECTRIC CORPORATION",
+      "status": "0"
+    },
+    {
+      "item": "QCAD51163",
+      "itemDescription": "Pneumatic Cylinder ** CDQ2YA32-30DCM",
+      "maker": "Inner Diameter:32㎜",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SMC CORPORATION",
+      "status": "Q4.Pneumatic Cylinder"
+    },
+    {
+      "item": "QDAA00769",
+      "itemDescription": "Signal Cable ** C-M8-REGL-11M-H-TOP",
+      "maker": "LTD",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "TOP ENGINEERING CO.",
+      "status": "C-M8-REGL-11M-H-TOP"
+    },
+    {
+      "item": "QDAA01447",
+      "itemDescription": "Signal Cable ** SWY-CKI01-15",
+      "maker": "LTD",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SAMWON ACT CO.",
+      "status": "SWY-CKI01-15"
+    },
+    {
+      "item": "QDAA01841",
+      "itemDescription": "Signal Cable ** SD787C-TP-4*2*0.25-1M",
+      "maker": "Cross Section Diameter:6.4㎜",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SAB BROCKSKES GMBH & CO.KG",
+      "status": "0"
+    },
+    {
+      "item": "QDAA02080",
+      "itemDescription": "Signal Cable ** SWM-PWS1CBL5M-A1-L",
+      "maker": "LTD",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SAMWON ACT CO.",
+      "status": "SWM-PWS1CBL5M-A1-L"
+    },
+    {
+      "item": "QDAA03297",
+      "itemDescription": "Signal Cable ** CB-A07",
+      "maker": "Cross Section Diameter:7㎜",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "KEYENCE CORPORATION",
+      "status": "0"
+    },
+    {
+      "item": "QDAB03583",
+      "itemDescription": "Sensor Accessory ** CN-73-C2",
+      "maker": "Feature:SQUARE",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "PANASONIC CORPORATION",
+      "status": "0"
+    },
+    {
+      "item": "QDAB04332",
+      "itemDescription": "Flow Sensor/Flow Switch ** PF2W511-10-1",
+      "maker": "Detection Method:KALMAN VORTEX",
+      "model": "",
+      "inventoryItemId": "",
+      "organizationId": "28753",
+      "uom": "SMC CORPORATION",
+      "status": "PF2W511-10-1"
+    }
+  ],
+  "wip_entities": [
+    {
+      "wipEntityId": "337389615",
+      "wipEntityName": "WO-249191255",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337389616",
+      "wipEntityName": "WO-249191256",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "336644278",
+      "wipEntityName": "WO-248616126",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337389617",
+      "wipEntityName": "WO-249191257",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "327182461",
+      "wipEntityName": "WO-241460083",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "325783682",
+      "wipEntityName": "WO-240378572",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "262871989",
+      "wipEntityName": "WO-198345359",
+      "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    }
+  ],
+  "common_codes": {}
+}

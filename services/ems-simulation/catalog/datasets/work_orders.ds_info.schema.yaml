@@ -1,0 +1,14 @@
+id: work_orders.ds_info.schema
+name: ds_info Dataset Schema
+version: 1.0.0
+columns:
+- name: wipEntityId
+  type: string
+- name: organizationId
+  type: string
+- name: userId
+  type: string
+- name: txnType
+  type: string
+- name: command
+  type: string

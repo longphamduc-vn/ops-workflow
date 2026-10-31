@@ -1,0 +1,98 @@
+{
+  "id": "fixture.purchasing.item.popup_retrieve",
+  "api_id": "purchasing.item.popup_retrieve",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_List": {
+        "cols": [
+          "uniqueNo",
+          "itemType",
+          "item",
+          "itemDescription",
+          "primaryUomCode",
+          "itemCost",
+          "buyerName",
+          "itemStatus",
+          "catalogGroup",
+          "specification",
+          "unificationFlag",
+          "poOwnership",
+          "rebSnFlag",
+          "buyItemType",
+          "buyItemTypeCode",
+          "inventoryItemId",
+          "organizationId",
+          "buyerId",
+          "onhandQuantity",
+          "availableQuantity",
+          "commonFlag",
+          "chkFlag",
+          "timelyPurchaseDate",
+          "onhandQty",
+          "poWaitingQty",
+          "waitRepairQty",
+          "availableTransferQtyAll",
+          "poInterlockFlag",
+          "notReceivingQty",
+          "poOptTargetFlag",
+          "orgMaskCnt",
+          "waitRepairFlag",
+          "qltyMgtTargetFlag",
+          "poType",
+          "poTypeCode",
+          "itemCategoryCode",
+          "itemCategoryDesc",
+          "itemCatalogGroupId",
+          "modelName",
+          "makerName"
+        ],
+        "count": 1,
+        "rows": []
+      },
+      "ds_Search": {
+        "cols": [
+          "item",
+          "itemDescription",
+          "makerPart",
+          "itemType",
+          "exceptionType",
+          "itemCategoryId",
+          "maker",
+          "organizationId",
+          "enabledFlag",
+          "issuePartsInvId",
+          "itemExclType",
+          "raeFlag"
+        ],
+        "count": 1,
+        "rows": [
+          [
+            "QDAB04332",
+            "",
+            "",
+            "Q",
+            "",
+            "",
+            "",
+            "28753",
+            "Y",
+            "",
+            "",
+            ""
+          ]
+        ]
+      }
+    }
+  }
+}

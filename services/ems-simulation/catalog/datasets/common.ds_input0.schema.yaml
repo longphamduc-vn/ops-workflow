@@ -1,0 +1,28 @@
+id: common.ds_input0.schema
+name: ds_input0 Dataset Schema
+version: 1.0.0
+columns:
+- name: item
+  type: string
+- name: itemDescription
+  type: string
+- name: makerPart
+  type: string
+- name: itemType
+  type: string
+- name: exceptionType
+  type: string
+- name: itemCategoryId
+  type: string
+- name: maker
+  type: string
+- name: organizationId
+  type: string
+- name: enabledFlag
+  type: string
+- name: issuePartsInvId
+  type: string
+- name: itemExclType
+  type: string
+- name: raeFlag
+  type: string

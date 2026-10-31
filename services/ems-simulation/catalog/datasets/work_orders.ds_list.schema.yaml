@@ -1,0 +1,30 @@
+id: work_orders.ds_list.schema
+name: ds_list Dataset Schema
+version: 1.0.0
+columns:
+- name: wipEntityId
+  type: string
+- name: historyId
+  type: string
+- name: organizationId
+  type: string
+- name: commentText
+  type: string
+- name: createdBy
+  type: string
+- name: creationDate
+  type: string
+- name: lastUpdatedBy
+  type: string
+- name: lastUpdateDate
+  type: string
+- name: lastUpdateLogin
+  type: string
+- name: pendingFlag
+  type: string
+- name: status
+  type: string
+- name: lastUpdatedByName
+  type: string
+- name: fileCnt
+  type: string

@@ -1,0 +1,27 @@
+id: purchasing.item_po_status.list
+name: Retrieve Item PO Status List
+domain: purchasing
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emscom/popupNav/retrieveItemPoStatusList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_Search
+    schema: purchasing.ds_Search.schema
+execution:
+  type: handler
+  handler: popup.retrieve_item_po_status
+  fixture_id: fixture.purchasing.item_po_status.list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_Rtn
+    schema: purchasing.ds_Rtn.schema

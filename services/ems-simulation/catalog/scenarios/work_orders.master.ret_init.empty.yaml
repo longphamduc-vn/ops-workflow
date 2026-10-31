@@ -1,0 +1,158 @@
+id: work_orders.master.ret_init.empty
+api_id: work_orders.master.ret_init
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_wo:
+      cols:
+      - workOrderType
+      - woTypeName
+      - workOrderTypeBef
+      - assetType
+      - description
+      - organizationId
+      - assetGroupId
+      - assetGroup
+      - equipGrpDesc
+      - assetNumber
+      - activityType
+      - activityCause
+      - scheduledStartDate
+      - scheduledCompletionDate
+      - requestNumber
+      - owningDepartment
+      - owningDepartmentId
+      - priority
+      - duration
+      - assetActivity
+      - assetActivityId
+      - projectNumber
+      - taskNumber
+      - statusType
+      - wipEntityId
+      - wipEntityName
+      - parentWipEntityId
+      - parentWorkOrder
+      - firm
+      - materialIssueByMo
+      - activitySource
+      - activitySourceBef
+      - shutdownType
+      - requestType
+      - statusTypeDisp
+      - maintenanceObjectId
+      - serialNumberControlCode
+      - pending
+      - warrantyStatus
+      - workflowType
+      - warrantyActive
+      - warrantyExpnDate
+      - classCode
+      - instanceNumber
+      - locationOrg
+      - projectId
+      - taskId
+      - systemStatus
+      - dateReleased
+      - manualRebuildFlag
+      - requestedStartDate
+      - dueDate
+      - instanceId
+      - prevAssetActivityId
+      - prevParentWipEntityId
+      - prevSystemStatus
+      - maintenanceObjectType
+      - materialShortageCode
+      - materialShortageCheckDate
+      - creationDate
+      - dsScheduledFlag
+      - projectControlLevel
+      - actualTotalCost
+      - estimatedTotalCost
+      - attributeCategory
+      - attribute1
+      - attribute2
+      - attribute3
+      - attribute4
+      - attribute5
+      - attribute6
+      - attribute7
+      - attribute8
+      - attribute9
+      - attribute10
+      - attribute11
+      - attribute12
+      - attribute13
+      - attribute14
+      - attribute15
+      - pmSuggestedStartDate
+      - pmSuggestedEndDate
+      - dateCompleted
+      - deptDescription
+      - scheduleName
+      - userName
+      - createByUserName
+      - tagoutRequired
+      - notificationRequired
+      - planMaintenance
+      - networkFlag
+      - deptChangeAllowed
+      - estimateNumber
+      - estimateId
+      - showEstimate
+      - actualStartDate
+      - dffAttribute3
+      - budgetDeptDesc
+      - schedulingDeptCode
+      - schedulingDeptDesc
+      - emrgActionNo
+      - wacDescription
+      - planStartDate
+      - planEndDate
+      - dffAttribute20
+      - dffAttribute21
+      - dffAttribute22
+      - maintMailCnt
+      - activityTotManCnt
+      - emNoDesc
+      - woStep
+      - txnType
+      - reqPoChgFlag
+      - constYn
+      - envConstructNo
+      - befScheduledStartDate
+      - befScheduledCompletionDate
+      - emrgIssueFlag
+      - albId
+      - plant
+      - lineCode
+      - dffAttribute4
+      - dffAttribute5
+      - projectName
+      - productGroupName
+      - projectDesc
+      - productGroupDesc
+      - ctoCnt
+      count: 0
+      rows: []
+    ds_step:
+      cols:
+      - x_return_status
+      - xReturnFlag1
+      - xReturnFlag2
+      - xReturnFlag3
+      - xReturnFlag4
+      count: 0
+      rows: []
+    ds_spAttachFile:
+      cols:
+      - attachFileCnt
+      count: 0
+      rows: []

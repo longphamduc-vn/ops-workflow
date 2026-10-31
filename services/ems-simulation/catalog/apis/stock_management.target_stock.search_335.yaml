@@ -1,0 +1,29 @@
+id: stock_management.target_stock.search_335
+name: Target Stock Search List (sp335)
+domain: stock_management
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: stock_management.ds_search.schema
+  - name: ds_ItemInfo
+    schema: stock_management.ds_ItemInfo.schema
+execution:
+  type: handler
+  handler: inventory.target_stock_search
+  fixture_id: fixture.stock_management.target_stock.search_335
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_StockInfomation
+    schema: stock_management.ds_StockInfomation.schema

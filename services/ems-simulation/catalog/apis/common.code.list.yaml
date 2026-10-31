@@ -1,0 +1,28 @@
+id: common.code.list
+name: Retrieve Common Code List
+domain: common
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emscom/codeNav/retComCodeList.lgdn
+request:
+  params:
+  - statementName
+  - comboCnt
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_input0
+    schema: common.ds_input0.schema
+execution:
+  type: handler
+  handler: common.com_code_list
+  fixture_id: fixture.common.code.list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_output0
+    schema: common.ds_output0.schema

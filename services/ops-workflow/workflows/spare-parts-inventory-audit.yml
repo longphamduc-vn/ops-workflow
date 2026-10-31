@@ -1,0 +1,149 @@
+version: "1.0"
+name: spare-parts-inventory-audit
+description: End-to-end audit of spare parts stock, inventory details enrichment, low-stock alerting, and read-model publication
+
+connectors:
+  ems:
+    type: nexacro
+    base_url: http://localhost:9000
+    format: xml
+    allowed_services:
+      - /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+      - /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+    limits:
+      max_concurrent: 3
+      min_interval: 100ms
+
+trigger:
+  type: cron
+  cron: "0 */4 * * *"
+  timezone: Asia/Ho_Chi_Minh
+
+inputs:
+  organization_id:
+    type: string
+    default: "28753"
+    description: Target EMS Organization Unit ID
+  alert_channel:
+    type: string
+    default: "#ops-alerts"
+    description: Notification destination channel
+
+env:
+  AUDIT_CATEGORY: "CRITICAL_SPARE_PARTS"
+  SYSTEM_SOURCE: "EMS_NEXACRO"
+
+defaults:
+  timeout: 30s
+  retry:
+    max_attempts: 3
+    backoff: exponential
+    delay: 1s
+    on: [timeout, network]
+
+steps:
+  - id: list_stock
+    type: call
+    with:
+      connector: ems
+      operation: /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+      params:
+        _ems_userId: "658359"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "EN"
+      in_datasets:
+        ds_search:
+          - organizationId: "${inputs.organization_id}"
+      out_datasets:
+        - ds_result
+    outputs:
+      items: "$.ds_result"
+
+  - id: normalize_stock
+    type: transform
+    needs: [list_stock]
+    with:
+      engine: jmespath
+      input: "${steps.list_stock.outputs.items}"
+      expression: |
+        [].{
+          item_code: itemName,
+          description: itemDescription,
+          inventory_item_id: inventoryItemId,
+          available_qty: availableQuantity,
+          uom: uomCode
+        }
+
+  - id: get_item_details
+    type: foreach
+    needs: [list_stock]
+    with:
+      items: "${steps.list_stock.outputs.items}"
+      concurrency: 3
+      on_item_error: skip
+      step:
+        type: call
+        with:
+          connector: ems
+          operation: /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+          params:
+            _ems_userId: "658359"
+            _ems_organizationId: "${inputs.organization_id}"
+          in_datasets:
+            ds_Input:
+              - organizationId: "${inputs.organization_id}"
+                inventoryItemId: "${item.inventoryItemId}"
+          out_datasets:
+            - ds_Item
+            - ds_Inv
+            - ds_Summary
+
+  - id: extract_details
+    type: transform
+    needs: [get_item_details]
+    with:
+      engine: jmespath
+      input: "${steps.get_item_details.outputs}"
+      expression: |
+        [].{
+          item_code: ds_Item[0].item,
+          model: ds_Item[0].model,
+          maker: ds_Item[0].maker,
+          target_qty: ds_Inv[0].targetQty,
+          stock_qty: ds_Inv[0].onhandQty,
+          month_avg_usage: ds_Summary[0].monthAvgUsage1y,
+          status: ds_Item[0].status
+        }
+
+  - id: merge_audit_records
+    type: join
+    needs: [normalize_stock, extract_details]
+    with:
+      left: "${steps.normalize_stock.outputs}"
+      right: "${steps.extract_details.outputs}"
+      on: item_code
+      how: left
+
+  - id: save_audit_database
+    type: db_upsert
+    needs: [merge_audit_records]
+    with:
+      table: spare_parts_audit
+      key: [item_code]
+      rows: "${steps.merge_audit_records.outputs}"
+
+  - id: send_summary_alert
+    type: notify
+    needs: [save_audit_database]
+    with:
+      channel: "${inputs.alert_channel}"
+      message: "Spare parts audit completed for organization ${inputs.organization_id}."
+
+on_error:
+  strategy: continue
+
+publish:
+  dataset: spare_parts_audit_dataset
+  source: "${steps.merge_audit_records.outputs}"
+  event: spare_parts.audit.completed
+

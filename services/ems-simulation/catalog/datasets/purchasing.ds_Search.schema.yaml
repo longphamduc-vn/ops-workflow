@@ -1,0 +1,14 @@
+id: purchasing.ds_Search.schema
+name: ds_Search Dataset Schema
+version: 1.0.0
+columns:
+- name: inventoryItemId
+  type: string
+- name: organizationId
+  type: string
+- name: enabledFlag
+  type: string
+- name: alternatePartNo
+  type: string
+- name: invItemList
+  type: string

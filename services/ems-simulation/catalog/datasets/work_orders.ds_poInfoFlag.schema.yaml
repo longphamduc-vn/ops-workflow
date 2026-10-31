@@ -1,0 +1,6 @@
+id: work_orders.ds_poInfoFlag.schema
+name: ds_poInfoFlag Dataset Schema
+version: 1.0.0
+columns:
+- name: poInfoFlag
+  type: string

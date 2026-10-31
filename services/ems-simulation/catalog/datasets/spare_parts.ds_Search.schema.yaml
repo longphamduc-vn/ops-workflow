@@ -1,0 +1,42 @@
+id: spare_parts.ds_Search.schema
+name: ds_Search Dataset Schema
+version: 1.0.0
+columns:
+- name: organizationId
+  type: string
+- name: wipEntityName
+  type: string
+- name: itemType
+  type: string
+- name: budgetDept
+  type: string
+- name: estimateStatus
+  type: string
+- name: requestorName
+  type: string
+- name: requestorUserId
+  type: string
+- name: supplier
+  type: string
+- name: estimateRequestDateFrom
+  type: string
+- name: estimateRequestDateTo
+  type: string
+- name: prvNo
+  type: string
+- name: budgetDeptName
+  type: string
+- name: vendorName
+  type: string
+- name: userId
+  type: string
+- name: itemYn
+  type: string
+- name: requestMasterId
+  type: string
+- name: wipEntityId
+  type: string
+- name: budgetDepartmentCode
+  type: string
+- name: vendorId
+  type: string

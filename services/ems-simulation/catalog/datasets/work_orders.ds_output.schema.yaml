@@ -1,0 +1,16 @@
+id: work_orders.ds_output.schema
+name: ds_output Dataset Schema
+version: 1.0.0
+columns:
+- name: wipEntityName
+  type: string
+- name: wipEntityId
+  type: string
+- name: workOrderType
+  type: string
+- name: workOrderTypeDesc
+  type: string
+- name: userDefinedStatusId
+  type: string
+- name: statusTypeDisp
+  type: string

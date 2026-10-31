@@ -1,0 +1,31 @@
+id: purchasing.item_po_status.list.empty
+api_id: purchasing.item_po_status.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_Rtn:
+      cols:
+      - item
+      - disuseInventoryFlag
+      - inventoryItemStatusCode
+      - agingInterlockFlag
+      - unitPriceStatusCode
+      - buyerId
+      - unitPriceFlag
+      - stopPoFlag
+      - transferQty
+      - transferFlag
+      - applyFlag
+      - waitRepairQty
+      - waitRepairFlag
+      - poOptTargetFlag
+      - qltyMgtTargetFlag
+      count: 0
+      rows: []

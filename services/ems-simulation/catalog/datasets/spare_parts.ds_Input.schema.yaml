@@ -1,0 +1,14 @@
+id: spare_parts.ds_Input.schema
+name: ds_Input Dataset Schema
+version: 1.0.0
+columns:
+- name: organizationId
+  type: string
+- name: inventoryItemId
+  type: string
+- name: requestCode
+  type: string
+- name: requestMasterId
+  type: string
+- name: rcodeItemId
+  type: string

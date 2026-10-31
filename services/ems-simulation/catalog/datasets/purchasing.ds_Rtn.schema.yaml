@@ -1,0 +1,34 @@
+id: purchasing.ds_Rtn.schema
+name: ds_Rtn Dataset Schema
+version: 1.0.0
+columns:
+- name: item
+  type: string
+- name: disuseInventoryFlag
+  type: string
+- name: inventoryItemStatusCode
+  type: string
+- name: agingInterlockFlag
+  type: string
+- name: unitPriceStatusCode
+  type: string
+- name: buyerId
+  type: string
+- name: unitPriceFlag
+  type: string
+- name: stopPoFlag
+  type: string
+- name: transferQty
+  type: string
+- name: transferFlag
+  type: string
+- name: applyFlag
+  type: string
+- name: waitRepairQty
+  type: string
+- name: waitRepairFlag
+  type: string
+- name: poOptTargetFlag
+  type: string
+- name: qltyMgtTargetFlag
+  type: string
