@@ -1,0 +1,25 @@
+services:
+  ops-workflow:
+    build:
+      context: ./services/ops-workflow
+      dockerfile: Dockerfile
+    container_name: opsflow-engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///opsflow.db
+      - WORKFLOWS_DIR=workflows
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./services/ops-workflow/workflows:/app/workflows
+      - ./services/ops-workflow/config:/app/config
+      - opsflow-data:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  opsflow-data:
