@@ -179,3 +179,4 @@ echo   requests.bat ems-health          Check EMS simulator health
 echo   requests.bat ems-logs [n]        View EMS simulator audit logs
 echo ==============================================================================
 goto :eof
+
