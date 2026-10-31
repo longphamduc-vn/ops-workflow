@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "opsflow"
 version = "0.1.0"
-description = "Generic workflow engine for operational automations and legacy EMS integration"
+description = "Component 1: Core Workflow & Integration Engine of the Operations Management System (ops-workflow)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Proprietary" }

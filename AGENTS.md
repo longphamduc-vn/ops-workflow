@@ -7,18 +7,24 @@
 
 ## 1. Context and goals
 
+- **System Role**: This project (`ops-workflow`, CLI/package `opsflow`) is **Component 1 (Core Workflow & Integration Engine)** of the overall Operations Management System.
 - The organization runs a legacy **EMS** whose UI is built on **Nexacro**. **We have no database access and cannot modify the EMS.**
 - Looking up a single piece of information in the EMS requires many manual steps and data transformations.
-- Goal: build a **parallel operations system** whose core is a **YAML-configured Workflow Engine**. The engine calls the EMS from the outside (replaying its HTTP requests), transforms the data, stores it in our own database, and raises alerts and reports.
-- The engine must be **generic**: other systems (REST, SQL, files, SOAP, ...) are added later by writing a new connector, **without changing the core**.
-- This is a **standalone, independently deployable service**. Other projects use it through a versioned API (see section 8), never by importing its internals or reading its database.
+- **Component 1 Goal**: Serve as the resilient operations backbone and ETL integration layer. The engine calls the legacy EMS and external systems from the outside (replaying authenticated HTTP/Nexacro sessions), executes robust DAG pipelines, normalizes data, maintains high-performance read-model datasets, and triggers alerts/webhooks.
+- **Ecosystem Architecture**:
+  - **Component 1 (`ops-workflow`)**: Core Workflow & Integration Engine (this service).
+  - **Component 2 (Operations Web Portal / Dashboard)**: Consumes Component 1's REST API and published read models to provide operator monitoring and interactive controls.
+  - **Component 3 (Incident Management & Ticketing)**: Subscribes to Component 1's signed webhook events to handle faults and escalation.
+  - **Component 4 (Analytics & Reporting)**: Queries published read models / views for business intelligence.
+- The engine is **generic**: other systems (REST, SQL, files, SOAP, ...) are added via connectors without modifying the core.
+- **Standalone Invariant**: This is an independently deployable service with its own database and release cycle. Other system components integrate through versioned interfaces (section 8), never by importing internals or accessing private engine tables.
 
 ### Out of scope (do NOT build)
 
-- Do not modify or write data back into the EMS. For now the EMS is **read-only**.
-- Do not try to reach the EMS database.
-- Do not build RPA / UI automation unless the user explicitly asks.
-- Do not build a rich web UI in early milestones. CLI + REST API is enough.
+- Do not modify or write data back into the EMS. The EMS connector is strictly **read-only**.
+- Do not try to reach the EMS database directly.
+- Do not build RPA / UI automation.
+- Do not build the frontend web portal in this repository (that belongs to Component 2). CLI + REST API + OpenAPI + Webhooks is Component 1's boundary.
 
 ---
 

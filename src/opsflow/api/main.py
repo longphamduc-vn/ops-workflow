@@ -49,9 +49,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     app = FastAPI(
-        title="Opsflow Workflow Engine API",
+        title="Opsflow Workflow Engine API (Component 1)",
         version="1.0.0",
-        description="Public REST API for triggering operational automations, monitoring runs, and querying published datasets.",
+        description="Public REST API for Component 1 (Core Workflow & Integration Engine) of the Operations Management System.",
         openapi_url="/api/v1/openapi.json",
         docs_url="/docs",
         redoc_url="/redoc",

@@ -1,8 +1,61 @@
-# ops-workflow (`opsflow`)
+# ops-workflow (`opsflow`) — Component 1: Core Workflow & Integration Engine
 
-Generic YAML-configured workflow engine for operational automations, legacy enterprise integration, and resilient task orchestration.
+> **Management System Component 1**: The resilient backbone, workflow orchestration engine, and external integration layer of the overall Operations Management System.
 
-Built according to the roadmap and specifications in [`AGENTS.md`](AGENTS.md).
+Built according to the roadmap, invariants, and specifications in [`AGENTS.md`](AGENTS.md).
+
+---
+
+## 🏛️ System Architecture & Component 1 Role
+
+Within the broader Operations Management System, **`ops-workflow` (Component 1)** acts as the central integration engine and ETL/automation pipeline:
+
+```mermaid
+graph TD
+    subgraph Consumers["Downstream Management System Components"]
+        C2["Component 2: Operations Web Portal & Dashboard"]
+        C3["Component 3: Incident Management & Alerting"]
+        C4["Component 4: Analytics & BI Reporting"]
+    end
+
+    subgraph Component1["Component 1: ops-workflow (This Service)"]
+        API["Public REST API v1 (/api/v1)<br/>• OpenAPI 3.1 Contract<br/>• Idempotency-Key Support"]
+        WH["Outbound Webhooks / Events<br/>• HMAC-SHA256 Signed<br/>• Exponential Backoff & DLQ"]
+        RM["Published Read Models / Datasets<br/>• Cursor Pagination<br/>• Filter & Sort"]
+        ENG["DAG Engine & Scheduler<br/>• YAML Workflow Definitions<br/>• Parallel Async Execution<br/>• State Machine & Crash-Resume"]
+        SEC["Security & Secrets<br/>• SimpleEval Sandbox<br/>• Auto-masking Secrets"]
+        CONN["Connector Registry<br/>• Rate Limits & Concurrency Guards<br/>• Read-only Service Whitelisting"]
+    end
+
+    subgraph External["External & Legacy Systems"]
+        EMS["Legacy EMS (Nexacro XML/SSV)<br/>• Read-Only<br/>• Session Auto-Relogin"]
+        EXT_API["REST / HTTP Services"]
+        EXT_DB["SQL Databases"]
+    end
+
+    C2 -->|"REST API / Python SDK"| API
+    C3 <--|"Signed Webhooks"| WH
+    C4 -->|"Query Read Models"| RM
+
+    API --> ENG
+    ENG --> RM
+    ENG --> WH
+    ENG --> SEC
+    ENG --> CONN
+
+    CONN -->|"Protected Calls"| EMS
+    CONN --> EXT_API
+    CONN --> EXT_DB
+```
+
+### Component Roles & Boundaries
+
+| Component | Scope & Responsibilities | Integration with Component 1 |
+|---|---|---|
+| **Component 1: `ops-workflow`** *(This Repository)* | • Core YAML workflow execution & DAG scheduling<br/>• External connector gateway (Legacy Nexacro EMS, HTTP, SQL)<br/>• Data normalization & snapshot read-model storage<br/>• Outbound signed webhook events & Prometheus observability | **Host service**: Exposes `/api/v1`, OpenAPI contract, and webhooks. |
+| **Component 2: Operations Web Portal** | • Visual monitoring dashboard for operations personnel<br/>• Manual trigger dispatch & workflow inspection<br/>• Interactive approval requests | Consumes **Component 1 REST API** & **Python SDK** via authenticated API keys. |
+| **Component 3: Incident Management** | • Automated ticket creation and SLA tracking<br/>• Escalation workflows and on-call paging | Subscribes to **Component 1 Webhook Events** (e.g., `equipment.status.updated`). |
+| **Component 4: Analytics & Reporting** | • Historical metrics, trends, and BI dashboards<br/>• Compliance and reliability reports | Queries **Component 1 Datasets** (`/api/v1/datasets/*`) or read views. |
 
 ---
 

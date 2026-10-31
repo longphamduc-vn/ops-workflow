@@ -1,8 +1,7 @@
 openapi: 3.1.0
 info:
-  title: Opsflow Workflow Engine API
-  description: Public REST API for triggering operational automations, monitoring
-    runs, and querying published datasets.
+  title: Opsflow Workflow Engine API (Component 1)
+  description: Public REST API for Component 1 (Core Workflow & Integration Engine) of the Operations Management System. Triggers operational automations, monitors runs, and exposes published datasets.
   version: 1.0.0
 paths:
   /health:
