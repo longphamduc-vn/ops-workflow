@@ -1,5 +1,7 @@
 """Nexacro Platform connector supporting XML wire format, session management, and in-body error detection."""
 
+from __future__ import annotations
+
 import asyncio
 import os
 import time
