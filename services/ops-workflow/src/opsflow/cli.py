@@ -79,6 +79,10 @@ def api(
         bool,
         typer.Option("--dev", "-d", help="Enable dev logging for all workflow runs triggered via API"),
     ] = False,
+    log_file: Annotated[
+        Path | None,
+        typer.Option("--log-file", "-l", help="File path to write API execution logs"),
+    ] = None,
 ) -> None:
     """Start the public REST API server."""
     import os
@@ -90,6 +94,11 @@ def api(
         from opsflow.core.logger import set_dev_mode
         set_dev_mode(True)
         console.print("[bold yellow][DEV MODE ENABLED][/bold yellow] Detailed execution telemetry active for all API runs.")
+
+    if log_file:
+        from opsflow.core.logger import set_log_file
+        set_log_file(log_file)
+        console.print(f"[bold cyan]Logging execution details to:[/bold cyan] {log_file}")
 
     console.print(f"[bold green]Starting Opsflow API server on {host}:{port}...[/bold green]")
     uvicorn.run("opsflow.api.main:app", host=host, port=port, reload=reload)
@@ -115,6 +124,10 @@ def run(
         bool,
         typer.Option("--dev", "-d", help="Enable detailed dev logging for calls, transforms, and responses"),
     ] = False,
+    log_file: Annotated[
+        Path | None,
+        typer.Option("--log-file", "-l", help="File path to write detailed execution logs"),
+    ] = None,
     db: Annotated[
         str,
         typer.Option("--db", help="Database connection URL"),
@@ -124,6 +137,11 @@ def run(
     if dev:
         from opsflow.core.logger import set_dev_mode
         set_dev_mode(True)
+
+    if log_file:
+        from opsflow.core.logger import set_log_file
+        set_log_file(log_file)
+        console.print(f"[bold cyan]Logging execution details to:[/bold cyan] {log_file}")
 
     console.print(f"[bold cyan]Loading workflow:[/bold cyan] {workflow_path}")
 

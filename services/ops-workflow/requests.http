@@ -123,7 +123,11 @@ X-API-Key: {{apiKey}}
 GET {{baseUrl}}/api/v1/runs/{{activeRunId}}/steps
 X-API-Key: {{apiKey}}
 
-### 3.3 Cancel In-Progress Run
+### 3.3 Get Detailed Run Execution Log File (Plain text with calls, transforms, responses, timings)
+GET {{baseUrl}}/api/v1/runs/{{activeRunId}}/logs
+X-API-Key: {{apiKey}}
+
+### 3.4 Cancel In-Progress Run
 POST {{baseUrl}}/api/v1/runs/{{activeRunId}}/cancel
 X-API-Key: {{apiKey}}
 

@@ -146,19 +146,31 @@ opsflow replay run_01H12345 --db sqlite+aiosqlite:///opsflow.db
 opsflow api --host 0.0.0.0 --port 8000
 ```
 
-### 🔍 Development Logging Mode (`--dev` / `OPSFLOW_DEV=1`)
+### 🔍 Development Logging Mode (`--dev` / `OPSFLOW_DEV=1`) & File Logging
 
 When developing or debugging workflows, enable dev mode with `--dev` (or `-d`) or by exporting `OPSFLOW_DEV=1`:
 ```bash
+# Output rich dev logging to terminal and default logs/opsflow_dev.log
 opsflow run workflows/spare-parts-inventory-audit.yml --dev
+
+# Specify a custom persistent log file destination
+opsflow run workflows/spare-parts-inventory-audit.yml --dev --log-file logs/audit_run.log
+
+# Start API server with dev logging and file logging enabled
+opsflow api --dev --log-file logs/api_server.log
 ```
-Dev mode outputs rich real-time execution telemetry to your terminal and logger:
+
+Dev mode outputs rich real-time execution telemetry to your terminal, file, and logger:
 - **`▶ STEP`**: Step start, parameters, and step-type badges.
 - **`⮞ CALL`**: Connector call details (`connector`, `op`, `params`, `in_datasets`).
 - **`⮜ RESP`**: Wire responses, dataset names, row counts, and latency in ms.
 - **`⚡ TRANSFORM`**: Data transformations (engine, expression preview, item counts in/out).
 - **`↺ FOREACH` / `⨝ JOIN` / `💾 DB_UPSERT`**: Iteration, relational merge, and database upsert metrics.
 - **`🔒 Secret Masking`**: Automatic runtime masking of all secrets and credentials.
+- **`📁 File Logging`**:
+  - Global aggregated log file (`logs/opsflow_dev.log` or `--log-file <path>`).
+  - Isolated per-run log files in `logs/runs/<run_id>.log`.
+  - Accessible via REST API endpoint: `GET /api/v1/runs/{run_id}/logs`.
 
 ---
 

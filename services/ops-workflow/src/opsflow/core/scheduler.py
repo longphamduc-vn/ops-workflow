@@ -86,6 +86,13 @@ class WorkflowScheduler:
             from opsflow.core.logger import set_dev_mode
             set_dev_mode(True)
 
+        if self.workflow.env.get("OPSFLOW_LOG_FILE"):
+            from opsflow.core.logger import set_log_file
+            set_log_file(self.workflow.env["OPSFLOW_LOG_FILE"])
+        elif effective_inputs.get("_log_file"):
+            from opsflow.core.logger import set_log_file
+            set_log_file(str(effective_inputs["_log_file"]))
+
         dev_log_workflow_start(self.workflow.name, active_run_id, effective_inputs)
 
         # 2. Check existing state if resuming

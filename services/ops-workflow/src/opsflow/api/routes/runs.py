@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from opsflow.api.auth import AuthenticatedConsumer, require_scope
 from opsflow.api.routes.workflows import get_repository
@@ -93,6 +93,24 @@ async def get_run_result(
         )
 
     return run.outputs or {}
+
+
+@router.get("/{run_id}/logs", summary="Get detailed execution log text for a run")
+async def get_run_logs(
+    run_id: str,
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:read"))],
+) -> Response:
+    """Retrieve detailed execution log text for a specific run."""
+    from opsflow.core.logger import get_run_log_path
+
+    log_path = get_run_log_path(run_id)
+    if not log_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No execution log file found for run '{run_id}'. (Ensure dev mode or log_file is active)",
+        )
+    content = log_path.read_text(encoding="utf-8")
+    return Response(content=content, media_type="text/plain; charset=utf-8")
 
 
 @router.post("/{run_id}/cancel", summary="Cancel a running run")

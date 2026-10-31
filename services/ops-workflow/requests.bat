@@ -24,6 +24,7 @@ if "%1"=="run-sync" goto :run_sync
 if "%1"=="run-async" goto :run_async
 if "%1"=="get-run" goto :get_run
 if "%1"=="get-steps" goto :get_steps
+if "%1"=="get-logs" goto :get_logs
 if "%1"=="query-dataset" goto :query_dataset
 if "%1"=="dataset" goto :query_dataset
 if "%1"=="dataset-schema" goto :dataset_schema
@@ -125,6 +126,16 @@ curl.exe -s -H "X-API-Key: %API_KEY%" "%BASE_URL%/api/v1/runs/%2/steps"
 echo.
 goto :eof
 
+:get_logs
+if "%2"=="" (
+    echo Usage: requests.bat get-logs ^<run_id^>
+    goto :eof
+)
+echo [INFO] Retrieving Execution Logs for Run: %2...
+curl.exe -s -H "X-API-Key: %API_KEY%" "%BASE_URL%/api/v1/runs/%2/logs"
+echo.
+goto :eof
+
 :query_dataset
 set "LIMIT=%2"
 if "%LIMIT%"=="" set "LIMIT=5"
@@ -183,6 +194,7 @@ echo   requests.bat run-sync            Execute stock sync workflow (?wait=5)
 echo   requests.bat run-async           Trigger async run with Idempotency-Key
 echo   requests.bat get-run ^<id^>        View run outputs
 echo   requests.bat get-steps ^<id^>      View per-step diagnostics
+echo   requests.bat get-logs ^<id^>       View detailed execution log file
 echo   requests.bat query-dataset [n]   Query published dataset records (default: 5)
 echo   requests.bat dataset-schema      View dataset schema
 echo   requests.bat list-webhooks       List webhook subscriptions

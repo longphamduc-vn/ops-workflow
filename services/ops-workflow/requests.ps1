@@ -123,6 +123,14 @@ switch ($Command.ToLower()) {
         Write-Cmd "Inspecting Step Details for Run: $Arg1..."
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/runs/$Arg1/steps" -Method Get -Headers $Headers | ConvertTo-Json -Depth 5
     }
+    "get-logs" {
+        if (-not $Arg1) {
+            Write-Error "Usage: .\requests.ps1 get-logs <run_id>"
+            return
+        }
+        Write-Cmd "Retrieving Execution Logs for Run: $Arg1..."
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/runs/$Arg1/logs" -Method Get -Headers $Headers
+    }
     { $_ -in "query-dataset", "dataset" } {
         $limit = if ($Arg1) { $Arg1 } else { "5" }
         Write-Cmd "Querying 'spare_parts_audit_dataset' (limit=$limit)..."
@@ -172,6 +180,7 @@ Commands:
   .\requests.ps1 run-async           Trigger async run with Idempotency-Key
   .\requests.ps1 get-run <run_id>    View execution outputs of a specific run
   .\requests.ps1 get-steps <run_id>  View per-step latency and diagnostics
+  .\requests.ps1 get-logs <run_id>   View detailed execution log file of a specific run
   .\requests.ps1 query-dataset [n]   Query published dataset records (default: 5)
   .\requests.ps1 dataset-schema      View dataset column schema
   .\requests.ps1 list-webhooks       List webhook subscriptions

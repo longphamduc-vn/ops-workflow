@@ -127,6 +127,17 @@ case "$1" in
         curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/runs/${RUN_ID}/steps" | python3 -m json.tool
         ;;
 
+    get-logs)
+        RUN_ID="$2"
+        if [ -z "${RUN_ID}" ]; then
+            echo "Usage: ./requests.sh get-logs <run_id>"
+            exit 1
+        fi
+        echo_cmd "Retrieving Execution Logs for Run: ${RUN_ID}..."
+        curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/runs/${RUN_ID}/logs"
+        echo ""
+        ;;
+
     # --------------------------------------------------------------------------
     # 5. Query Read-Model Datasets
     # --------------------------------------------------------------------------
@@ -193,6 +204,7 @@ Commands:
   ./requests.sh run-async           Trigger async run with Idempotency-Key
   ./requests.sh get-run <run_id>    View execution outputs of a specific run
   ./requests.sh get-steps <run_id>  View per-step latency and diagnostics
+  ./requests.sh get-logs <run_id>   View detailed execution log file of a specific run
   ./requests.sh query-dataset [n]   Query published dataset records (default: 5)
   ./requests.sh dataset-schema      View dataset column schema
   ./requests.sh list-webhooks       List webhook subscriptions
