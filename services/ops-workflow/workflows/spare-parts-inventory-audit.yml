@@ -34,6 +34,14 @@ inputs:
     type: string
     default: "EN"
     description: User language preference
+  item_code:
+    type: string
+    default: "QCAB10960"
+    description: Primary spare part item code for ds_ItemInfo
+  item_code_2:
+    type: string
+    default: "QDAB03583"
+    description: Secondary spare part item code for ds_ItemInfo
   alert_channel:
     type: string
     default: "#ops-alerts"
@@ -64,9 +72,25 @@ steps:
       in_datasets:
         ds_search:
           - organizationId: "${inputs.organization_id}"
-            userId: "${inputs.user_id}"
+            itemId: ""
+            commonFlag: ""
+            periodicFlag: ""
+            itemDesc: ""
+            maker: ""
+            vendorName: ""
             itemCond: "Y"
+            userId: "${inputs.user_id}"
+            model: ""
             optimizeFlag: "Y"
+        ds_ItemInfo:
+          - item: "${inputs.item_code}"
+            itemDesc: ""
+            inventoryItemId: ""
+            remark: ""
+          - item: "${inputs.item_code_2}"
+            itemDesc: ""
+            inventoryItemId: ""
+            remark: ""
       out_datasets:
         - ds_result
     outputs:

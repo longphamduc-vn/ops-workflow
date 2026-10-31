@@ -35,6 +35,10 @@ inputs:
     type: string
     default: "Y"
     description: Filter by optimization eligibility flag (Y/N)
+  item_code:
+    type: string
+    default: "QDAB03583"
+    description: Target spare part item code for ds_ItemInfo
 
 defaults:
   timeout: 30s
@@ -58,7 +62,14 @@ steps:
         ds_search:
           - organizationId: "${inputs.organization_id}"
             userId: "${inputs.user_id}"
+            itemDescription: ""
+            inventoryItemId: ""
             optimizeFlag: "${inputs.optimize_flag}"
+        ds_ItemInfo:
+          - item: "${inputs.item_code}"
+            itemDesc: ""
+            inventoryItemId: ""
+            remark: ""
       out_datasets:
         - ds_StockInfomation
     outputs:
