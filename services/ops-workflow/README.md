@@ -163,7 +163,8 @@ opsflow api --dev --log-file logs/api_server.log
 Dev mode outputs rich real-time execution telemetry to your terminal, file, and logger:
 - **`▶ STEP`**: Step start, parameters, and step-type badges.
 - **`⮞ CALL`**: Connector call details (`connector`, `op`, `params`, `in_datasets`).
-- **`⮜ RESP`**: Wire responses, dataset names, row counts, and latency in ms.
+- **`⚡ WIRE REQ / WIRE RESP`**: Full wire-level HTTP telemetry (URL, headers, cookies, raw XML body, status code, latency).
+- **`⮜ RESP`**: Logical wire responses, dataset names, row counts, and latency in ms.
 - **`⚡ TRANSFORM`**: Data transformations (engine, expression preview, item counts in/out).
 - **`↺ FOREACH` / `⨝ JOIN` / `💾 DB_UPSERT`**: Iteration, relational merge, and database upsert metrics.
 - **`🔒 Secret Masking`**: Automatic runtime masking of all secrets and credentials.
@@ -171,6 +172,39 @@ Dev mode outputs rich real-time execution telemetry to your terminal, file, and 
   - Global aggregated log file (`logs/opsflow_dev.log` or `--log-file <path>`).
   - Isolated per-run log files in `logs/runs/<run_id>.log`.
   - Accessible via REST API endpoint: `GET /api/v1/runs/{run_id}/logs`.
+
+---
+
+### 🔌 Connecting to Real Nexacro EMS (Troubleshooting & Best Practices)
+
+When replacing `ems-simulation` with a real enterprise EMS backend:
+
+```yaml
+connectors:
+  ems:
+    type: nexacro
+    base_url: https://real-ems-host:8443
+    format: xml
+    verify_ssl: false         # Bypass self-signed internal enterprise SSL certificates
+    follow_redirects: true    # Automatically follow HTTP-to-HTTPS or proxy redirects
+    timeout: 60s              # Increased timeout for slow legacy database queries
+    auth:
+      login_url: /login.do
+      username: ${env.EMS_USERNAME}
+      password: ${secrets.EMS_PASSWORD}
+      session_ttl: 30m
+    allowed_services:
+      - /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+      - /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+```
+
+**Common Enterprise EMS Issues & Fixes**:
+1. **SSL Certificate Verification Failed (`[SSL: CERTIFICATE_VERIFY_FAILED]`)**:
+   - Set `verify_ssl: false` under the connector config or export `OPSFLOW_INSECURE_SKIP_VERIFY=1`.
+2. **Server Returned HTML / 404 / 500 Instead of XML**:
+   - The engine automatically logs the exact raw HTML or text returned by the server under `[WIRE: RESP]` in `logs/runs/<run_id>.log` or console so you can see if Apache/Tomcat/Nginx intercepted the request.
+3. **Session Authentication Failure**:
+   - Inspect the exact login wire request and server error message under `[WIRE: REQ connector=ems_auth]` in the log file.
 
 ---
 

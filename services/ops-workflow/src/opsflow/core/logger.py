@@ -278,6 +278,65 @@ def dev_log_call_response(
     logger.debug(f"[RESP] connector={connector} op={operation} ok={ok} meta={meta}")
 
 
+def dev_log_wire_request(
+    connector: str,
+    method: str,
+    url: str,
+    headers: dict[str, Any] | None = None,
+    cookies: dict[str, Any] | None = None,
+    body: str | None = None,
+) -> None:
+    """Log low-level wire HTTP request sent to external system."""
+    safe_headers = _safe_str(headers, max_len=500) if headers else "{}"
+    safe_cookies = _safe_str(cookies, max_len=200) if cookies else "{}"
+    safe_body = _safe_str(body, max_len=2000) if body else ""
+
+    _write_file_log(
+        "DEBUG",
+        "WIRE: REQ",
+        f"connector={connector} {method} {url} headers={safe_headers} cookies={safe_cookies} body={safe_body}",
+    )
+
+    if not _DEV_MODE:
+        return
+    console.print(f"      [dim yellow]⚡ WIRE REQ:[/dim yellow] [yellow]{method} {url}[/yellow]")
+    if cookies:
+        console.print(f"        [dim]Cookies:[/dim] {safe_cookies}")
+    if body:
+        preview = safe_body.strip().replace("\n", " ")
+        if len(preview) > 150:
+            preview = preview[:147] + "..."
+        console.print(f"        [dim]Body:[/dim] [dim]{preview}[/dim]")
+
+
+def dev_log_wire_response(
+    connector: str,
+    status_code: int,
+    headers: dict[str, Any] | None = None,
+    body: str | None = None,
+    latency_ms: int = 0,
+) -> None:
+    """Log low-level wire HTTP response received from external system."""
+    safe_headers = _safe_str(headers, max_len=500) if headers else "{}"
+    safe_body = _safe_str(body, max_len=2000) if body else ""
+
+    _write_file_log(
+        "DEBUG",
+        "WIRE: RESP",
+        f"connector={connector} status={status_code} latency={latency_ms}ms headers={safe_headers} body={safe_body}",
+    )
+
+    if not _DEV_MODE:
+        return
+    status_color = "green" if 200 <= status_code < 300 else ("yellow" if 300 <= status_code < 400 else "red")
+    console.print(f"      [dim {status_color}]⚡ WIRE RESP:[/dim {status_color}] [{status_color}]HTTP {status_code}[/{status_color}] [dim]({latency_ms}ms)[/dim]")
+    if body:
+        preview = safe_body.strip().replace("\n", " ")
+        if len(preview) > 150:
+            preview = preview[:147] + "..."
+        console.print(f"        [dim]Body:[/dim] [dim]{preview}[/dim]")
+
+
 def dev_log_transform(
     engine: str,
     expression: str,

@@ -62,6 +62,8 @@ class NexacroSession:
 
     async def authenticate(self) -> None:
         """Authenticate against EMS login service and establish session."""
+        from opsflow.core.logger import _write_file_log, dev_log_wire_request, dev_log_wire_response
+
         login_payload = serialize_xml(
             parameters={
                 "USER_ID": self.username,
@@ -69,23 +71,67 @@ class NexacroSession:
             }
         )
 
-        response = await self.client.post(
-            self.login_url,
-            content=login_payload,
-            headers={"Content-Type": "text/xml; charset=UTF-8"},
+        full_login_url = (
+            self.login_url
+            if self.login_url.startswith("http")
+            else f"{str(self.client.base_url).rstrip('/')}/{self.login_url.lstrip('/')}"
+        )
+        headers = {"Content-Type": "text/xml; charset=UTF-8"}
+
+        dev_log_wire_request(
+            connector="ems_auth",
+            method="POST",
+            url=full_login_url,
+            headers=headers,
+            cookies=dict(self.client.cookies),
+            body=login_payload,
+        )
+
+        start_t = time.monotonic()
+        try:
+            response = await self.client.post(
+                self.login_url,
+                content=login_payload,
+                headers=headers,
+            )
+        except Exception as exc:
+            _write_file_log(
+                "ERROR",
+                "AUTH: FAILED",
+                f"Connection error during login to {full_login_url}: {exc}",
+            )
+            raise OpsflowError(f"Nexacro login connection failure to {full_login_url}: {exc}") from exc
+
+        latency_ms = int((time.monotonic() - start_t) * 1000)
+        dev_log_wire_response(
+            connector="ems_auth",
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            body=response.text,
+            latency_ms=latency_ms,
         )
 
         if response.status_code >= 400:
+            preview = response.text[:300].replace("\n", " ")
             raise OpsflowError(
-                f"Nexacro authentication HTTP failure: {response.status_code} ({response.text[:100]})"
+                f"Nexacro authentication HTTP failure: {response.status_code} on {full_login_url}. Server returned: {preview}"
             )
 
-        # Parse response body
-        params, _ = deserialize_xml(response.text)
-        error_code = params.get("ErrorCode", "0")
-        if error_code != "0":
+        # Parse response body safely
+        try:
+            params, _ = deserialize_xml(response.text)
+        except Exception as exc:
+            preview = response.text[:300].replace("\n", " ")
+            raise OpsflowError(
+                f"Nexacro login service returned non-XML response (HTTP {response.status_code}) on {full_login_url}: {exc}. Preview: {preview}"
+            ) from exc
+
+        error_code = str(params.get("ErrorCode", "0"))
+        if error_code not in ("0", "1"):
             err_msg = params.get("ErrorMsg", "Login failed")
-            raise OpsflowError(f"Nexacro login rejected with ErrorCode {error_code}: {err_msg}")
+            raise OpsflowError(
+                f"Nexacro login rejected on {full_login_url} with ErrorCode '{error_code}': {err_msg}"
+            )
 
         self.session_id = params.get("SESSION_ID") or response.cookies.get("JSESSIONID")
         self.cookies.update(response.cookies)

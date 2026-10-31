@@ -1,6 +1,7 @@
 """Nexacro Platform connector supporting XML wire format, session management, and in-body error detection."""
 
 import asyncio
+import os
 import time
 from typing import Any, Literal
 
@@ -49,9 +50,26 @@ class NexacroConnector(Connector):
 
         self._last_call_time = 0.0
 
+        # SSL, redirect, and header options for connecting to real EMS environments
+        verify_ssl = kwargs.get("verify_ssl", kwargs.get("verify", True))
+        if os.getenv("OPSFLOW_INSECURE_SKIP_VERIFY", "").strip().lower() in ("1", "true", "yes"):
+            verify_ssl = False
+
+        follow_redirects = kwargs.get("follow_redirects", True)
+        custom_headers = kwargs.get("headers") or {}
+
+        req_headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) NexacroPlatform/17.0 (EMS Client)",
+            "Accept": "*/*",
+        }
+        req_headers.update(custom_headers)
+
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=self.timeout,
+            verify=verify_ssl,
+            follow_redirects=follow_redirects,
+            headers=req_headers,
         )
 
         self.session = NexacroSession(
@@ -122,6 +140,8 @@ class NexacroConnector(Connector):
 
     async def _send_request(self, operation: str, params: dict[str, Any]) -> Result:
         """Send wire request and parse in-body Nexacro response."""
+        from opsflow.core.logger import dev_log_wire_request, dev_log_wire_response
+
         in_datasets = params.get("in_datasets") or {}
         req_params = params.get("params") or {}
 
@@ -132,15 +152,33 @@ class NexacroConnector(Connector):
             else f"{self.base_url}/{operation.lstrip('/')}"
         )
 
+        headers = {"Content-Type": "text/xml; charset=UTF-8"}
+        dev_log_wire_request(
+            connector=self.name,
+            method="POST",
+            url=url,
+            headers=headers,
+            cookies=dict(self.client.cookies),
+            body=payload,
+        )
+
         start_t = time.monotonic()
         try:
             response = await self.client.post(
                 url,
                 content=payload,
-                headers={"Content-Type": "text/xml; charset=UTF-8"},
+                headers=headers,
             )
             self._last_call_time = time.monotonic()
             latency_ms = int((self._last_call_time - start_t) * 1000)
+
+            dev_log_wire_response(
+                connector=self.name,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                body=response.text,
+                latency_ms=latency_ms,
+            )
 
             # Check transport/HTTP-level error
             if response.status_code >= 400:
@@ -148,19 +186,34 @@ class NexacroConnector(Connector):
                 http_kind: ErrorKind = "network" if response.status_code >= 500 else "business"
                 if response.status_code in (401, 403):
                     http_kind = "auth"
+                preview = response.text[:300].replace("\n", " ")
                 return Result(
                     ok=False,
                     error=ErrorInfo(
                         kind=http_kind,
                         code=str(response.status_code),
-                        message=f"HTTP {response.status_code}: {response.text[:200]}",
+                        message=f"HTTP {response.status_code}: {preview}",
                         retryable=is_retryable,
                     ),
-                    meta={"latency_ms": latency_ms, "status_code": response.status_code},
+                    meta={"latency_ms": latency_ms, "status_code": response.status_code, "raw_response": response.text[:2000]},
                 )
 
             # In-body error detection (Section 6.3)
-            resp_params, datasets = deserialize_xml(response.text)
+            try:
+                resp_params, datasets = deserialize_xml(response.text)
+            except Exception as exc:
+                preview = response.text[:500].replace("\n", " ")
+                return Result(
+                    ok=False,
+                    error=ErrorInfo(
+                        kind="validation",
+                        code="INVALID_XML_RESPONSE",
+                        message=f"Server returned non-XML response (HTTP {response.status_code}): {exc}. Response preview: {preview}",
+                        retryable=False,
+                    ),
+                    meta={"latency_ms": latency_ms, "status_code": response.status_code, "raw_response": response.text[:2000]},
+                )
+
             error_code = resp_params.get("ErrorCode") or resp_params.get("errorCode", "0")
             error_msg = resp_params.get("ErrorMsg") or resp_params.get("errorMsg", "OK")
 
@@ -168,7 +221,7 @@ class NexacroConnector(Connector):
             if str(error_code) not in ("0", "1"):
                 # Determine if error is authentication/session related
                 is_auth_error = (
-                    error_code in ("-9999", "-9000", "SESSION_TIMEOUT", "AUTH_FAIL")
+                    str(error_code) in ("-9999", "-9000", "SESSION_TIMEOUT", "AUTH_FAIL")
                     or "session" in error_msg.lower()
                     or "login" in error_msg.lower()
                 )
@@ -177,7 +230,7 @@ class NexacroConnector(Connector):
                     ok=False,
                     error=ErrorInfo(
                         kind=err_kind,
-                        code=error_code,
+                        code=str(error_code),
                         message=error_msg,
                         retryable=is_auth_error,
                     ),
@@ -197,7 +250,21 @@ class NexacroConnector(Connector):
                 error=ErrorInfo(
                     kind="timeout",
                     code="TIMEOUT",
-                    message=f"Nexacro call timed out: {exc}",
+                    message=f"Nexacro call timed out connecting to {url}: {exc}",
+                    retryable=True,
+                ),
+            )
+        except httpx.ConnectError as exc:
+            err_msg = str(exc)
+            hint = ""
+            if "CERTIFICATE_VERIFY_FAILED" in err_msg or "certificate verify failed" in err_msg.lower():
+                hint = " [HINT: SSL certificate verification failed. If your real EMS uses an internal/self-signed cert, set 'verify_ssl: false' in the connector config or set OPSFLOW_INSECURE_SKIP_VERIFY=1]"
+            return Result(
+                ok=False,
+                error=ErrorInfo(
+                    kind="network",
+                    code="CONNECT_ERROR",
+                    message=f"Nexacro connection failed to {url}: {exc}{hint}",
                     retryable=True,
                 ),
             )
@@ -207,7 +274,7 @@ class NexacroConnector(Connector):
                 error=ErrorInfo(
                     kind="network",
                     code="NETWORK_ERROR",
-                    message=f"Nexacro network communication error: {exc}",
+                    message=f"Nexacro network communication error connecting to {url}: {exc}",
                     retryable=True,
                 ),
             )

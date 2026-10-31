@@ -47,7 +47,20 @@ class CallStep(Step):
             in_datasets=params.get("in_datasets"),
         )
 
-        res: Result = await connector.call(operation, params)
+        try:
+            res: Result = await connector.call(operation, params)
+        except Exception as exc:
+            from opsflow.core.models import ErrorInfo
+
+            res = Result(
+                ok=False,
+                error=ErrorInfo(
+                    kind="internal",
+                    code=exc.__class__.__name__,
+                    message=f"Connector call failed with unexpected error: {exc}",
+                    retryable=False,
+                ),
+            )
 
         dev_log_call_response(
             connector=connector_name,

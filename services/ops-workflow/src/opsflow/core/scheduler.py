@@ -43,8 +43,13 @@ class WorkflowScheduler:
                         self.connectors[conn_name] = create_connector(
                             c_type, name=conn_name, config=cfg_dict
                         )
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        from opsflow.core.logger import _write_file_log
+                        _write_file_log(
+                            "ERROR",
+                            "CONNECTOR: INIT",
+                            f"Failed to initialize connector '{conn_name}': {exc}",
+                        )
         self.repository = repository
         self.max_concurrency = max_concurrency
         self.step_factory = step_factory or create_step
