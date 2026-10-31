@@ -24,6 +24,7 @@ if "%1"=="run-sync" goto :run_sync
 if "%1"=="run-equipment" goto :run_equipment
 if "%1"=="run-po" goto :run_po
 if "%1"=="run-target-stock" goto :run_target_stock
+if "%1"=="run-procurement" goto :run_procurement
 if "%1"=="run-async" goto :run_async
 if "%1"=="get-run" goto :get_run
 if "%1"=="get-steps" goto :get_steps
@@ -125,6 +126,15 @@ curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/target-stock-optimization/runs?
   -H "X-API-Key: %API_KEY%" ^
   -H "Content-Type: application/json" ^
   -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"item_description\": \"Motor\"}}"
+echo.
+goto :eof
+
+:run_procurement
+echo [INFO] Triggering 'procurement-rfq-stock-optimization' (?wait=5)...
+curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/procurement-rfq-stock-optimization/runs?wait=5" ^
+  -H "X-API-Key: %API_KEY%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"item_code\": \"QDAB03583\", \"alert_channel\": \"%ALERT_CHANNEL%\"}}"
 echo.
 goto :eof
 

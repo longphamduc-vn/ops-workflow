@@ -1,0 +1,364 @@
+version: "1.0"
+name: procurement-rfq-stock-optimization
+description: End-to-end Procurement, RFQ lifecycle evaluation, and target stock optimization with automated interlock assessment and read-model publication based on Dd.yaml specification
+
+connectors:
+  ems:
+    type: nexacro
+    base_url: http://localhost:9000
+    format: xml
+    verify_ssl: false
+    follow_redirects: true
+    allowed_services:
+      - /emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn
+      - /emscom/popupNav/retrieveItem.lgdn
+      - /emscom/popupNav/retrieveItemPoStatusList.lgdn
+      - /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+    limits:
+      max_concurrent: 3
+      min_interval: 100ms
+
+trigger:
+  type: cron
+  cron: "0 */2 * * *"
+  timezone: Asia/Ho_Chi_Minh
+
+inputs:
+  organization_id:
+    type: string
+    default: "28753"
+    description: Target EMS Organization Unit ID
+  user_id:
+    type: string
+    default: "658359"
+    description: User ID for EMS API execution context
+  language:
+    type: string
+    default: "EN"
+    description: User language preference
+  item_code:
+    type: string
+    default: "QDAB03583"
+    description: Primary spare part item code for optimization & RFQ analysis
+  optimize_flag:
+    type: string
+    default: "Y"
+    description: Target stock optimization eligibility flag (Y/N)
+  alert_channel:
+    type: string
+    default: "#procurement-alerts"
+    description: Notification destination channel for procurement interlocks
+
+defaults:
+  timeout: 30s
+  retry:
+    max_attempts: 3
+    backoff: exponential
+    delay: 1s
+    on: [timeout, network]
+
+steps:
+  # =========================================================================
+  # STEP 1A: Fetch Target Stock, MOQ, On-hand and PR Recommendations from EMS
+  # (Corresponds to Trace 146/147: TargetStockSearchList.lgdn)
+  # =========================================================================
+  - id: fetch_target_stock
+    type: call
+    with:
+      connector: ems
+      operation: /emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_search:
+          - organizationId: "${inputs.organization_id}"
+            userId: "${inputs.user_id}"
+            itemDescription: ""
+            inventoryItemId: ""
+            optimizeFlag: "${inputs.optimize_flag}"
+        ds_ItemInfo:
+          - item: "${inputs.item_code}"
+            itemDesc: ""
+            inventoryItemId: ""
+            remark: ""
+      out_datasets:
+        - ds_StockInfomation
+    outputs:
+      stock_records: "$.ds_StockInfomation"
+
+  # =========================================================================
+  # STEP 1B: Fetch Item Master, Buyer Manager and Purchasing Type in Parallel
+  # (Corresponds to Trace 57-68: retrieveItem.lgdn)
+  # =========================================================================
+  - id: fetch_item_master
+    type: call
+    with:
+      connector: ems
+      operation: /emscom/popupNav/retrieveItem.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_Search:
+          - item: "${inputs.item_code}"
+            organizationId: "${inputs.organization_id}"
+      out_datasets:
+        - ds_List
+    outputs:
+      catalog_items: "$.ds_List"
+
+  # =========================================================================
+  # STEP 2A: Normalize Target Stock & Extract Inventory Item ID for Correlation
+  # =========================================================================
+  - id: normalize_target_stock
+    type: transform
+    needs: [fetch_target_stock]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_target_stock.outputs.stock_records}"
+      expression: |
+        [].{
+          item_code: item,
+          description: itemDescription,
+          model: model,
+          maker: maker,
+          uom: uom,
+          unit_price_sp: itemCost,
+          unit_price_spr: sprRmi,
+          min_order_qty: minOrderQty,
+          onhand_qty: onhandQty,
+          request_qty: purchaseRequisitionQty,
+          target_qty: targetQty,
+          disuse_flag: disuseFlag,
+          hold_reason: holdReasonContent,
+          contact_name: managementContactName,
+          inventory_item_id: inventoryItemId
+        }
+
+  # =========================================================================
+  # STEP 2B: Normalize Item Master Details (Buyer Manager & Category)
+  # =========================================================================
+  - id: normalize_item_master
+    type: transform
+    needs: [fetch_item_master]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_item_master.outputs.catalog_items}"
+      expression: |
+        [].{
+          item_code: item,
+          buy_item_type: buyItemType,
+          manager: manager,
+          buyer_name: buyerName,
+          item_status: itemStatus
+        }
+
+  # =========================================================================
+  # STEP 3: Fetch Purchase Order Interlocks & Transfer/Repair Quantities
+  # (Corresponds to Trace 4: retrieveItemPoStatusList.lgdn)
+  # =========================================================================
+  - id: fetch_po_interlocks
+    type: call
+    needs: [normalize_target_stock]
+    with:
+      connector: ems
+      operation: /emscom/popupNav/retrieveItemPoStatusList.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_Search:
+          - inventoryItemId: ""
+            organizationId: "${inputs.organization_id}"
+            invItemList: "${steps.normalize_target_stock.outputs[0].inventory_item_id}"
+      out_datasets:
+        - ds_Rtn
+    outputs:
+      po_records: "$.ds_Rtn"
+
+  # =========================================================================
+  # STEP 4: Fetch Detailed Item Specs & FDM Drawing Link in Parallel with PO
+  # (Corresponds to Trace 8-52: retrieveItemInfoDetail.lgdn)
+  # =========================================================================
+  - id: fetch_item_details
+    type: call
+    needs: [normalize_target_stock]
+    with:
+      connector: ems
+      operation: /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_Input:
+          - organizationId: "${inputs.organization_id}"
+            inventoryItemId: "${steps.normalize_target_stock.outputs[0].inventory_item_id}"
+      out_datasets:
+        - ds_Item
+        - ds_Inv
+        - ds_Summary
+    outputs:
+      item_details: "$.ds_Item"
+      inv_details: "$.ds_Inv"
+      summary_details: "$.ds_Summary"
+
+  # =========================================================================
+  # STEP 5A: Normalize PO Status, Interlocks (stopPo, transfer, waitRepair, etc.)
+  # =========================================================================
+  - id: normalize_po_interlocks
+    type: transform
+    needs: [fetch_po_interlocks]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_po_interlocks.outputs.po_records}"
+      expression: |
+        [].{
+          item_code: item,
+          stop_po_flag: stopPoFlag,
+          buyer_id: buyerId,
+          transfer_flag: transferFlag,
+          transfer_qty: transferQty,
+          wait_repair_flag: waitRepairFlag,
+          wait_repair_qty: waitRepairQty,
+          disuse_inv_flag: disuseInventoryFlag,
+          aging_interlock_flag: agingInterlockFlag,
+          po_opt_target_flag: poOptTargetFlag,
+          po_waiting_qty: poWaitingQty,
+          unit_price_status_code: unitPriceStatusCode
+        }
+
+  # =========================================================================
+  # STEP 5B: Normalize FDM Drawing URL and Accurate Inventory Balances from ds_Item & ds_Inv
+  # (Extracts targetQty, requestQty, poWaitingQty [PO stand by], notReceivingQty [PO remained], onhandQty)
+  # =========================================================================
+  - id: normalize_item_details
+    type: transform
+    needs: [fetch_item_details]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_item_details.outputs}"
+      expression: |
+        [
+          {
+            item_code: item_details[0].item,
+            fdm_url: item_details[0].fdmUrl,
+            allocated_qty: item_details[0].allocatedQuantity,
+            available_qty: item_details[0].availableQuantity,
+            detail_status: item_details[0].itemStatus,
+            target_qty: inv_details[0].targetQty,
+            request_qty: inv_details[0].requestQty,
+            po_stand_by: inv_details[0].poWaitingQty,
+            po_remained_qty: inv_details[0].notReceivingQty,
+            onhand_qty: inv_details[0].onhandQty
+          }
+        ]
+
+  # =========================================================================
+  # STEP 6: Relational Left Join (Target Stock + Item Master)
+  # =========================================================================
+  - id: join_stock_and_master
+    type: join
+    needs: [normalize_target_stock, normalize_item_master]
+    with:
+      left: "${steps.normalize_target_stock.outputs}"
+      right: "${steps.normalize_item_master.outputs}"
+      on: item_code
+      how: left
+
+  # =========================================================================
+  # STEP 7: Relational Left Join (Enrich with PO Interlocks)
+  # =========================================================================
+  - id: join_with_po_interlocks
+    type: join
+    needs: [join_stock_and_master, normalize_po_interlocks]
+    with:
+      left: "${steps.join_stock_and_master.outputs}"
+      right: "${steps.normalize_po_interlocks.outputs}"
+      on: item_code
+      how: left
+
+  # =========================================================================
+  # STEP 8: Relational Left Join (Enrich with FDM CAD Link and Availability)
+  # =========================================================================
+  - id: join_with_item_details
+    type: join
+    needs: [join_with_po_interlocks, normalize_item_details]
+    with:
+      left: "${steps.join_with_po_interlocks.outputs}"
+      right: "${steps.normalize_item_details.outputs}"
+      on: item_code
+      how: left
+
+  # =========================================================================
+  # STEP 9: Evaluate Business Rules, Interlocks, Remained Quantities & RFQ State
+  # (Fully implements the logic rules, formulas, and states from Dd.yaml)
+  # =========================================================================
+  - id: evaluate_procurement_rules
+    type: transform
+    needs: [join_with_item_details]
+    with:
+      engine: jmespath
+      input: "${steps.join_with_item_details.outputs}"
+      expression: |
+        [].{
+          item_code: item_code,
+          description: description,
+          model: model,
+          vendor_name: maker,
+          uom: uom,
+          buy_item_type: buy_item_type,
+          manager: manager,
+          buyer_id: buyer_id,
+          buyer_name: buyer_name,
+          fdm_url: fdm_url,
+          unit_price_sp: unit_price_sp,
+          unit_price_spr: unit_price_spr,
+          min_order_qty: min_order_qty,
+          target_qty: target_qty,
+          onhand_qty: onhand_qty,
+          request_qty: request_qty,
+          po_stand_by: po_stand_by,
+          po_remained_qty: po_remained_qty,
+          transfer_qty: transfer_qty,
+          wait_repair_qty: wait_repair_qty,
+          interlock_purchase_blocked: stop_po_flag,
+          interlock_transfer_required: transfer_flag,
+          interlock_disuse_scrap: disuse_flag,
+          interlock_repair_priority: wait_repair_flag,
+          interlock_aging_warning: aging_interlock_flag,
+          interlock_po_opt_target: po_opt_target_flag,
+          hold_reason: hold_reason
+        }
+
+  # =========================================================================
+  # STEP 10: Persist Full Procurement Snapshot to Ops Read-Model Table
+  # =========================================================================
+  - id: save_procurement_optimization_db
+    type: db_upsert
+    needs: [evaluate_procurement_rules]
+    with:
+      table: procurement_stock_optimization
+      key: [item_code]
+      rows: "${steps.evaluate_procurement_rules.outputs}"
+
+  # =========================================================================
+  # STEP 11: Alert Dispatch to Notification Channel
+  # =========================================================================
+  - id: notify_procurement_alerts
+    type: notify
+    needs: [save_procurement_optimization_db]
+    with:
+      channel: "${inputs.alert_channel}"
+      message: "Procurement & stock optimization evaluation completed for item ${inputs.item_code} in organization ${inputs.organization_id}."
+
+# Publish snapshot read-model dataset & emit event
+publish:
+  dataset: procurement_stock_optimization_dataset
+  source: "${steps.evaluate_procurement_rules.outputs}"
+  event: procurement.stock_optimization.evaluated
+

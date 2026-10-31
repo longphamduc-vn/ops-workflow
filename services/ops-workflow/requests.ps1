@@ -123,6 +123,17 @@ switch ($Command.ToLower()) {
         } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/target-stock-optimization/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
     }
+    "run-procurement" {
+        Write-Cmd "Triggering 'procurement-rfq-stock-optimization' (Synchronous wait 5s)..."
+        $body = @{
+            inputs = @{
+                organization_id = $OrgId
+                item_code = "QDAB03583"
+                alert_channel = $AlertChannel
+            }
+        } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/procurement-rfq-stock-optimization/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
+    }
     "run-async" {
         $idemKey = "ps-run-" + [Guid]::NewGuid().ToString("N").Substring(0, 8)
         Write-Cmd "Triggering Asynchronous Run with Idempotency-Key: $idemKey..."

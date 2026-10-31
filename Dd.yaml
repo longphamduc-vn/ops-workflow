@@ -1,0 +1,232 @@
+version: "5.0"
+domain: "Procurement, RFQ & Stock Optimization"
+system: "LG Display EMS Nexacro Platform"
+
+summary_status:
+  item_info:
+    item_code: "QDAB03583" # Source: ds_Rtn.item / ds_StockInfomation.item
+    description: "Sensor Accessory ** CN-73-C2, PANASONIC CORPORATION, Feature: SQUARE" # Source: ds_StockInfomation.itemDescription
+    image_url: "fdmUrl" # Source: ds_Item.fdmUrl / ds_result.fdmUrl
+    model: "CN-73-C2" # Source: ds_StockInfomation.model
+    vendor_name: "PANASONIC CORPORATION" # Source: ds_StockInfomation.maker
+    buy_item_type: "SP" # Source: ds_List.buyItemType / ds_result.buyItemType
+    uom: "EA" # Source: ds_StockInfomation.uom
+    unit_price_sp: 6.39 # Source: ds_StockInfomation.itemCost
+    unit_price_spr: 0.00 # Source: ds_StockInfomation.sprRmi
+    min_order_qty: 4 # Source: ds_StockInfomation.minOrderQty
+
+  interlock:
+    purchase:
+      status: "N" # Source: ds_Rtn.stopPoFlag ('N' = Active, 'Y' = Blocked)
+      calculation_rule: "stopPoFlag == 'Y'"
+      action: "Block purchase order creation"
+
+    transfer:
+      status: "Y" # Source: ds_Rtn.transferFlag
+      calculation_rule: "transferFlag == 'Y'"
+      action: "Inter-company transfer required before placing new PO"
+
+    disuse:
+      status: "Y" # Source: ds_StockInfomation.disuseFlag / ds_Rtn.disuseInventoryFlag
+      calculation_rule: "disuseFlag == 'Y' || disuseInventoryFlag == 'Y'"
+      action: "Replenishment blocked (Scrap / Disuse item: 불용 폐기)"
+
+    repair:
+      status: "N" # Source: ds_Rtn.waitRepairFlag
+      calculation_rule: "waitRepairFlag == 'Y'"
+      action: "Prioritize repair reuse over new procurement"
+
+    aging:
+      status: "N" # Source: ds_Rtn.agingInterlockFlag
+      calculation_rule: "agingInterlockFlag == 'Y'"
+      action: "Warning on aging inventory stock"
+
+    po_opt_target:
+      status: "N" # Source: ds_Rtn.poOptTargetFlag
+      calculation_rule: "poOptTargetFlag == 'Y'"
+      action: "Inter-company purchasing for lower price target"
+
+  price_status:
+    current_price_state: "Đã có giá" # Derived rule based on unit_price_sp
+    current_price_calculation:
+      formula: "IF(unit_price_sp != null && unit_price_sp > 0, 'Đã có giá', 'Chưa có giá')"
+      inputs:
+        unit_price_sp: 6.39 # ds_StockInfomation.itemCost
+
+    rfq_history_rule: "IF COUNT(rfq_requests) > 1 THEN FETCH MAX(creation_date) RECORD"
+
+    rfq_lifecycle:
+      - state: "PRICE_UNREGISTERED"
+        desc: "Price not registered in system"
+        conditions:
+          unit_price_sp: null
+          buyer_id: ""
+          buyer_name: ""
+
+      - state: "ASSIGN_BUYER"
+        desc: "Buyer assigned to item master"
+        conditions:
+          unit_price_sp: null
+          buyer_id: "1403074" # Source: ds_Rtn.buyerId
+          buyer_name: "Nguyen Thi Hong Ngoc" # Source: ds_List.manager
+
+      - state: "REQUEST_RFQ"
+        desc: "Requestor initiates RFQ for assigned buyer"
+        conditions:
+          unit_price_sp: null
+          buyer_id: "1403074"
+          buyer_name: "Nguyen Thi Hong Ngoc"
+          stopPoFlag: "N"
+
+      - state: "PRE_ESTIMATE_CREATED"
+        desc: "Buyer negotiates and inputs preliminary estimate"
+        conditions:
+          buyer_id: "1403074"
+          pre_estimate_price: "> 0"
+
+      - state: "PRE_ESTIMATE_CREATED_ERROR"
+        desc: "Error creating preliminary estimate due to missing buyerId or unassigned ownership"
+        calculation_rule: "buyer_id == '' || buyer_id == null || assign_error_flag == 'Y'"
+        external_purchase_system:
+          field_pon_status: "ponStatus" # Source: External Purchaser API
+          field_kr_purchaser: "krPurchaser" # Source: External Purchaser API
+          note: "External Purchaser Portal status tracking"
+
+      - state: "PRICE_REGISTRATION"
+        desc: "Price approved and registered"
+        conditions:
+          unit_price_sp: "> 0"
+
+      - state: "CANCELLED"
+        desc: "RFQ Cancelled. Revert to ASSIGN_BUYER"
+        calculation_rule: "IF RFQ_Status == 'CANCEL' THEN FETCH cancel_reason FROM ds_RFQHistory WHERE rfq_id == MAX(rfq_id)"
+
+  quantity:
+    target_qty: 1 # Source: ds_Inv.targetQty / ds_StockInfomation.targetQty
+    request_qty: 4 # Source: ds_Inv.requestQty / ds_StockInfomation.purchaseRequisitionQty
+    po_stand_by: 0 # Source: ds_Inv.poWaitingQty / ds_Rtn.poWaitingQty (PO stand by)
+    po_remained_qty: 0 # Source: ds_Inv.notReceivingQty (PO remained - pending delivery/receiving)
+    onhand_qty: 1 # Source: ds_Inv.onhandQty / ds_StockInfomation.onhandQty
+    transfer_qty: 1 # Source: ds_Rtn.transferQty (Số lượng điều chuyển)
+    wait_repair_qty: 0 # Source: ds_Rtn.waitRepairQty (Số lượng chờ sửa chữa)
+
+api_field_specifications:
+  retrieveItemPoStatusList:
+    endpoint: "emscom/popupNav/retrieveItemPoStatusList.lgdn"
+    dataset: "ds_Rtn"
+    fields:
+      item:
+        type: "String"
+        desc: "Item master identification code"
+      stopPoFlag:
+        type: "String"
+        desc: "Purchase interlock flag ('Y' = Blocked, 'N' = Active)"
+      buyerId:
+        type: "String"
+        desc: "Assigned buyer user ID"
+      transferFlag:
+        type: "String"
+        desc: "Inter-company transfer interlock flag ('Y'/'N')"
+      transferQty:
+        type: "Integer"
+        desc: "Available quantity for inter-company transfer"
+      waitRepairFlag:
+        type: "String"
+        desc: "Repairable stock interlock flag ('Y'/'N')"
+      waitRepairQty:
+        type: "Integer"
+        desc: "Quantity waiting for repair"
+      disuseInventoryFlag:
+        type: "String"
+        desc: "Scrap/Disuse item flag ('Y'/'N')"
+      agingInterlockFlag:
+        type: "String"
+        desc: "Aging stock warning flag ('Y'/'N')"
+      poOptTargetFlag:
+        type: "String"
+        desc: "Inter-company purchase price optimization flag ('Y'/'N')"
+      poWaitingQty:
+        type: "Integer"
+        desc: "Outstanding PO quantity pending delivery"
+
+  TargetStockSearchList:
+    endpoint: "emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn"
+    dataset: "ds_StockInfomation"
+    fields:
+      item:
+        type: "String"
+        desc: "Item master code"
+      itemDescription:
+        type: "String"
+        desc: "Detailed item description and specs"
+      model:
+        type: "String"
+        desc: "Manufacturer part number / model"
+      maker:
+        type: "String"
+        desc: "Manufacturer / Vendor name"
+      uom:
+        type: "String"
+        desc: "Unit of Measure"
+      itemCost:
+        type: "Decimal"
+        desc: "Unit price for standard spare parts (SP)"
+      sprRmi:
+        type: "Decimal"
+        desc: "Unit price for repairable spare parts (SPR)"
+      minOrderQty:
+        type: "Integer"
+        desc: "Minimum Order Quantity (MOQ)"
+      onhandQty:
+        type: "Integer"
+        desc: "Current on-hand warehouse inventory"
+      purchaseRequisitionQty:
+        type: "Integer"
+        desc: "Calculated purchase requisition quantity"
+      targetQty:
+        type: "Integer"
+        desc: "Target stock level"
+      disuseFlag:
+        type: "String"
+        desc: "Disuse/Scrap flag"
+      holdReasonContent:
+        type: "String"
+        desc: "Interlock hold/cancellation reason text"
+      managementContactName:
+        type: "String"
+        desc: "Inventory manager contact name"
+
+  retrieveItemInfoDetail:
+    endpoint: "emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn"
+    datasets:
+      ds_Item:
+        fdmUrl:
+          type: "String"
+          desc: "FDM CAD/drawing URL link"
+      ds_Inv:
+        targetQty:
+          type: "Integer"
+          desc: "Target stock quantity"
+        requestQty:
+          type: "Integer"
+          desc: "Purchase requisition request quantity"
+        poWaitingQty:
+          type: "Integer"
+          desc: "PO stand by quantity"
+        notReceivingQty:
+          type: "Integer"
+          desc: "PO remained quantity (pending delivery/receiving)"
+        onhandQty:
+          type: "Integer"
+          desc: "Current on-hand warehouse quantity"
+
+  retrieveItem:
+    endpoint: "emscom/popupNav/retrieveItem.lgdn"
+    dataset: "ds_List"
+    fields:
+      buyItemType:
+        type: "String"
+        desc: "Item purchasing category ('SP', 'SPR')"
+      manager:
+        type: "String"
+        desc: "Assigned buyer full name"

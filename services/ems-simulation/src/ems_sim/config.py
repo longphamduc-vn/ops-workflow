@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
     record_payloads: bool = True
+    strict_request_validation: bool = True
 
 
 settings = Settings()

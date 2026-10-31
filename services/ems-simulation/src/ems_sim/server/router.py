@@ -9,9 +9,11 @@ from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
 
 from ems_sim.builder.response_builder import NexacroResponseBuilder
+from ems_sim.config import settings
 from ems_sim.database.repository import SimulationRepository
 from ems_sim.models.protocol import NexacroRequest, NexacroResponse
 from ems_sim.parser.request_parser import NexacroParser
+from ems_sim.validator.request_validator import RequestValidator
 
 logger = logging.getLogger(__name__)
 
@@ -105,10 +107,12 @@ async def dispatch_nexacro_request(full_path: str, request: Request) -> Response
         )
 
     # 2. Parse request payload (supports XML and JSON)
+    parse_error_msg = None
     try:
         nexacro_req = NexacroParser.parse_payload(raw_body, content_type=content_type_header)
     except Exception as e:
-        logger.error(f"Failed to parse request payload: {e}")
+        logger.warning(f"Failed to parse request payload: {e}")
+        parse_error_msg = str(e)
         nexacro_req = NexacroRequest()
 
     raw_req_dict = None
@@ -120,6 +124,67 @@ async def dispatch_nexacro_request(full_path: str, request: Request) -> Response
         )
     except Exception:
         raw_req_dict = {"xml": body_text[:500]}
+
+    # Check for malformed syntax error
+    if parse_error_msg and body_text:
+        duration_ms = (time.perf_counter() - start_time) * 1000
+        await execution_logger.log(
+            api_id=api_def.id,
+            method=method,
+            path=norm_path,
+            status_code=400,
+            duration_ms=duration_ms,
+            request_time=req_timestamp,
+            response_time=datetime.now(UTC),
+            execution_result="MALFORMED_REQUEST",
+            error_message=f"Malformed request payload: {parse_error_msg}",
+            request_payload=raw_req_dict,
+        )
+        err_resp = NexacroResponse.error(
+            f"Malformed request payload: {parse_error_msg}", error_code="-400"
+        )
+        if respond_xml:
+            return Response(
+                content=NexacroResponseBuilder.serialize_xml(err_resp),
+                status_code=400,
+                media_type="application/xml; charset=utf-8",
+            )
+        return JSONResponse(status_code=400, content=NexacroResponseBuilder.build_dict(err_resp))
+
+    # 2.5. Strict Request Structure & Dataset Validation
+    if settings.strict_request_validation and not nexacro_req.get_param("_scenario"):
+        dataset_registry = getattr(request.app.state, "dataset_registry", None)
+        validation_error = RequestValidator.validate(
+            api_def=api_def,
+            request=nexacro_req,
+            dataset_registry=dataset_registry,
+        )
+        if validation_error:
+            logger.warning(f"Request validation failed on {api_def.id}: {validation_error}")
+            duration_ms = (time.perf_counter() - start_time) * 1000
+            await execution_logger.log(
+                api_id=api_def.id,
+                method=method,
+                path=norm_path,
+                status_code=400,
+                duration_ms=duration_ms,
+                request_time=req_timestamp,
+                response_time=datetime.now(UTC),
+                execution_result="VALIDATION_FAILED",
+                error_message=validation_error,
+                request_payload=raw_req_dict,
+            )
+            err_resp = NexacroResponse.error(
+                f"Request validation error: {validation_error}",
+                error_code="-400",
+            )
+            if respond_xml:
+                return Response(
+                    content=NexacroResponseBuilder.serialize_xml(err_resp),
+                    status_code=400,
+                    media_type="application/xml; charset=utf-8",
+                )
+            return JSONResponse(status_code=400, content=NexacroResponseBuilder.build_dict(err_resp))
 
     # 3. Execute via Simulation Engine
     scenario_id = None

@@ -82,6 +82,11 @@ case "$1" in
         curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/target-stock-optimization" | python3 -m json.tool
         ;;
 
+    inspect-procurement)
+        echo_cmd "Inspecting 'procurement-rfq-stock-optimization' Schema..."
+        curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/procurement-rfq-stock-optimization" | python3 -m json.tool
+        ;;
+
     # --------------------------------------------------------------------------
     # 3. Trigger Workflow Runs
     # --------------------------------------------------------------------------
@@ -131,6 +136,14 @@ case "$1" in
             -H "X-API-Key: ${API_KEY}" \
             -H "Content-Type: application/json" \
             -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"item_description\": \"Motor\"}}" | python3 -m json.tool
+        ;;
+
+    run-procurement)
+        echo_cmd "Triggering 'procurement-rfq-stock-optimization' (Synchronous wait 5s)..."
+        curl -s -X POST "${BASE_URL}/api/v1/workflows/procurement-rfq-stock-optimization/runs?wait=5" \
+            -H "X-API-Key: ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"item_code\": \"QDAB03583\", \"alert_channel\": \"${ALERT_CHANNEL}\"}}" | python3 -m json.tool
         ;;
 
     run-async)
@@ -243,6 +256,7 @@ Commands:
   ./requests.sh run-equipment       Execute work order & equipment lookup (?wait=5)
   ./requests.sh run-po              Execute purchase order tracking (?wait=5)
   ./requests.sh run-target-stock    Execute target stock optimization (?wait=5)
+  ./requests.sh run-procurement     Execute procurement RFQ & stock optimization (?wait=5)
   ./requests.sh run-async           Trigger async run with Idempotency-Key
   ./requests.sh get-run <run_id>    View execution outputs of a specific run
   ./requests.sh get-steps <run_id>  View per-step latency and diagnostics

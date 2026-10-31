@@ -84,6 +84,11 @@ class NexacroResponse(BaseModel):
     ) -> "NexacroResponse":
         """Create an error Nexacro response."""
         return cls(
-            params={"errorCode": error_code, "errorMsg": error_msg},
+            params={
+                "errorCode": error_code,
+                "ErrorCode": error_code,
+                "errorMsg": error_msg,
+                "ErrorMsg": error_msg,
+            },
             datasets=datasets or {},
         )

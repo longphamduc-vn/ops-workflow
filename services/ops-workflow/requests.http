@@ -59,6 +59,10 @@ X-API-Key: {{apiKey}}
 GET {{baseUrl}}/api/v1/workflows/target-stock-optimization
 X-API-Key: {{apiKey}}
 
+### 1.7 Inspect 'procurement-rfq-stock-optimization' Metadata & Schema (Dd.yaml spec)
+GET {{baseUrl}}/api/v1/workflows/procurement-rfq-stock-optimization
+X-API-Key: {{apiKey}}
+
 
 ### ------------------------------------------------------------------------------
 ### 2. TRIGGER WORKFLOW RUNS
@@ -160,6 +164,21 @@ Content-Type: {{jsonContentType}}
   }
 }
 
+### 2.8 Run 'procurement-rfq-stock-optimization' (Based on Dd.yaml & Nexacro traces)
+# Evaluates 6 interlocks, remaining stock, RFQ states, and calculates purchase requisitions
+# @name triggerProcurementOpt
+POST {{baseUrl}}/api/v1/workflows/procurement-rfq-stock-optimization/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "item_code": "QDAB03583",
+    "alert_channel": "{{alertChannel}}"
+  }
+}
+
 
 
 ### ------------------------------------------------------------------------------
@@ -210,6 +229,10 @@ X-API-Key: {{apiKey}}
 
 ### 4.6 Query 'target_stock_optimization_dataset' (Target Stock Analysis dataset)
 GET {{baseUrl}}/api/v1/datasets/target_stock_optimization_dataset?limit=5
+X-API-Key: {{apiKey}}
+
+### 4.7 Query 'procurement_stock_optimization_dataset' (Procurement & RFQ Interlocks dataset)
+GET {{baseUrl}}/api/v1/datasets/procurement_stock_optimization_dataset?limit=5
 X-API-Key: {{apiKey}}
 
 

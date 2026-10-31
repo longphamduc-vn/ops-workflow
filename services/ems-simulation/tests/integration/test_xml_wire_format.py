@@ -34,6 +34,22 @@ async def test_xml_request_and_response_stock_status(client: AsyncClient):
             </Row>
         </Rows>
     </Dataset>
+    <Dataset id="ds_ItemInfo">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="item">QCAB10960</Col>
+                <Col id="itemDesc"></Col>
+                <Col id="inventoryItemId">387152</Col>
+                <Col id="remark"></Col>
+            </Row>
+        </Rows>
+    </Dataset>
 </Root>"""
 
     response = await client.post(
@@ -157,3 +173,64 @@ async def test_xml_unregistered_endpoint_404(client: AsyncClient):
     assert params_elem is not None
     param_map = {p.attrib["id"]: p.text for p in params_elem}
     assert param_map.get("errorCode") == "-404"
+
+
+@pytest.mark.asyncio
+async def test_xml_missing_dataset_returns_400_validation_error(client: AsyncClient):
+    """Verify endpoint rejects request when required dataset (e.g. ds_ItemInfo) is missing."""
+    invalid_request = """<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="_ems_userId" type="string">658359</Parameter>
+        <Parameter id="_ems_organizationId" type="string">28753</Parameter>
+    </Parameters>
+    <Dataset id="ds_search">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">28753</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>"""
+
+    response = await client.post(
+        "/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn",
+        content=invalid_request,
+        headers={"Content-Type": "application/xml"},
+    )
+    assert response.status_code == 400
+    assert "application/xml" in response.headers["content-type"]
+
+    root = ET.fromstring(response.text)
+    params_elem = root.find("{http://www.nexacroplatform.com/platform/dataset}Parameters")
+    if params_elem is None:
+        params_elem = root.find("Parameters")
+    assert params_elem is not None
+    param_map = {p.attrib["id"]: p.text for p in params_elem}
+    assert param_map.get("errorCode") == "-400"
+    assert "Missing required dataset 'ds_ItemInfo'" in param_map.get("errorMsg", "")
+
+
+@pytest.mark.asyncio
+async def test_xml_malformed_syntax_returns_400_error(client: AsyncClient):
+    """Verify malformed XML payload returns 400 Bad Request."""
+    malformed_xml = "<?xml version='1.0'?><Root><UnclosedTag>"
+
+    response = await client.post(
+        "/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn",
+        content=malformed_xml,
+        headers={"Content-Type": "application/xml"},
+    )
+    assert response.status_code == 400
+
+    root = ET.fromstring(response.text)
+    params_elem = root.find("{http://www.nexacroplatform.com/platform/dataset}Parameters")
+    if params_elem is None:
+        params_elem = root.find("Parameters")
+    assert params_elem is not None
+    param_map = {p.attrib["id"]: p.text for p in params_elem}
+    assert param_map.get("errorCode") == "-400"
+    assert "Malformed request payload" in param_map.get("errorMsg", "")

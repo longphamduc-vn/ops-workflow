@@ -31,16 +31,66 @@ SAMPLE_XML_PAYLOAD = """<?xml version="1.0" encoding="UTF-8"?>
         <Parameter id="_ems_userId" type="string">658359</Parameter>
         <Parameter id="_ems_organizationId" type="string">28753</Parameter>
         <Parameter id="_ems_language" type="string">EN</Parameter>
+        <Parameter id="statementName" type="string">COM_CODE_LIST</Parameter>
+        <Parameter id="comboCnt" type="string">1</Parameter>
     </Parameters>
     <Dataset id="ds_search">
         <ColumnInfo>
             <Column id="organizationId" type="STRING" size="256"/>
             <Column id="item" type="STRING" size="256"/>
+            <Column id="optimizeFlag" type="STRING" size="256"/>
         </ColumnInfo>
         <Rows>
             <Row>
                 <Col id="organizationId">28753</Col>
                 <Col id="item">QDAB03583</Col>
+                <Col id="optimizeFlag">Y</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_Search">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">28753</Col>
+                <Col id="item">QCAB10960</Col>
+                <Col id="itemDesc">LM Guide</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_ItemInfo">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="item">QCAB10960</Col>
+                <Col id="itemDesc"></Col>
+                <Col id="inventoryItemId">387152</Col>
+                <Col id="remark"></Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_Input">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
+            <Column id="item" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">28753</Col>
+                <Col id="inventoryItemId">387152</Col>
+                <Col id="userId">658359</Col>
+                <Col id="item">QCAB10960</Col>
             </Row>
         </Rows>
     </Dataset>
@@ -48,11 +98,13 @@ SAMPLE_XML_PAYLOAD = """<?xml version="1.0" encoding="UTF-8"?>
         <ColumnInfo>
             <Column id="wipEntityId" type="STRING" size="256"/>
             <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
         </ColumnInfo>
         <Rows>
             <Row>
                 <Col id="wipEntityId">337389615</Col>
                 <Col id="organizationId">28753</Col>
+                <Col id="userId">658359</Col>
             </Row>
         </Rows>
     </Dataset>
@@ -63,6 +115,18 @@ SAMPLE_XML_PAYLOAD = """<?xml version="1.0" encoding="UTF-8"?>
         <Rows>
             <Row>
                 <Col id="wipEntityId">337389615</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_input0">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="item" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">28753</Col>
+                <Col id="item">QCAB10960</Col>
             </Row>
         </Rows>
     </Dataset>
