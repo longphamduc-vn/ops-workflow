@@ -1,0 +1,3898 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://nexacroplatform.com">
+
+    <Parameters>
+
+        <Parameter id="_ems_userId">658359</Parameter>
+
+        <Parameter id="_ems_organizationId">28753</Parameter>
+
+        <Parameter id="_ems_language">EN</Parameter>
+
+    </Parameters>
+
+    <Dataset id="ds_search">
+
+        <ColumnInfo>
+
+            <Column id="organizationId" type="STRING" size="256" />
+
+            <Column id="itemCond" type="STRING" size="256" />
+
+            <Column id="optimizeFlag" type="STRING" size="256" />
+
+            <Column id="optimizedApplyDate" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            <Row>
+
+                <Col id="organizationId">28753</Col>
+
+                <Col id="itemCond">Y</Col>
+
+                <Col id="optimizeFlag">Y</Col>
+
+                <Col id="optimizedApplyDate">20210316</Col>
+
+            </Row>
+
+        </Rows>
+
+    </Dataset>
+
+    <Dataset id="ds_ItemInfo">
+
+        <ColumnInfo>
+
+            <Column id="item" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            __ROWS_XML__
+
+        </Rows>
+
+    </Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">QCAD38190</Col>
+
+				<Col id="itemDesc">Pneumatic&#32;Cylinder&#32;**&#32;MXQ16-100B,&#32;SMC&#32;CORPORATION,&#32;Inner&#32;Diameter:16㎜,&#32;Applicable&#32;Pressure:0.7㎫,&#32;Road&#32;Method:SLIDE,&#32;The&#32;Diameter&#32;Of&#32;A&#32;Pipe:,&#32;Installation&#32;Method:BASIC,&#32;Stroke:100㎜,&#32;Working&#32;Method:DOUBLE&#32;ACTING,&#32;Cushion:,&#32;Pistone&#32;Maxim</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">597</Col>
+
+				<Col id="reqAmount">1791</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">1160150</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">Y</Col>
+
+				<Col id="periodicFlag">Y</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileMain">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileSscs">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">__ITEM__</Col>
+
+				<Col id="itemDesc">__ITEM_DESC__</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">3150</Col>
+
+				<Col id="reqAmount">9450</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">2475273</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">N</Col>
+
+				<Col id="periodicFlag">N</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+import os
+
+import xml.etree.ElementTree as ET
+
+import requests
+
+
+
+
+
+
+
+class NexacroService:
+
+    # Định nghĩa đường dẫn trỏ tới thư mục chứa các file XML mẫu
+
+    TEMPLATE_DIR = os.path.join(
+
+        os.path.dirname(os.path.abspath(__file__)), "templates"
+
+    )
+
+
+
+
+    @classmethod
+
+    def _read_template(cls, filename: str) -> str:
+
+        """Đọc nội dung văn bản thô từ file XML mẫu"""
+
+        file_path = os.path.join(cls.TEMPLATE_DIR, filename)
+
+        with open(file_path, "r", encoding="utf-8") as f:
+
+            return f.read()
+
+
+
+
+    @classmethod
+
+    def build_request_xml(cls, items: list) -> str:
+
+        """[Step 1] Đọc template và thay thế danh sách item nhập từ UI"""
+
+        template = cls._read_template("step1_req.xml")
+
+        rows_xml = "\n".join(
+
+            [f'\t\t\t<Row><Col id="item">{item}</Col></Row>' for item in items]
+
+        )
+
+        # Dùng .replace() để không bao giờ bị lỗi xung đột dấu ngoặc nhọn {} của file XML gốc
+
+        return template.replace("__ROWS_XML__", rows_xml)
+
+
+
+
+    @classmethod
+
+    def build_step2_xml(cls, inventory_item_id: str) -> str:
+
+        """[Step 2] Đọc template và bơm chính xác duy nhất 1 ID của vòng lặp"""
+
+        template = cls._read_template("step2_req.xml")
+
+        # Thay thế chuỗi đánh dấu bằng ID thực tế một cách an toàn
+
+        return template.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+
+
+
+    @classmethod
+
+    def build_step3_xml(cls, item: str, item_desc: str, inventory_item_id: str) -> str:
+
+        """[Step 3] Đọc template và thay thế đồng thời 3 trường động từ kết quả Step 1"""
+
+        template = cls._read_template("step3_req.xml")
+
+        
+
+        # Thay thế tuần tự 3 chuỗi đánh dấu bằng dữ liệu thực tế
+
+        xml_output = template.replace("__ITEM__", str(item))
+
+        xml_output = xml_output.replace("__ITEM_DESC__", str(item_desc))
+
+        xml_output = xml_output.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+        return xml_output
+
+
+
+
+    @staticmethod
+
+    def send_post_request(url: str, xml_data: str) -> str:
+
+        """Thực hiện bắn HTTP POST"""
+
+        headers = {"Content-Type": "application/xml; charset=UTF-8"}
+
+        response = requests.post(
+
+            url, data=xml_data.encode("utf-8"), headers=headers, timeout=30
+
+        )
+
+        response.raise_for_status()
+
+        return response.text
+
+
+
+
+    @staticmethod
+
+    def parse_response_xml(xml_response_text: str) -> tuple:
+
+        """Phân tích XML nhận về từ server để lấy errorMsg và danh sách dữ liệu hàng.
+
+        Sửa lỗi: Kiểm tra điều kiện strip() văn bản để không làm hỏng Step 1 khi nhận thẻ trống,
+
+        đồng thời hỗ trợ tìm kiếm linh hoạt lỗi ErrorMsg không có Namespace của Step 3.
+
+        """
+
+        root = ET.fromstring(xml_response_text)
+
+        ns = {"ns": "http://www.nexacroplatform.com/platform/dataset"}
+
+
+
+
+        error_msg = ""
+
+        
+
+        # --- 1. KIỂM TRA THÔNG BÁO LỖI (BẮT BUỘC VĂN BẢN PHẢI CÓ NỘI DUNG) ---
+
+        
+
+        # Cách 1: Tìm theo Namespace chuẩn (Kiểu chữ thường errorMsg)
+
+        err_param = root.find(".//ns:Parameter[@id='errorMsg']", ns)
+
+        if err_param is not None and err_param.text is not None:
+
+            text_val = str(err_param.text).strip()
+
+            if text_val: # Chỉ lấy nếu text không rỗng (Giúp Step 1 chạy bình thường)
+
+                error_msg = text_val
+
+
+
+
+        # Cách 2: Nếu chưa tìm thấy lỗi, quét linh hoạt không Namespace (Kiểu chữ hoa ErrorMsg của Step 3)
+
+        if not error_msg:
+
+            # Tìm tất cả các thẻ Parameter bất kể có dính ns: hay không
+
+            all_parameters = root.findall(".//{*}Parameter")
+
+            for param in all_parameters:
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorMsg", "ErrorMsg"]:
+
+                    if param.text is not None:
+
+                        text_val = str(param.text).strip()
+
+                        if text_val: # Chỉ lấy nếu thực sự chứa nội dung báo lỗi
+
+                            error_msg = text_val
+
+                            break
+
+
+
+
+        # Cách 3: Dự phòng cuối cùng nếu ErrorMsg trống hoàn toàn nhưng ErrorCode trả về là mã lỗi âm (-1)
+
+        if not error_msg:
+
+            for param in root.findall(".//{*}Parameter"):
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorCode", "ErrorCode"] and str(param.text).strip() == "-1":
+
+                    error_msg = "Lỗi hệ thống (ErrorCode: -1 từ Server)"
+
+                    break
+
+
+
+
+        # --- 2. TRÍCH XUẤT DỮ LIỆU BẢNG (GIỮ NGUYÊN BẢN CHẠY ĐƯỢC CỦA BẠN) ---
+
+        rows_data = []
+
+        dataset_result = root.find(".//ns:Dataset[@id='ds_result']", ns)
+
+        if dataset_result is not None:
+
+            dataset_rows = dataset_result.find("ns:Rows", ns)
+
+            if dataset_rows is not None:
+
+                for row in dataset_rows.findall("ns:Row", ns):
+
+                    row_dict = {}
+
+                    for col in row.findall("ns:Col", ns):
+
+                        col_id = col.get("id")
+
+                        col_value = col.text if col.text is not None else ""
+
+                        row_dict[col_id] = col_value
+
+                    rows_data.append(row_dict)
+
+
+
+
+        return error_msg, rows_data
+
+API_URL=http://ems.lgdisplay.com:9000/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+
+API_URL_STEP2=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn
+
+API_URL_STEP3=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/retrievePoRequest.lgdn
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://nexacroplatform.com">
+
+    <Parameters>
+
+        <Parameter id="_ems_userId">658359</Parameter>
+
+        <Parameter id="_ems_organizationId">28753</Parameter>
+
+        <Parameter id="_ems_language">EN</Parameter>
+
+    </Parameters>
+
+    <Dataset id="ds_search">
+
+        <ColumnInfo>
+
+            <Column id="organizationId" type="STRING" size="256" />
+
+            <Column id="itemCond" type="STRING" size="256" />
+
+            <Column id="optimizeFlag" type="STRING" size="256" />
+
+            <Column id="optimizedApplyDate" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            <Row>
+
+                <Col id="organizationId">28753</Col>
+
+                <Col id="itemCond">Y</Col>
+
+                <Col id="optimizeFlag">Y</Col>
+
+                <Col id="optimizedApplyDate">20210316</Col>
+
+            </Row>
+
+        </Rows>
+
+    </Dataset>
+
+    <Dataset id="ds_ItemInfo">
+
+        <ColumnInfo>
+
+            <Column id="item" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            __ROWS_XML__
+
+        </Rows>
+
+    </Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">QCAD38190</Col>
+
+				<Col id="itemDesc">Pneumatic&#32;Cylinder&#32;**&#32;MXQ16-100B,&#32;SMC&#32;CORPORATION,&#32;Inner&#32;Diameter:16㎜,&#32;Applicable&#32;Pressure:0.7㎫,&#32;Road&#32;Method:SLIDE,&#32;The&#32;Diameter&#32;Of&#32;A&#32;Pipe:,&#32;Installation&#32;Method:BASIC,&#32;Stroke:100㎜,&#32;Working&#32;Method:DOUBLE&#32;ACTING,&#32;Cushion:,&#32;Pistone&#32;Maxim</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">597</Col>
+
+				<Col id="reqAmount">1791</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">1160150</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">Y</Col>
+
+				<Col id="periodicFlag">Y</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileMain">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileSscs">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">__ITEM__</Col>
+
+				<Col id="itemDesc">__ITEM_DESC__</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">3150</Col>
+
+				<Col id="reqAmount">9450</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">2475273</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">N</Col>
+
+				<Col id="periodicFlag">N</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+import os
+
+import xml.etree.ElementTree as ET
+
+import requests
+
+
+
+
+
+
+
+class NexacroService:
+
+    # Định nghĩa đường dẫn trỏ tới thư mục chứa các file XML mẫu
+
+    TEMPLATE_DIR = os.path.join(
+
+        os.path.dirname(os.path.abspath(__file__)), "templates"
+
+    )
+
+
+
+
+    @classmethod
+
+    def _read_template(cls, filename: str) -> str:
+
+        """Đọc nội dung văn bản thô từ file XML mẫu"""
+
+        file_path = os.path.join(cls.TEMPLATE_DIR, filename)
+
+        with open(file_path, "r", encoding="utf-8") as f:
+
+            return f.read()
+
+
+
+
+    @classmethod
+
+    def build_request_xml(cls, items: list) -> str:
+
+        """[Step 1] Đọc template và thay thế danh sách item nhập từ UI"""
+
+        template = cls._read_template("step1_req.xml")
+
+        rows_xml = "\n".join(
+
+            [f'\t\t\t<Row><Col id="item">{item}</Col></Row>' for item in items]
+
+        )
+
+        # Dùng .replace() để không bao giờ bị lỗi xung đột dấu ngoặc nhọn {} của file XML gốc
+
+        return template.replace("__ROWS_XML__", rows_xml)
+
+
+
+
+    @classmethod
+
+    def build_step2_xml(cls, inventory_item_id: str) -> str:
+
+        """[Step 2] Đọc template và bơm chính xác duy nhất 1 ID của vòng lặp"""
+
+        template = cls._read_template("step2_req.xml")
+
+        # Thay thế chuỗi đánh dấu bằng ID thực tế một cách an toàn
+
+        return template.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+
+
+
+    @classmethod
+
+    def build_step3_xml(cls, item: str, item_desc: str, inventory_item_id: str) -> str:
+
+        """[Step 3] Đọc template và thay thế đồng thời 3 trường động từ kết quả Step 1"""
+
+        template = cls._read_template("step3_req.xml")
+
+        
+
+        # Thay thế tuần tự 3 chuỗi đánh dấu bằng dữ liệu thực tế
+
+        xml_output = template.replace("__ITEM__", str(item))
+
+        xml_output = xml_output.replace("__ITEM_DESC__", str(item_desc))
+
+        xml_output = xml_output.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+        return xml_output
+
+
+
+
+    @staticmethod
+
+    def send_post_request(url: str, xml_data: str) -> str:
+
+        """Thực hiện bắn HTTP POST"""
+
+        headers = {"Content-Type": "application/xml; charset=UTF-8"}
+
+        response = requests.post(
+
+            url, data=xml_data.encode("utf-8"), headers=headers, timeout=30
+
+        )
+
+        response.raise_for_status()
+
+        return response.text
+
+
+
+
+    @staticmethod
+
+    def parse_response_xml(xml_response_text: str) -> tuple:
+
+        """Phân tích XML nhận về từ server để lấy errorMsg và danh sách dữ liệu hàng.
+
+        Sửa lỗi: Kiểm tra điều kiện strip() văn bản để không làm hỏng Step 1 khi nhận thẻ trống,
+
+        đồng thời hỗ trợ tìm kiếm linh hoạt lỗi ErrorMsg không có Namespace của Step 3.
+
+        """
+
+        root = ET.fromstring(xml_response_text)
+
+        ns = {"ns": "http://www.nexacroplatform.com/platform/dataset"}
+
+
+
+
+        error_msg = ""
+
+        
+
+        # --- 1. KIỂM TRA THÔNG BÁO LỖI (BẮT BUỘC VĂN BẢN PHẢI CÓ NỘI DUNG) ---
+
+        
+
+        # Cách 1: Tìm theo Namespace chuẩn (Kiểu chữ thường errorMsg)
+
+        err_param = root.find(".//ns:Parameter[@id='errorMsg']", ns)
+
+        if err_param is not None and err_param.text is not None:
+
+            text_val = str(err_param.text).strip()
+
+            if text_val: # Chỉ lấy nếu text không rỗng (Giúp Step 1 chạy bình thường)
+
+                error_msg = text_val
+
+
+
+
+        # Cách 2: Nếu chưa tìm thấy lỗi, quét linh hoạt không Namespace (Kiểu chữ hoa ErrorMsg của Step 3)
+
+        if not error_msg:
+
+            # Tìm tất cả các thẻ Parameter bất kể có dính ns: hay không
+
+            all_parameters = root.findall(".//{*}Parameter")
+
+            for param in all_parameters:
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorMsg", "ErrorMsg"]:
+
+                    if param.text is not None:
+
+                        text_val = str(param.text).strip()
+
+                        if text_val: # Chỉ lấy nếu thực sự chứa nội dung báo lỗi
+
+                            error_msg = text_val
+
+                            break
+
+
+
+
+        # Cách 3: Dự phòng cuối cùng nếu ErrorMsg trống hoàn toàn nhưng ErrorCode trả về là mã lỗi âm (-1)
+
+        if not error_msg:
+
+            for param in root.findall(".//{*}Parameter"):
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorCode", "ErrorCode"] and str(param.text).strip() == "-1":
+
+                    error_msg = "Lỗi hệ thống (ErrorCode: -1 từ Server)"
+
+                    break
+
+
+
+
+        # --- 2. TRÍCH XUẤT DỮ LIỆU BẢNG (GIỮ NGUYÊN BẢN CHẠY ĐƯỢC CỦA BẠN) ---
+
+        rows_data = []
+
+        dataset_result = root.find(".//ns:Dataset[@id='ds_result']", ns)
+
+        if dataset_result is not None:
+
+            dataset_rows = dataset_result.find("ns:Rows", ns)
+
+            if dataset_rows is not None:
+
+                for row in dataset_rows.findall("ns:Row", ns):
+
+                    row_dict = {}
+
+                    for col in row.findall("ns:Col", ns):
+
+                        col_id = col.get("id")
+
+                        col_value = col.text if col.text is not None else ""
+
+                        row_dict[col_id] = col_value
+
+                    rows_data.append(row_dict)
+
+
+
+
+        return error_msg, rows_data
+
+API_URL=http://ems.lgdisplay.com:9000/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+
+API_URL_STEP2=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn
+
+API_URL_STEP3=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/retrievePoRequest.lgdn
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://nexacroplatform.com">
+
+    <Parameters>
+
+        <Parameter id="_ems_userId">658359</Parameter>
+
+        <Parameter id="_ems_organizationId">28753</Parameter>
+
+        <Parameter id="_ems_language">EN</Parameter>
+
+    </Parameters>
+
+    <Dataset id="ds_search">
+
+        <ColumnInfo>
+
+            <Column id="organizationId" type="STRING" size="256" />
+
+            <Column id="itemCond" type="STRING" size="256" />
+
+            <Column id="optimizeFlag" type="STRING" size="256" />
+
+            <Column id="optimizedApplyDate" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            <Row>
+
+                <Col id="organizationId">28753</Col>
+
+                <Col id="itemCond">Y</Col>
+
+                <Col id="optimizeFlag">Y</Col>
+
+                <Col id="optimizedApplyDate">20210316</Col>
+
+            </Row>
+
+        </Rows>
+
+    </Dataset>
+
+    <Dataset id="ds_ItemInfo">
+
+        <ColumnInfo>
+
+            <Column id="item" type="STRING" size="256" />
+
+        </ColumnInfo>
+
+        <Rows>
+
+            __ROWS_XML__
+
+        </Rows>
+
+    </Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">QCAD38190</Col>
+
+				<Col id="itemDesc">Pneumatic&#32;Cylinder&#32;**&#32;MXQ16-100B,&#32;SMC&#32;CORPORATION,&#32;Inner&#32;Diameter:16㎜,&#32;Applicable&#32;Pressure:0.7㎫,&#32;Road&#32;Method:SLIDE,&#32;The&#32;Diameter&#32;Of&#32;A&#32;Pipe:,&#32;Installation&#32;Method:BASIC,&#32;Stroke:100㎜,&#32;Working&#32;Method:DOUBLE&#32;ACTING,&#32;Cushion:,&#32;Pistone&#32;Maxim</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">597</Col>
+
+				<Col id="reqAmount">1791</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">1160150</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">Y</Col>
+
+				<Col id="periodicFlag">Y</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileMain">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_FileSscs">
+
+		<ColumnInfo />
+
+		<Rows>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+
+	<Parameters>
+
+		<Parameter id="_ems_userId">658359</Parameter>
+
+		<Parameter id="_ems_organizationId">28753</Parameter>
+
+		<Parameter id="_ems_language">EN</Parameter>
+
+	</Parameters>
+
+	<Dataset id="ds_search">
+
+		<ColumnInfo>
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="overShortageQty" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestFrmDate" type="STRING" size="256"  />
+
+			<Column id="requestToDate" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="itemYn" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="requestDept" type="STRING" size="256"  />
+
+			<Column id="requestDeptCode" type="STRING" size="256"  />
+
+			<Column id="chkInclude" type="STRING" size="256"  />
+
+			<Column id="userId" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="tPrvNo" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="prvTypeCode" type="STRING" size="256"  />
+
+			<Column id="excelExportFlag" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="dateType" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="authWipEntityId" type="STRING" size="256"  />
+
+			<Column id="cancelPrvNo" type="STRING" size="256"  />
+
+			<Column id="type" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="prvNo" />
+
+				<Col id="overShortageQty" />
+
+				<Col id="unitPriceStatusCode" />
+
+				<Col id="itemStatus" />
+
+				<Col id="confirmFlag" />
+
+				<Col id="requestFrmDate">20260921</Col>
+
+				<Col id="requestToDate">20260921</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="itemYn">N</Col>
+
+				<Col id="userId">658359</Col>
+
+				<Col id="publicFlag" />
+
+				<Col id="periodicFlag" />
+
+				<Col id="dateType">REQUEST</Col>
+
+				<Col id="type">REV_CONFIRM_Q</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+	<Dataset id="ds_param">
+
+		<ColumnInfo>
+
+			<Column id="checked" type="STRING" size="256"  />
+
+			<Column id="prvNo" type="STRING" size="256"  />
+
+			<Column id="confirmFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatus" type="STRING" size="256"  />
+
+			<Column id="itemType" type="STRING" size="256"  />
+
+			<Column id="item" type="STRING" size="256"  />
+
+			<Column id="itemDesc" type="STRING" size="256"  />
+
+			<Column id="itemStatus" type="STRING" size="256"  />
+
+			<Column id="requestQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="overShortageQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="unitPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reqAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="requestorName" type="STRING" size="256"  />
+
+			<Column id="requestorDept" type="STRING" size="256"  />
+
+			<Column id="requestDate" type="STRING" size="256"  />
+
+			<Column id="reviewerName" type="STRING" size="256"  />
+
+			<Column id="emNo" type="STRING" size="256"  />
+
+			<Column id="emNoDesc" type="STRING" size="256"  />
+
+			<Column id="budgetDeptCode" type="STRING" size="256"  />
+
+			<Column id="requestComment" type="STRING" size="256"  />
+
+			<Column id="reviewComment" type="STRING" size="256"  />
+
+			<Column id="emNoBudget" type="STRING" size="256"  />
+
+			<Column id="scheduledUseDate" type="STRING" size="256"  />
+
+			<Column id="orderTypeDesc" type="STRING" size="256"  />
+
+			<Column id="owningDept" type="STRING" size="256"  />
+
+			<Column id="bufferZone" type="STRING" size="256"  />
+
+			<Column id="wacCode" type="STRING" size="256"  />
+
+			<Column id="wacDesc" type="STRING" size="256"  />
+
+			<Column id="vendorName" type="STRING" size="256"  />
+
+			<Column id="realLeadTime" type="BIGDECIMAL" size="256"  />
+
+			<Column id="makerOnHand" type="STRING" size="256"  />
+
+			<Column id="supplierStatus" type="STRING" size="256"  />
+
+			<Column id="deliveryConfirmDate" type="STRING" size="256"  />
+
+			<Column id="unitPriceStatus" type="STRING" size="256"  />
+
+			<Column id="poRequestNo" type="STRING" size="256"  />
+
+			<Column id="approvalInfo" type="STRING" size="256"  />
+
+			<Column id="workOrder" type="STRING" size="256"  />
+
+			<Column id="woDesc" type="STRING" size="256"  />
+
+			<Column id="poNo" type="STRING" size="256"  />
+
+			<Column id="poDate" type="STRING" size="256"  />
+
+			<Column id="poQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poPrice" type="BIGDECIMAL" size="256"  />
+
+			<Column id="poAmount" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="receivingDate" type="STRING" size="256"  />
+
+			<Column id="poCancelFlag" type="STRING" size="256"  />
+
+			<Column id="confirmDate" type="STRING" size="256"  />
+
+			<Column id="confirmName" type="STRING" size="256"  />
+
+			<Column id="commonStopFlag" type="STRING" size="256"  />
+
+			<Column id="prvStatusCode" type="STRING" size="256"  />
+
+			<Column id="itemTypeCode" type="STRING" size="256"  />
+
+			<Column id="unitPiceStatusCode" type="STRING" size="256"  />
+
+			<Column id="reqEstimateFlag" type="STRING" size="256"  />
+
+			<Column id="prvComleteBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poRequestBtnFlag" type="STRING" size="256"  />
+
+			<Column id="poChageBtnFlag" type="STRING" size="256"  />
+
+			<Column id="prvSaveBtnFlag" type="STRING" size="256"  />
+
+			<Column id="reviewerId" type="STRING" size="256"  />
+
+			<Column id="instanceId" type="STRING" size="256"  />
+
+			<Column id="requestorId" type="STRING" size="256"  />
+
+			<Column id="requestorDeptCode" type="STRING" size="256"  />
+
+			<Column id="inventoryItemId" type="STRING" size="256"  />
+
+			<Column id="organizationId" type="STRING" size="256"  />
+
+			<Column id="wipEntityId" type="STRING" size="256"  />
+
+			<Column id="requisitionLineId" type="STRING" size="256"  />
+
+			<Column id="txnGroupId" type="STRING" size="256"  />
+
+			<Column id="lineLocationId" type="STRING" size="256"  />
+
+			<Column id="poRequestM asterId" type="STRING" size="256"  />
+
+			<Column id="orderType" type="STRING" size="256"  />
+
+			<Column id="vendorId" type="STRING" size="256"  />
+
+			<Column id="approverId" type="STRING" size="256"  />
+
+			<Column id="attachment" type="STRING" size="256"  />
+
+			<Column id="sscsAttachment" type="STRING" size="256"  />
+
+			<Column id="budgetDept" type="STRING" size="256"  />
+
+			<Column id="poRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="owningDepartmentId" type="STRING" size="256"  />
+
+			<Column id="owningDeptCode" type="STRING" size="256"  />
+
+			<Column id="rfqRequestMasterId" type="STRING" size="256"  />
+
+			<Column id="fileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="prvNoFlag" type="STRING" size="256"  />
+
+			<Column id="sscsFileCnt" type="BIGDECIMAL" size="256"  />
+
+			<Column id="reviewItemQty" type="BIGDECIMAL" size="256"  />
+
+			<Column id="delayReasonName" type="STRING" size="256"  />
+
+			<Column id="reqPoChgFlag" type="STRING" size="256"  />
+
+			<Column id="overShortagePrvQty" type="STRING" size="256"  />
+
+			<Column id="publicFlag" type="STRING" size="256"  />
+
+			<Column id="periodicFlag" type="STRING" size="256"  />
+
+			<Column id="addPoReason" type="STRING" size="256"  />
+
+			<Column id="equipmentGroup" type="STRING" size="256"  />
+
+			<Column id="updateEnable" type="STRING" size="256"  />
+
+			<Column id="useDate" type="STRING" size="256"  />
+
+			<Column id="reasonDesc" type="STRING" size="256"  />
+
+			<Column id="reviewerFlag" type="STRING" size="256"  />
+
+			<Column id="waitRepairQty" type="STRING" size="256"  />
+
+			<Column id="partsUseTypeCode" type="STRING" size="256"  />
+
+		</ColumnInfo>
+
+		<Rows>
+
+			<Row>
+
+				<Col id="checked">1</Col>
+
+				<Col id="prvNo">Q2405-2244838</Col>
+
+				<Col id="confirmFlag">Y</Col>
+
+				<Col id="prvStatus">Confirm&#32;PO&#32;Review</Col>
+
+				<Col id="itemType">Invidual&#32;Management</Col>
+
+				<Col id="item">__ITEM__</Col>
+
+				<Col id="itemDesc">__ITEM_DESC__</Col>
+
+				<Col id="requestQty">3</Col>
+
+				<Col id="unitPrice">3150</Col>
+
+				<Col id="reqAmount">9450</Col>
+
+				<Col id="requestorName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="requestorDept">NY&#32;SW&#32;PO&#32;M&#32;Technology&#32;DB/BD&#32;Unit&#32;B1</Col>
+
+				<Col id="requestDate">20240529134226000</Col>
+
+				<Col id="reviewerName">Pham&#32;Duc&#32;Long</Col>
+
+				<Col id="emNo">HWBMTL22BP0102</Col>
+
+				<Col id="requestComment">Người&#32;kiểm&#32;tra&#32;tình&#32;hình:&#32;Mr&#32;Đức&#10;+&#32;Requestor:&#32;Mr&#32;Huyện&#10;+&#32;Lý&#32;do&#32;mua&#32;:&#32;Sử&#32;Dụng&#32;Ngay&#10;+&#32;Trạng&#32;thái&#32;tồn&#32;khohiện&#32;tại:&#32;0ea&#10;+&#32;Tóm&#32;lược&#32;sử&#32;dụng:&#32;24ea/1line&#10;+&#32;안전&#32;재고품&#32;1ea&#10;+&#32;Location:&#32;H1&#32;2F&#10;+&#32;Machine:&#32;DIP&#10;+&#32;Số&#32;lượng&#32;mua:&#32;3ea&#10;</Col>
+
+				<Col id="reviewComment">phamduclong04&#10;tranhuutao</Col>
+
+				<Col id="emNoBudget">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="scheduledUseDate">20240603000000000</Col>
+
+				<Col id="orderTypeDesc">즉사용(Ready-to-use)</Col>
+
+				<Col id="owningDept">NY&#32;PO&#32;M&#32;Technology&#32;CP&#32;Unit&#32;2</Col>
+
+				<Col id="realLeadTime" />
+
+				<Col id="makerOnHand" />
+
+				<Col id="supplierStatus" />
+
+				<Col id="deliveryConfirmDate" />
+
+				<Col id="unitPriceStatus">Price&#32;Registration</Col>
+
+				<Col id="approvalInfo" />
+
+				<Col id="workOrder" />
+
+				<Col id="poNo" />
+
+				<Col id="poDate" />
+
+				<Col id="poQty" />
+
+				<Col id="receivingQty" />
+
+				<Col id="receivingDate" />
+
+				<Col id="confirmDate">20260921000000000</Col>
+
+				<Col id="prvStatusCode">QP007</Col>
+
+				<Col id="itemTypeCode">N001</Col>
+
+				<Col id="reviewerId">658359</Col>
+
+				<Col id="instanceId">5771628</Col>
+
+				<Col id="requestorId">658359</Col>
+
+				<Col id="requestorDeptCode">87301</Col>
+
+				<Col id="inventoryItemId">__INVENTORY_ITEM_ID__</Col>
+
+				<Col id="organizationId">28753</Col>
+
+				<Col id="wipEntityId" />
+
+				<Col id="requisitionLineId" />
+
+				<Col id="txnGroupId">325911141</Col>
+
+				<Col id="lineLocationId" />
+
+				<Col id="orderType">T001</Col>
+
+				<Col id="vendorId">2475273</Col>
+
+				<Col id="approverId">658359</Col>
+
+				<Col id="budgetDept">NY&#32;PO&#32;M&#32;Technology&#32;CP/SG&#32;Part&#32;1</Col>
+
+				<Col id="poRequestMasterId" />
+
+				<Col id="owningDepartmentId">977596</Col>
+
+				<Col id="prvNoFlag">N</Col>
+
+				<Col id="reviewItemQty">3</Col>
+
+				<Col id="delayReasonName" />
+
+				<Col id="publicFlag">N</Col>
+
+				<Col id="periodicFlag">N</Col>
+
+				<Col id="addPoReason">3ea&#32;NG</Col>
+
+				<Col id="equipmentGroup">MTL</Col>
+
+				<Col id="updateEnable">N</Col>
+
+				<Col id="useDate">20241011</Col>
+
+				<Col id="reasonDesc">R001</Col>
+
+				<Col id="reviewerFlag">N</Col>
+
+				<Col id="waitRepairQty">0</Col>
+
+				<Col id="partsUseTypeCode">N001</Col>
+
+			</Row>
+
+		</Rows>
+
+	</Dataset>
+
+</Root>
+
+
+
+
+import os
+
+import xml.etree.ElementTree as ET
+
+import requests
+
+
+
+
+
+
+
+class NexacroService:
+
+    # Định nghĩa đường dẫn trỏ tới thư mục chứa các file XML mẫu
+
+    TEMPLATE_DIR = os.path.join(
+
+        os.path.dirname(os.path.abspath(__file__)), "templates"
+
+    )
+
+
+
+
+    @classmethod
+
+    def _read_template(cls, filename: str) -> str:
+
+        """Đọc nội dung văn bản thô từ file XML mẫu"""
+
+        file_path = os.path.join(cls.TEMPLATE_DIR, filename)
+
+        with open(file_path, "r", encoding="utf-8") as f:
+
+            return f.read()
+
+
+
+
+    @classmethod
+
+    def build_request_xml(cls, items: list) -> str:
+
+        """[Step 1] Đọc template và thay thế danh sách item nhập từ UI"""
+
+        template = cls._read_template("step1_req.xml")
+
+        rows_xml = "\n".join(
+
+            [f'\t\t\t<Row><Col id="item">{item}</Col></Row>' for item in items]
+
+        )
+
+        # Dùng .replace() để không bao giờ bị lỗi xung đột dấu ngoặc nhọn {} của file XML gốc
+
+        return template.replace("__ROWS_XML__", rows_xml)
+
+
+
+
+    @classmethod
+
+    def build_step2_xml(cls, inventory_item_id: str) -> str:
+
+        """[Step 2] Đọc template và bơm chính xác duy nhất 1 ID của vòng lặp"""
+
+        template = cls._read_template("step2_req.xml")
+
+        # Thay thế chuỗi đánh dấu bằng ID thực tế một cách an toàn
+
+        return template.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+
+
+
+    @classmethod
+
+    def build_step3_xml(cls, item: str, item_desc: str, inventory_item_id: str) -> str:
+
+        """[Step 3] Đọc template và thay thế đồng thời 3 trường động từ kết quả Step 1"""
+
+        template = cls._read_template("step3_req.xml")
+
+        
+
+        # Thay thế tuần tự 3 chuỗi đánh dấu bằng dữ liệu thực tế
+
+        xml_output = template.replace("__ITEM__", str(item))
+
+        xml_output = xml_output.replace("__ITEM_DESC__", str(item_desc))
+
+        xml_output = xml_output.replace("__INVENTORY_ITEM_ID__", str(inventory_item_id))
+
+        return xml_output
+
+
+
+
+    @staticmethod
+
+    def send_post_request(url: str, xml_data: str) -> str:
+
+        """Thực hiện bắn HTTP POST"""
+
+        headers = {"Content-Type": "application/xml; charset=UTF-8"}
+
+        response = requests.post(
+
+            url, data=xml_data.encode("utf-8"), headers=headers, timeout=30
+
+        )
+
+        response.raise_for_status()
+
+        return response.text
+
+
+
+
+    @staticmethod
+
+    def parse_response_xml(xml_response_text: str) -> tuple:
+
+        """Phân tích XML nhận về từ server để lấy errorMsg và danh sách dữ liệu hàng.
+
+        Sửa lỗi: Kiểm tra điều kiện strip() văn bản để không làm hỏng Step 1 khi nhận thẻ trống,
+
+        đồng thời hỗ trợ tìm kiếm linh hoạt lỗi ErrorMsg không có Namespace của Step 3.
+
+        """
+
+        root = ET.fromstring(xml_response_text)
+
+        ns = {"ns": "http://www.nexacroplatform.com/platform/dataset"}
+
+
+
+
+        error_msg = ""
+
+        
+
+        # --- 1. KIỂM TRA THÔNG BÁO LỖI (BẮT BUỘC VĂN BẢN PHẢI CÓ NỘI DUNG) ---
+
+        
+
+        # Cách 1: Tìm theo Namespace chuẩn (Kiểu chữ thường errorMsg)
+
+        err_param = root.find(".//ns:Parameter[@id='errorMsg']", ns)
+
+        if err_param is not None and err_param.text is not None:
+
+            text_val = str(err_param.text).strip()
+
+            if text_val: # Chỉ lấy nếu text không rỗng (Giúp Step 1 chạy bình thường)
+
+                error_msg = text_val
+
+
+
+
+        # Cách 2: Nếu chưa tìm thấy lỗi, quét linh hoạt không Namespace (Kiểu chữ hoa ErrorMsg của Step 3)
+
+        if not error_msg:
+
+            # Tìm tất cả các thẻ Parameter bất kể có dính ns: hay không
+
+            all_parameters = root.findall(".//{*}Parameter")
+
+            for param in all_parameters:
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorMsg", "ErrorMsg"]:
+
+                    if param.text is not None:
+
+                        text_val = str(param.text).strip()
+
+                        if text_val: # Chỉ lấy nếu thực sự chứa nội dung báo lỗi
+
+                            error_msg = text_val
+
+                            break
+
+
+
+
+        # Cách 3: Dự phòng cuối cùng nếu ErrorMsg trống hoàn toàn nhưng ErrorCode trả về là mã lỗi âm (-1)
+
+        if not error_msg:
+
+            for param in root.findall(".//{*}Parameter"):
+
+                p_id = str(param.get("id")).strip()
+
+                if p_id in ["errorCode", "ErrorCode"] and str(param.text).strip() == "-1":
+
+                    error_msg = "Lỗi hệ thống (ErrorCode: -1 từ Server)"
+
+                    break
+
+
+
+
+        # --- 2. TRÍCH XUẤT DỮ LIỆU BẢNG (GIỮ NGUYÊN BẢN CHẠY ĐƯỢC CỦA BẠN) ---
+
+        rows_data = []
+
+        dataset_result = root.find(".//ns:Dataset[@id='ds_result']", ns)
+
+        if dataset_result is not None:
+
+            dataset_rows = dataset_result.find("ns:Rows", ns)
+
+            if dataset_rows is not None:
+
+                for row in dataset_rows.findall("ns:Row", ns):
+
+                    row_dict = {}
+
+                    for col in row.findall("ns:Col", ns):
+
+                        col_id = col.get("id")
+
+                        col_value = col.text if col.text is not None else ""
+
+                        row_dict[col_id] = col_value
+
+                    rows_data.append(row_dict)
+
+
+
+
+        return error_msg, rows_data
+
+API_URL=http://ems.lgdisplay.com:9000/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
+
+API_URL_STEP2=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn
+
+API_URL_STEP3=http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/retrievePoRequest.lgdn
