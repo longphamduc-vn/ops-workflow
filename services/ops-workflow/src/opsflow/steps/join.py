@@ -3,6 +3,7 @@
 from typing import Any
 
 from opsflow.core.context import Context
+from opsflow.core.logger import dev_log_join
 from opsflow.core.models import Result
 from opsflow.steps.base import Step
 from opsflow.steps.registry import register_step
@@ -55,5 +56,13 @@ class JoinStep(Step):
                     k = r_item.get(right_key)
                     if k not in matched_right_keys:
                         joined.append(dict(r_item))
+
+        dev_log_join(
+            left_count=len(left),
+            right_count=len(right),
+            on_key=on_key,
+            how=how,
+            result_count=len(joined),
+        )
 
         return Result(ok=True, data=joined)

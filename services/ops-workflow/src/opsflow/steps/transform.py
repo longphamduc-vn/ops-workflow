@@ -5,6 +5,7 @@ from typing import Any
 import jmespath
 
 from opsflow.core.context import Context
+from opsflow.core.logger import dev_log_transform
 from opsflow.core.models import Result
 from opsflow.steps.base import Step
 from opsflow.steps.registry import register_step
@@ -41,6 +42,13 @@ class TransformStep(Step):
             transformed = jmespath.search(expression, raw_input)
             if mappings and isinstance(mappings, dict):
                 transformed = _apply_mappings(transformed, mappings)
+
+            dev_log_transform(
+                engine=config.get("engine", "jmespath"),
+                expression=expression,
+                input_data=raw_input,
+                output_data=transformed,
+            )
 
             return Result(ok=True, data=transformed)
         except Exception as exc:

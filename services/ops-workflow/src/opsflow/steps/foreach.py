@@ -4,6 +4,7 @@ import asyncio
 from typing import Any
 
 from opsflow.core.context import Context
+from opsflow.core.logger import dev_log_foreach
 from opsflow.core.models import Result
 from opsflow.steps.base import Step
 from opsflow.steps.registry import create_step, register_step
@@ -26,6 +27,8 @@ class ForeachStep(Step):
         concurrency = int(config.get("concurrency", 1))
         on_item_error = config.get("on_item_error", "fail")
         child_step_config = config.get("step")
+
+        dev_log_foreach(items_count=len(items), concurrency=concurrency, on_error=on_item_error)
 
         if not isinstance(child_step_config, dict):
             return Result(ok=False, meta={"error": "Missing 'step' configuration in foreach"})

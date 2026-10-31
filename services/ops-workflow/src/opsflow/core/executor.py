@@ -8,6 +8,7 @@ from collections.abc import Callable
 from typing import Any
 
 from opsflow.core.context import Context
+from opsflow.core.logger import dev_log_step_finish, dev_log_step_start
 from opsflow.core.models import (
     ErrorInfo,
     Result,
@@ -108,6 +109,7 @@ class StepExecutor:
         should_execute, skip_reason = self.should_run(ctx)
         if not should_execute:
             ctx.record_step_status(self.step_config.id, "skipped")
+            dev_log_step_finish(self.step_config.id, self.step_config.type, "skipped", 0)
             return Result(
                 ok=True,
                 data=None,
@@ -115,6 +117,7 @@ class StepExecutor:
             )
 
         ctx.record_step_status(self.step_config.id, "running")
+        dev_log_step_start(self.step_config.id, self.step_config.type, self.step_config.with_params)
 
         # Determine effective timeout
         timeout_str = self.step_config.timeout or self.defaults.timeout
@@ -196,8 +199,22 @@ class StepExecutor:
             outputs = self._extract_outputs(last_result.data, ctx)
             ctx.record_step_output(self.step_config.id, outputs)
             last_result.data = outputs
+            dev_log_step_finish(
+                self.step_config.id,
+                self.step_config.type,
+                "success",
+                elapsed_ms,
+                outputs=outputs,
+            )
         else:
             ctx.record_step_status(self.step_config.id, "failed")
+            dev_log_step_finish(
+                self.step_config.id,
+                self.step_config.type,
+                "failed",
+                elapsed_ms,
+                error=last_result.error,
+            )
 
         return last_result
 

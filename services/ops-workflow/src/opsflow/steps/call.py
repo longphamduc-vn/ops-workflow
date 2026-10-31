@@ -4,6 +4,7 @@ from typing import Any
 
 from opsflow.core.context import Context
 from opsflow.core.errors import ConnectorNotFoundError
+from opsflow.core.logger import dev_log_call, dev_log_call_response
 from opsflow.core.models import Result
 from opsflow.steps.base import Step
 from opsflow.steps.registry import register_step
@@ -39,5 +40,21 @@ class CallStep(Step):
         }
         params.update(config.get("params", {}))
 
+        dev_log_call(
+            connector=connector_name,
+            operation=operation,
+            params=params.get("params"),
+            in_datasets=params.get("in_datasets"),
+        )
+
         res: Result = await connector.call(operation, params)
+
+        dev_log_call_response(
+            connector=connector_name,
+            operation=operation,
+            ok=res.ok,
+            data=res.data,
+            error=res.error,
+            meta=res.meta,
+        )
         return res

@@ -41,6 +41,9 @@ def validate(
     console.print(f"[bold blue]Validating workflow:[/bold blue] {workflow_path}")
     try:
         wf = load_workflow_from_file(workflow_path)
+        if wf.env.get("OPSFLOW_DEV", "").lower() in ("1", "true", "yes"):
+            from opsflow.core.logger import set_dev_mode
+            set_dev_mode(True)
         errors = validate_workflow(wf)
     except ValidationError as exc:
         console.print(f"[bold red][FAIL] Schema/Parsing error:[/bold red] {exc}", highlight=False)
@@ -96,16 +99,27 @@ def run(
         str | None,
         typer.Option("--inputs", "-i", help="JSON string or file path (@params.json) with inputs"),
     ] = None,
+    dev: Annotated[
+        bool,
+        typer.Option("--dev", "-d", help="Enable detailed dev logging for calls, transforms, and responses"),
+    ] = False,
     db: Annotated[
         str,
         typer.Option("--db", help="Database connection URL"),
     ] = "sqlite+aiosqlite:///opsflow.db",
 ) -> None:
     """Execute a workflow run and output progress and final results."""
+    if dev:
+        from opsflow.core.logger import set_dev_mode
+        set_dev_mode(True)
+
     console.print(f"[bold cyan]Loading workflow:[/bold cyan] {workflow_path}")
 
     try:
         wf = load_workflow_from_file(workflow_path)
+        if wf.env.get("OPSFLOW_DEV", "").lower() in ("1", "true", "yes"):
+            from opsflow.core.logger import set_dev_mode
+            set_dev_mode(True)
         errors = validate_workflow(wf)
         if errors:
             console.print(

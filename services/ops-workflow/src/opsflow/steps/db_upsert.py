@@ -3,6 +3,7 @@
 from typing import Any
 
 from opsflow.core.context import Context
+from opsflow.core.logger import dev_log_db_upsert, dev_log_notify
 from opsflow.core.models import Result
 from opsflow.steps.base import Step
 from opsflow.steps.registry import register_step
@@ -23,6 +24,7 @@ class DbUpsertStep(Step):
 
         # Record upserted rows in context for inspection / read-model storage
         saved_count = len(rows)
+        dev_log_db_upsert(table=table, keys=keys, row_count=saved_count)
         return Result(
             ok=True,
             data={"table": table, "upserted": saved_count, "keys": keys},
@@ -39,6 +41,7 @@ class NotifyStep(Step):
     async def execute(self, config: dict[str, Any], ctx: Context) -> Result:
         channel = config.get("channel", "default")
         message = config.get("message", "")
+        dev_log_notify(channel=channel, message=message)
         # Simulated alert delivery
         return Result(
             ok=True,

@@ -136,12 +136,39 @@ opsflow list --dir workflows/
 # Execute a workflow run locally
 opsflow run workflows/equipment_status_lookup.yml --inputs '{"equipment_id": "EQP-01"}'
 
+# Execute with comprehensive dev logging (calls, transforms, wire responses, secret masking)
+opsflow run workflows/spare-parts-inventory-audit.yml --dev
+
 # Replay an interrupted or failed run from database
 opsflow replay run_01H12345 --db sqlite+aiosqlite:///opsflow.db
 
-# Launch the REST API server
+# Launch the REST API server (with 100% offline Swagger UI at /docs)
 opsflow api --host 0.0.0.0 --port 8000
 ```
+
+### 🔍 Development Logging Mode (`--dev` / `OPSFLOW_DEV=1`)
+
+When developing or debugging workflows, enable dev mode with `--dev` (or `-d`) or by exporting `OPSFLOW_DEV=1`:
+```bash
+opsflow run workflows/spare-parts-inventory-audit.yml --dev
+```
+Dev mode outputs rich real-time execution telemetry to your terminal and logger:
+- **`▶ STEP`**: Step start, parameters, and step-type badges.
+- **`⮞ CALL`**: Connector call details (`connector`, `op`, `params`, `in_datasets`).
+- **`⮜ RESP`**: Wire responses, dataset names, row counts, and latency in ms.
+- **`⚡ TRANSFORM`**: Data transformations (engine, expression preview, item counts in/out).
+- **`↺ FOREACH` / `⨝ JOIN` / `💾 DB_UPSERT`**: Iteration, relational merge, and database upsert metrics.
+- **`🔒 Secret Masking`**: Automatic runtime masking of all secrets and credentials.
+
+---
+
+## 🧪 Testing & Execution Scripts
+
+The repository includes cross-platform execution scripts and HTTP client collections:
+- [`requests.http`](requests.http): Standard REST Client file for VS Code, JetBrains, or Neovim HTTP clients.
+- [`requests.sh`](requests.sh): Bash / Linux / macOS cURL execution script with colored output.
+- [`requests.ps1`](requests.ps1): Windows PowerShell 5.1 & PowerShell 7+ script.
+- [`requests.bat`](requests.bat): Windows Command Prompt (CMD) batch script.
 
 ---
 

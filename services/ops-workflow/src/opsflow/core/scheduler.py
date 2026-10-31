@@ -9,6 +9,7 @@ from typing import Any
 from opsflow.core.context import Context
 from opsflow.core.dag import DAG
 from opsflow.core.executor import StepExecutor
+from opsflow.core.logger import dev_log_workflow_finish, dev_log_workflow_start
 from opsflow.core.models import Result, StepConfig, WorkflowDefinition
 from opsflow.metrics import GLOBAL_METRICS
 from opsflow.steps.base import Step
@@ -76,6 +77,8 @@ class WorkflowScheduler:
             env=self.workflow.env,
             connectors=self.connectors,
         )
+
+        dev_log_workflow_start(self.workflow.name, active_run_id, effective_inputs)
 
         # 2. Check existing state if resuming
         if resume_from_existing and self.repository:
@@ -245,5 +248,7 @@ class WorkflowScheduler:
             )
 
         duration_sec = (datetime.now(UTC) - run_start_time).total_seconds()
+        duration_ms = int(duration_sec * 1000)
+        dev_log_workflow_finish(self.workflow.name, active_run_id, final_status, duration_ms)
         GLOBAL_METRICS.record_run(self.workflow.name, final_status, duration_sec)
         return active_run_id, final_status, ctx
