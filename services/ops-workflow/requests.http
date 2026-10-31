@@ -93,6 +93,22 @@ Content-Type: {{jsonContentType}}
   }
 }
 
+### 2.4 Run 'spare-parts-inventory-audit' with On-Demand Dev Mode Logging ("_dev": true)
+# Triggers full dev logging (calls, transforms, responses) directly in the API server console
+# @name triggerAuditWithDev
+POST {{baseUrl}}/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "alert_channel": "{{alertChannel}}",
+    "_dev": true
+  }
+}
+
+
 
 ### ------------------------------------------------------------------------------
 ### 3. RUN STATUS & PER-STEP EXECUTION DIAGNOSTICS

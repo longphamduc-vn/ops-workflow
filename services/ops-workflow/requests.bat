@@ -19,6 +19,7 @@ if "%1"=="workflows" goto :workflows
 if "%1"=="inspect-audit" goto :inspect_audit
 if "%1"=="inspect-sync" goto :inspect_sync
 if "%1"=="run-audit" goto :run_audit
+if "%1"=="run-audit-dev" goto :run_audit_dev
 if "%1"=="run-sync" goto :run_sync
 if "%1"=="run-async" goto :run_async
 if "%1"=="get-run" goto :get_run
@@ -75,6 +76,15 @@ curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/spare-parts-inventory-audit/run
   -H "X-API-Key: %API_KEY%" ^
   -H "Content-Type: application/json" ^
   -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"alert_channel\": \"%ALERT_CHANNEL%\"}}"
+echo.
+goto :eof
+
+:run_audit_dev
+echo [INFO] Triggering 'spare-parts-inventory-audit' with DEV LOGGING enabled (_dev: true)...
+curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5" ^
+  -H "X-API-Key: %API_KEY%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"alert_channel\": \"%ALERT_CHANNEL%\", \"_dev\": true}}"
 echo.
 goto :eof
 
@@ -168,6 +178,7 @@ echo   requests.bat ready               Check API readiness
 echo   requests.bat metrics             View Prometheus metrics
 echo   requests.bat list-workflows      List registered workflows
 echo   requests.bat run-audit           Execute audit workflow (?wait=5)
+echo   requests.bat run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
 echo   requests.bat run-sync            Execute stock sync workflow (?wait=5)
 echo   requests.bat run-async           Trigger async run with Idempotency-Key
 echo   requests.bat get-run ^<id^>        View run outputs

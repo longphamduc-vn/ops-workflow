@@ -75,9 +75,21 @@ def api(
     host: Annotated[str, typer.Option(help="Host to bind API server")] = "0.0.0.0",
     port: Annotated[int, typer.Option(help="Port to listen on")] = 8000,
     reload: Annotated[bool, typer.Option(help="Enable auto-reload for development")] = False,
+    dev: Annotated[
+        bool,
+        typer.Option("--dev", "-d", help="Enable dev logging for all workflow runs triggered via API"),
+    ] = False,
 ) -> None:
     """Start the public REST API server."""
+    import os
+
     import uvicorn
+
+    if dev:
+        os.environ["OPSFLOW_DEV"] = "1"
+        from opsflow.core.logger import set_dev_mode
+        set_dev_mode(True)
+        console.print("[bold yellow][DEV MODE ENABLED][/bold yellow] Detailed execution telemetry active for all API runs.")
 
     console.print(f"[bold green]Starting Opsflow API server on {host}:{port}...[/bold green]")
     uvicorn.run("opsflow.api.main:app", host=host, port=port, reload=reload)

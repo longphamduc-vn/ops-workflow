@@ -78,6 +78,14 @@ class WorkflowScheduler:
             connectors=self.connectors,
         )
 
+        # Enable dev mode if requested via workflow env or _dev input
+        if (
+            self.workflow.env.get("OPSFLOW_DEV", "").strip().lower() in ("1", "true", "yes", "on")
+            or effective_inputs.get("_dev") is True
+        ):
+            from opsflow.core.logger import set_dev_mode
+            set_dev_mode(True)
+
         dev_log_workflow_start(self.workflow.name, active_run_id, effective_inputs)
 
         # 2. Check existing state if resuming

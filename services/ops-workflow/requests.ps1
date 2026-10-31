@@ -72,6 +72,17 @@ switch ($Command.ToLower()) {
         } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
     }
+    "run-audit-dev" {
+        Write-Cmd "Triggering 'spare-parts-inventory-audit' with DEV LOGGING enabled (_dev: true)..."
+        $body = @{
+            inputs = @{
+                organization_id = $OrgId
+                alert_channel = $AlertChannel
+                _dev = $true
+            }
+        } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
+    }
     "run-sync" {
         Write-Cmd "Triggering 'spare-parts-inventory-sync' (Synchronous wait 5s)..."
         $body = @{
@@ -156,6 +167,7 @@ Commands:
   .\requests.ps1 list-workflows      List registered workflows
   .\requests.ps1 inspect-audit       Inspect 'spare-parts-inventory-audit'
   .\requests.ps1 run-audit           Execute audit workflow (?wait=5)
+  .\requests.ps1 run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
   .\requests.ps1 run-sync            Execute stock sync workflow (?wait=5)
   .\requests.ps1 run-async           Trigger async run with Idempotency-Key
   .\requests.ps1 get-run <run_id>    View execution outputs of a specific run

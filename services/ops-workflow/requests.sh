@@ -78,6 +78,14 @@ case "$1" in
             -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"alert_channel\": \"${ALERT_CHANNEL}\"}}" | python3 -m json.tool
         ;;
 
+    run-audit-dev)
+        echo_cmd "Triggering 'spare-parts-inventory-audit' with DEV LOGGING enabled (_dev: true)..."
+        curl -s -X POST "${BASE_URL}/api/v1/workflows/spare-parts-inventory-audit/runs?wait=5" \
+            -H "X-API-Key: ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"alert_channel\": \"${ALERT_CHANNEL}\", \"_dev\": true}}" | python3 -m json.tool
+        ;;
+
     run-sync)
         echo_cmd "Triggering 'spare-parts-inventory-sync' (Synchronous wait 5s)..."
         curl -s -X POST "${BASE_URL}/api/v1/workflows/spare-parts-inventory-sync/runs?wait=5" \
@@ -180,6 +188,7 @@ Commands:
   ./requests.sh list-workflows      List registered workflows
   ./requests.sh inspect-audit       Inspect 'spare-parts-inventory-audit'
   ./requests.sh run-audit           Execute audit workflow (?wait=5)
+  ./requests.sh run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
   ./requests.sh run-sync            Execute stock sync workflow (?wait=5)
   ./requests.sh run-async           Trigger async run with Idempotency-Key
   ./requests.sh get-run <run_id>    View execution outputs of a specific run
