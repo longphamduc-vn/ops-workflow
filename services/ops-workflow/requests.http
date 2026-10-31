@@ -47,6 +47,18 @@ X-API-Key: {{apiKey}}
 GET {{baseUrl}}/api/v1/workflows/spare-parts-inventory-sync
 X-API-Key: {{apiKey}}
 
+### 1.4 Inspect 'equipment-status-lookup' Metadata & Schema
+GET {{baseUrl}}/api/v1/workflows/equipment-status-lookup
+X-API-Key: {{apiKey}}
+
+### 1.5 Inspect 'purchase-order-tracking' Metadata & Schema
+GET {{baseUrl}}/api/v1/workflows/purchase-order-tracking
+X-API-Key: {{apiKey}}
+
+### 1.6 Inspect 'target-stock-optimization' Metadata & Schema
+GET {{baseUrl}}/api/v1/workflows/target-stock-optimization
+X-API-Key: {{apiKey}}
+
 
 ### ------------------------------------------------------------------------------
 ### 2. TRIGGER WORKFLOW RUNS
@@ -108,6 +120,46 @@ Content-Type: {{jsonContentType}}
   }
 }
 
+### 2.5 Run 'equipment-status-lookup' (Work Order & Maintenance Inspection)
+# @name triggerEquipmentLookup
+POST {{baseUrl}}/api/v1/workflows/equipment-status-lookup/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "work_order_number": "WO-2026-001",
+    "wip_entity_id": "337389615"
+  }
+}
+
+### 2.6 Run 'purchase-order-tracking' (Item PO Status & Buyer Details)
+# @name triggerPoTracking
+POST {{baseUrl}}/api/v1/workflows/purchase-order-tracking/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "search_keyword": "MOTOR"
+  }
+}
+
+### 2.7 Run 'target-stock-optimization' (Target Stock, Safety Stock & Onhand Analysis)
+# @name triggerTargetStockOpt
+POST {{baseUrl}}/api/v1/workflows/target-stock-optimization/runs?wait=5
+X-API-Key: {{apiKey}}
+Content-Type: {{jsonContentType}}
+
+{
+  "inputs": {
+    "organization_id": "{{orgId}}",
+    "item_description": "Motor"
+  }
+}
+
 
 
 ### ------------------------------------------------------------------------------
@@ -146,6 +198,18 @@ X-API-Key: {{apiKey}}
 
 ### 4.3 Query 'spare_parts_inventory' (Stock Status sync dataset)
 GET {{baseUrl}}/api/v1/datasets/spare_parts_inventory?limit=5
+X-API-Key: {{apiKey}}
+
+### 4.4 Query 'equipment_status_dataset' (Work Order & Equipment Maintenance dataset)
+GET {{baseUrl}}/api/v1/datasets/equipment_status_dataset?limit=5
+X-API-Key: {{apiKey}}
+
+### 4.5 Query 'item_po_status_dataset' (PO Status tracking dataset)
+GET {{baseUrl}}/api/v1/datasets/item_po_status_dataset?limit=5
+X-API-Key: {{apiKey}}
+
+### 4.6 Query 'target_stock_optimization_dataset' (Target Stock Analysis dataset)
+GET {{baseUrl}}/api/v1/datasets/target_stock_optimization_dataset?limit=5
 X-API-Key: {{apiKey}}
 
 

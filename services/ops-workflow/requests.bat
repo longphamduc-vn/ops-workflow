@@ -21,6 +21,9 @@ if "%1"=="inspect-sync" goto :inspect_sync
 if "%1"=="run-audit" goto :run_audit
 if "%1"=="run-audit-dev" goto :run_audit_dev
 if "%1"=="run-sync" goto :run_sync
+if "%1"=="run-equipment" goto :run_equipment
+if "%1"=="run-po" goto :run_po
+if "%1"=="run-target-stock" goto :run_target_stock
 if "%1"=="run-async" goto :run_async
 if "%1"=="get-run" goto :get_run
 if "%1"=="get-steps" goto :get_steps
@@ -95,6 +98,33 @@ curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/spare-parts-inventory-sync/runs
   -H "X-API-Key: %API_KEY%" ^
   -H "Content-Type: application/json" ^
   -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\"}}"
+echo.
+goto :eof
+
+:run_equipment
+echo [INFO] Triggering 'equipment-status-lookup' (?wait=5)...
+curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/equipment-status-lookup/runs?wait=5" ^
+  -H "X-API-Key: %API_KEY%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"work_order_number\": \"WO-2026-001\", \"wip_entity_id\": \"337389615\"}}"
+echo.
+goto :eof
+
+:run_po
+echo [INFO] Triggering 'purchase-order-tracking' (?wait=5)...
+curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/purchase-order-tracking/runs?wait=5" ^
+  -H "X-API-Key: %API_KEY%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"search_keyword\": \"MOTOR\"}}"
+echo.
+goto :eof
+
+:run_target_stock
+echo [INFO] Triggering 'target-stock-optimization' (?wait=5)...
+curl.exe -s -X POST "%BASE_URL%/api/v1/workflows/target-stock-optimization/runs?wait=5" ^
+  -H "X-API-Key: %API_KEY%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"inputs\": {\"organization_id\": \"%ORG_ID%\", \"item_description\": \"Motor\"}}"
 echo.
 goto :eof
 
@@ -191,6 +221,9 @@ echo   requests.bat list-workflows      List registered workflows
 echo   requests.bat run-audit           Execute audit workflow (?wait=5)
 echo   requests.bat run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
 echo   requests.bat run-sync            Execute stock sync workflow (?wait=5)
+echo   requests.bat run-equipment       Execute work order & equipment lookup (?wait=5)
+echo   requests.bat run-po              Execute purchase order tracking (?wait=5)
+echo   requests.bat run-target-stock    Execute target stock optimization (?wait=5)
 echo   requests.bat run-async           Trigger async run with Idempotency-Key
 echo   requests.bat get-run ^<id^>        View run outputs
 echo   requests.bat get-steps ^<id^>      View per-step diagnostics

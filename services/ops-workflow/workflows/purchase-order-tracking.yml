@@ -1,0 +1,113 @@
+version: "1.0"
+name: purchase-order-tracking
+description: Track item purchase order status, unit prices, and supplier procurement details from EMS
+
+connectors:
+  ems:
+    type: nexacro
+    base_url: http://localhost:9000
+    format: xml
+    verify_ssl: false
+    follow_redirects: true
+    allowed_services:
+      - /emscom/popupNav/retrieveItem.lgdn
+      - /emscom/popupNav/retrieveItemPoStatusList.lgdn
+    limits:
+      max_concurrent: 3
+      min_interval: 100ms
+
+trigger:
+  type: manual
+
+inputs:
+  item_code_prefix:
+    type: string
+    default: "QDAB"
+    description: Item code or keyword to query
+  organization_id:
+    type: string
+    default: "28753"
+    description: Organization Unit ID
+  user_id:
+    type: string
+    default: "658359"
+    description: User ID
+  language:
+    type: string
+    default: "EN"
+    description: Language code
+
+defaults:
+  timeout: 30s
+  retry:
+    max_attempts: 3
+    backoff: exponential
+    delay: 1s
+    on: [timeout, network]
+
+steps:
+  - id: search_catalog_items
+    type: call
+    with:
+      connector: ems
+      operation: /emscom/popupNav/retrieveItem.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_Search:
+          - item: "${inputs.item_code_prefix}"
+      out_datasets:
+        - ds_List
+    outputs:
+      catalog_items: "$.ds_List"
+
+  - id: fetch_po_status
+    type: call
+    needs: [search_catalog_items]
+    with:
+      connector: ems
+      operation: /emscom/popupNav/retrieveItemPoStatusList.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_Search:
+          - organizationId: "${inputs.organization_id}"
+            invItemList: "356327"
+      out_datasets:
+        - ds_Rtn
+    outputs:
+      po_records: "$.ds_Rtn"
+
+  - id: normalize_po_status
+    type: transform
+    needs: [fetch_po_status]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_po_status.outputs.po_records}"
+      expression: |
+        [].{
+          item_code: item,
+          item_status: inventoryItemStatusCode,
+          unit_price_code: unitPriceStatusCode,
+          buyer_id: buyerId,
+          transfer_qty: transferQty,
+          wait_repair_qty: waitRepairQty,
+          disuse_flag: disuseInventoryFlag
+        }
+
+  - id: save_po_database
+    type: db_upsert
+    needs: [normalize_po_status]
+    with:
+      table: purchase_order_status
+      key: [item_code]
+      rows: "${steps.normalize_po_status.outputs}"
+
+publish:
+  dataset: purchase_order_status
+  source: "${steps.normalize_po_status.outputs}"
+  event: purchase_order.status.synced

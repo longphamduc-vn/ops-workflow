@@ -1,0 +1,96 @@
+version: "1.0"
+name: target-stock-optimization
+description: Retrieve and analyze target stock levels, optimization flags, and replenishment recommendations from EMS
+
+connectors:
+  ems:
+    type: nexacro
+    base_url: http://localhost:9000
+    format: xml
+    verify_ssl: false
+    follow_redirects: true
+    allowed_services:
+      - /emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn
+    limits:
+      max_concurrent: 3
+      min_interval: 100ms
+
+trigger:
+  type: manual
+
+inputs:
+  organization_id:
+    type: string
+    default: "28753"
+    description: Target EMS Organization Unit ID
+  user_id:
+    type: string
+    default: "658359"
+    description: User ID
+  language:
+    type: string
+    default: "EN"
+    description: Language code
+  optimize_flag:
+    type: string
+    default: "Y"
+    description: Filter by optimization eligibility flag (Y/N)
+
+defaults:
+  timeout: 30s
+  retry:
+    max_attempts: 3
+    backoff: exponential
+    delay: 1s
+    on: [timeout, network]
+
+steps:
+  - id: fetch_target_stock
+    type: call
+    with:
+      connector: ems
+      operation: /emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn
+      params:
+        _ems_userId: "${inputs.user_id}"
+        _ems_organizationId: "${inputs.organization_id}"
+        _ems_language: "${inputs.language}"
+      in_datasets:
+        ds_search:
+          - organizationId: "${inputs.organization_id}"
+            userId: "${inputs.user_id}"
+            optimizeFlag: "${inputs.optimize_flag}"
+      out_datasets:
+        - ds_StockInfomation
+    outputs:
+      target_stock_records: "$.ds_StockInfomation"
+
+  - id: normalize_target_stock
+    type: transform
+    needs: [fetch_target_stock]
+    with:
+      engine: jmespath
+      input: "${steps.fetch_target_stock.outputs.target_stock_records}"
+      expression: |
+        [].{
+          item_code: item,
+          description: itemDescription,
+          inventory_item_id: inventoryItemId,
+          target_quantity: targetQty,
+          safety_stock: safetryStockQty,
+          current_stock: onhandQty,
+          model: model,
+          maker: maker
+        }
+
+  - id: save_target_stock
+    type: db_upsert
+    needs: [normalize_target_stock]
+    with:
+      table: target_stock_optimization
+      key: [item_code]
+      rows: "${steps.normalize_target_stock.outputs}"
+
+publish:
+  dataset: target_stock_optimization
+  source: "${steps.normalize_target_stock.outputs}"
+  event: target_stock.optimization.synced

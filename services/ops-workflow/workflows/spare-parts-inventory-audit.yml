@@ -7,6 +7,8 @@ connectors:
     type: nexacro
     base_url: http://localhost:9000
     format: xml
+    verify_ssl: false
+    follow_redirects: true
     allowed_services:
       - /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
       - /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
@@ -24,6 +26,14 @@ inputs:
     type: string
     default: "28753"
     description: Target EMS Organization Unit ID
+  user_id:
+    type: string
+    default: "658359"
+    description: User ID for EMS API execution context
+  language:
+    type: string
+    default: "EN"
+    description: User language preference
   alert_channel:
     type: string
     default: "#ops-alerts"
@@ -48,12 +58,15 @@ steps:
       connector: ems
       operation: /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn
       params:
-        _ems_userId: "658359"
+        _ems_userId: "${inputs.user_id}"
         _ems_organizationId: "${inputs.organization_id}"
-        _ems_language: "EN"
+        _ems_language: "${inputs.language}"
       in_datasets:
         ds_search:
           - organizationId: "${inputs.organization_id}"
+            userId: "${inputs.user_id}"
+            itemCond: "Y"
+            optimizeFlag: "Y"
       out_datasets:
         - ds_result
     outputs:
@@ -71,7 +84,10 @@ steps:
           description: itemDescription,
           inventory_item_id: inventoryItemId,
           available_qty: availableQuantity,
-          uom: uomCode
+          onhand_qty: onhandQuantity,
+          uom: uomCode,
+          maker: maker,
+          model: model
         }
 
   - id: get_item_details
@@ -87,8 +103,9 @@ steps:
           connector: ems
           operation: /emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn
           params:
-            _ems_userId: "658359"
+            _ems_userId: "${inputs.user_id}"
             _ems_organizationId: "${inputs.organization_id}"
+            _ems_language: "${inputs.language}"
           in_datasets:
             ds_Input:
               - organizationId: "${inputs.organization_id}"
@@ -146,4 +163,3 @@ publish:
   dataset: spare_parts_audit_dataset
   source: "${steps.merge_audit_records.outputs}"
   event: spare_parts.audit.completed
-

@@ -1,120 +1,191 @@
-"""End-to-end workflow execution test for the Golden Example against mocked HTTP."""
+"""End-to-end workflow execution test for equipment-status-lookup against mocked Nexacro HTTP."""
 
-import json
 from pathlib import Path
 
 import httpx
 import pytest
 import respx
 
-from opsflow.connectors.http import HttpConnector
+from opsflow.connectors.nexacro.connector import NexacroConnector
 from opsflow.core.parser import load_workflow_from_file
 from opsflow.core.scheduler import WorkflowScheduler
+
+
+WIP_ENTITY_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">1</Parameter>
+        <Parameter id="ErrorMsg" type="string"></Parameter>
+    </Parameters>
+    <Dataset id="ds_output">
+        <ColumnInfo>
+            <Column id="wipEntityId" type="STRING" size="256"/>
+            <Column id="wipEntityName" type="STRING" size="256"/>
+            <Column id="assetNumber" type="STRING" size="256"/>
+            <Column id="description" type="STRING" size="256"/>
+            <Column id="statusType" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="wipEntityId">337389615</Col>
+                <Col id="wipEntityName">WO-2026-001</Col>
+                <Col id="assetNumber">ASSET-PUMP-01</Col>
+                <Col id="description">Main Pump Overhaul</Col>
+                <Col id="statusType">3</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>"""
+
+WO_MASTER_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">1</Parameter>
+        <Parameter id="ErrorMsg" type="string"></Parameter>
+    </Parameters>
+    <Dataset id="ds_wo">
+        <ColumnInfo>
+            <Column id="wipEntityId" type="STRING" size="256"/>
+            <Column id="wipEntityName" type="STRING" size="256"/>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="assetNumber" type="STRING" size="256"/>
+            <Column id="statusType" type="STRING" size="256"/>
+            <Column id="description" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="wipEntityId">337389615</Col>
+                <Col id="wipEntityName">WO-2026-001</Col>
+                <Col id="organizationId">28753</Col>
+                <Col id="assetNumber">ASSET-PUMP-01</Col>
+                <Col id="statusType">3</Col>
+                <Col id="description">Main Pump Overhaul</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_step">
+        <ColumnInfo>
+            <Column id="operationSeqNum" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+    <Dataset id="ds_spAttachFile">
+        <ColumnInfo>
+            <Column id="fileId" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+</Root>"""
+
+STATUS_HISTORY_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="ErrorCode" type="string">1</Parameter>
+        <Parameter id="ErrorMsg" type="string"></Parameter>
+    </Parameters>
+    <Dataset id="ds_list">
+        <ColumnInfo>
+            <Column id="wipEntityId" type="STRING" size="256"/>
+            <Column id="seq" type="INT" size="256"/>
+            <Column id="statusType" type="STRING" size="256"/>
+            <Column id="statusChangeDate" type="STRING" size="256"/>
+            <Column id="changedBy" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="wipEntityId">337389615</Col>
+                <Col id="seq">1</Col>
+                <Col id="statusType">3</Col>
+                <Col id="statusChangeDate">2026-10-28 08:00:00</Col>
+                <Col id="changedBy">658359</Col>
+                <Col id="remark">Inspection complete</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+</Root>"""
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_golden_workflow_end_to_end_with_respx() -> None:
-    # 1. Mock external HTTP responses
-    base_url = "https://ems.company.local"
+    base_url = "http://localhost:9000"
 
-    # Mock list endpoint
-    respx.post(f"{base_url}/eqp/selectEqpList.do").respond(
+    # Mock Nexacro endpoints
+    respx.post(f"{base_url}/emscom/woSearchNav/retrieveWipEntity.lgdn").respond(
         status_code=200,
-        json={
-            "dsList": [
-                {"EQP_ID": "EQP001"},
-                {"EQP_ID": "EQP002"},
-            ]
-        },
+        content=WIP_ENTITY_XML.encode("utf-8"),
+        headers={"Content-Type": "application/xml; charset=UTF-8"},
+    )
+    respx.post(f"{base_url}/emscom/woMasterNav/WoMasterRetInit.lgdn").respond(
+        status_code=200,
+        content=WO_MASTER_XML.encode("utf-8"),
+        headers={"Content-Type": "application/xml; charset=UTF-8"},
+    )
+    respx.post(f"{base_url}/emsworkorder/wo50/wo580Nav/statusHistory.lgdn").respond(
+        status_code=200,
+        content=STATUS_HISTORY_XML.encode("utf-8"),
+        headers={"Content-Type": "application/xml; charset=UTF-8"},
     )
 
-    # Dynamic mock for detail endpoint
-    def detail_side_effect(request: httpx.Request) -> httpx.Response:
-        try:
-            body = json.loads(request.content)
-            eqp_id = body.get("dsCond", [{}])[0].get("EQP_ID")
-        except Exception:
-            eqp_id = None
-
-        if eqp_id == "EQP001":
-            return httpx.Response(
-                200,
-                json={
-                    "dsDetail": [
-                        {
-                            "EQP_ID": "EQP001",
-                            "EQP_NM": "Main Pump",
-                            "STATUS_CD": "01",
-                            "UPD_DT": "2026-10-28 08:00:00",
-                        }
-                    ]
-                },
-            )
-        elif eqp_id == "EQP002":
-            return httpx.Response(
-                200,
-                json={
-                    "dsDetail": [
-                        {
-                            "EQP_ID": "EQP002",
-                            "EQP_NM": "Cooling Fan",
-                            "STATUS_CD": "99",
-                            "UPD_DT": "2026-10-28 08:05:00",
-                        }
-                    ]
-                },
-            )
-        return httpx.Response(404, json={"error": f"Unknown eqp_id: {eqp_id}"})
-
-    respx.post(f"{base_url}/eqp/selectEqpDetail.do").mock(side_effect=detail_side_effect)
-
-    # 2. Load golden workflow definition
+    # Load workflow definition
     golden_path = Path("workflows/equipment-status-lookup.yml")
     wf = load_workflow_from_file(golden_path)
 
-    # 3. Instantiate HTTP connector matching the ems connector declaration
-    ems_connector = HttpConnector(
+    # Instantiate Nexacro connector
+    ems_connector = NexacroConnector(
         name="ems",
         base_url=base_url,
+        format="xml",
+        allowed_services=[
+            "/emscom/woSearchNav/retrieveWipEntity.lgdn",
+            "/emscom/woMasterNav/WoMasterRetInit.lgdn",
+            "/emsworkorder/wo50/wo580Nav/statusHistory.lgdn",
+        ],
         limits={"max_concurrent": 3, "min_interval": "10ms"},
     )
 
-    # 4. Schedule and execute workflow
+    # Schedule and execute workflow
     scheduler = WorkflowScheduler(
         workflow=wf,
         connectors={"ems": ems_connector},
         max_concurrency=3,
     )
 
-    run_id, status, ctx = await scheduler.run(inputs={"site_code": "SITE_HANOI"})
+    run_id, status, ctx = await scheduler.run(
+        inputs={
+            "organization_id": "28753",
+            "wip_entity_id": "337389615",
+            "alert_channel": "#ops-alerts",
+        }
+    )
 
-    # 5. Verify assertions
+    # Verify assertions
     assert status == "success"
 
-    # Verify list step outputs
-    list_step_output = ctx.step_outputs.get("list_equipment")
-    assert list_step_output is not None
-    assert len(list_step_output.get("items", [])) == 2
+    # Verify WIP entity output
+    wip_output = ctx.step_outputs.get("get_wip_entity")
+    assert wip_output is not None
+    assert len(wip_output.get("wip_records", [])) == 1
+    assert wip_output["wip_records"][0]["wipEntityId"] == "337389615"
 
-    # Verify foreach step outputs
-    detail_output = ctx.step_outputs.get("get_detail")
-    assert detail_output is not None
-    assert len(detail_output) == 2
+    # Verify WO master output
+    wo_output = ctx.step_outputs.get("get_wo_master")
+    assert wo_output is not None
+    assert len(wo_output.get("wo_master", [])) == 1
 
-    # Verify normalize step transformed codes to human readable statuses
-    norm_output = ctx.step_outputs.get("normalize")
+    # Verify normalize step transformed records
+    norm_output = ctx.step_outputs.get("normalize_equipment_status")
     assert norm_output is not None
-    assert len(norm_output) == 2
-    assert norm_output[0]["equipment_id"] == "EQP001"
-    assert norm_output[0]["status"] == "running"
-    assert norm_output[1]["equipment_id"] == "EQP002"
-    assert norm_output[1]["status"] == "fault"
+    assert len(norm_output) == 1
+    assert norm_output[0]["wip_entity_id"] == "337389615"
+    assert norm_output[0]["equipment_id"] == "ASSET-PUMP-01"
+    assert norm_output[0]["status"] == "3"
 
     # Verify db_upsert step
-    assert ctx.step_statuses.get("save") == "success"
+    assert ctx.step_statuses.get("save_equipment_status") == "success"
 
-    # Verify alert_fault notify step was executed (because status == 'fault' is present)
-    assert ctx.step_statuses.get("alert_fault") == "success"
+    # Verify alert step
+    assert ctx.step_statuses.get("alert_status") == "success"
 
     await ems_connector.close()

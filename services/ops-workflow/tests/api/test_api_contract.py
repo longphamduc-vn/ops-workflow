@@ -77,8 +77,9 @@ async def test_list_and_get_workflows(api_client: httpx.AsyncClient) -> None:
     assert res.status_code == 200
     data = res.json()
     assert len(data) >= 1
-    assert data[0]["name"] == "equipment-status-lookup"
-    assert "site_code" in data[0]["inputs"]
+    eqp_wf = next((w for w in data if w["name"] == "equipment-status-lookup"), None)
+    assert eqp_wf is not None
+    assert "organization_id" in eqp_wf["inputs"]
 
     # Get single workflow metadata
     res_meta = await api_client.get("/api/v1/workflows/equipment-status-lookup", headers=headers)

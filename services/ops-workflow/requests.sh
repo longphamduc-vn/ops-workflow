@@ -67,6 +67,21 @@ case "$1" in
         curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/spare-parts-inventory-sync" | python3 -m json.tool
         ;;
 
+    inspect-equipment)
+        echo_cmd "Inspecting 'equipment-status-lookup' Schema..."
+        curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/equipment-status-lookup" | python3 -m json.tool
+        ;;
+
+    inspect-po)
+        echo_cmd "Inspecting 'purchase-order-tracking' Schema..."
+        curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/purchase-order-tracking" | python3 -m json.tool
+        ;;
+
+    inspect-target-stock)
+        echo_cmd "Inspecting 'target-stock-optimization' Schema..."
+        curl -s -H "X-API-Key: ${API_KEY}" "${BASE_URL}/api/v1/workflows/target-stock-optimization" | python3 -m json.tool
+        ;;
+
     # --------------------------------------------------------------------------
     # 3. Trigger Workflow Runs
     # --------------------------------------------------------------------------
@@ -92,6 +107,30 @@ case "$1" in
             -H "X-API-Key: ${API_KEY}" \
             -H "Content-Type: application/json" \
             -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\"}}" | python3 -m json.tool
+        ;;
+
+    run-equipment)
+        echo_cmd "Triggering 'equipment-status-lookup' (Synchronous wait 5s)..."
+        curl -s -X POST "${BASE_URL}/api/v1/workflows/equipment-status-lookup/runs?wait=5" \
+            -H "X-API-Key: ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"work_order_number\": \"WO-2026-001\", \"wip_entity_id\": \"337389615\"}}" | python3 -m json.tool
+        ;;
+
+    run-po)
+        echo_cmd "Triggering 'purchase-order-tracking' (Synchronous wait 5s)..."
+        curl -s -X POST "${BASE_URL}/api/v1/workflows/purchase-order-tracking/runs?wait=5" \
+            -H "X-API-Key: ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"search_keyword\": \"MOTOR\"}}" | python3 -m json.tool
+        ;;
+
+    run-target-stock)
+        echo_cmd "Triggering 'target-stock-optimization' (Synchronous wait 5s)..."
+        curl -s -X POST "${BASE_URL}/api/v1/workflows/target-stock-optimization/runs?wait=5" \
+            -H "X-API-Key: ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"inputs\": {\"organization_id\": \"${ORG_ID}\", \"item_description\": \"Motor\"}}" | python3 -m json.tool
         ;;
 
     run-async)
@@ -201,6 +240,9 @@ Commands:
   ./requests.sh run-audit           Execute audit workflow (?wait=5)
   ./requests.sh run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
   ./requests.sh run-sync            Execute stock sync workflow (?wait=5)
+  ./requests.sh run-equipment       Execute work order & equipment lookup (?wait=5)
+  ./requests.sh run-po              Execute purchase order tracking (?wait=5)
+  ./requests.sh run-target-stock    Execute target stock optimization (?wait=5)
   ./requests.sh run-async           Trigger async run with Idempotency-Key
   ./requests.sh get-run <run_id>    View execution outputs of a specific run
   ./requests.sh get-steps <run_id>  View per-step latency and diagnostics

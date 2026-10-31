@@ -92,6 +92,37 @@ switch ($Command.ToLower()) {
         } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/spare-parts-inventory-sync/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
     }
+    "run-equipment" {
+        Write-Cmd "Triggering 'equipment-status-lookup' (Synchronous wait 5s)..."
+        $body = @{
+            inputs = @{
+                organization_id = $OrgId
+                work_order_number = "WO-2026-001"
+                wip_entity_id = "337389615"
+            }
+        } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/equipment-status-lookup/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
+    }
+    "run-po" {
+        Write-Cmd "Triggering 'purchase-order-tracking' (Synchronous wait 5s)..."
+        $body = @{
+            inputs = @{
+                organization_id = $OrgId
+                search_keyword = "MOTOR"
+            }
+        } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/purchase-order-tracking/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
+    }
+    "run-target-stock" {
+        Write-Cmd "Triggering 'target-stock-optimization' (Synchronous wait 5s)..."
+        $body = @{
+            inputs = @{
+                organization_id = $OrgId
+                item_description = "Motor"
+            }
+        } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "$BaseUrl/api/v1/workflows/target-stock-optimization/runs?wait=5" -Method Post -Headers $Headers -Body $body | ConvertTo-Json -Depth 5
+    }
     "run-async" {
         $idemKey = "ps-run-" + [Guid]::NewGuid().ToString("N").Substring(0, 8)
         Write-Cmd "Triggering Asynchronous Run with Idempotency-Key: $idemKey..."
@@ -177,6 +208,9 @@ Commands:
   .\requests.ps1 run-audit           Execute audit workflow (?wait=5)
   .\requests.ps1 run-audit-dev       Execute audit workflow with DEV LOGGING enabled (_dev: true)
   .\requests.ps1 run-sync            Execute stock sync workflow (?wait=5)
+  .\requests.ps1 run-equipment       Execute work order & equipment lookup (?wait=5)
+  .\requests.ps1 run-po              Execute purchase order tracking (?wait=5)
+  .\requests.ps1 run-target-stock    Execute target stock optimization (?wait=5)
   .\requests.ps1 run-async           Trigger async run with Idempotency-Key
   .\requests.ps1 get-run <run_id>    View execution outputs of a specific run
   .\requests.ps1 get-steps <run_id>  View per-step latency and diagnostics
