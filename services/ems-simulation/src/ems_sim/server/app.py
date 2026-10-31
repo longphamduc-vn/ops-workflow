@@ -3,9 +3,13 @@
 import json
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from ems_sim.config import settings
 from ems_sim.database.connection import close_db, get_session_factory, init_db
@@ -91,8 +95,22 @@ def create_app() -> FastAPI:
         title="Nexacro EMS API Simulation Platform",
         description="Configuration-Driven API Simulation Platform for Nexacro-based EMS APIs",
         version="0.1.0",
+        docs_url=None,
         lifespan=lifespan,
     )
+
+    static_dir = Path(__file__).parent / "static"
+    if static_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+        @app.get("/docs", include_in_schema=False)
+        async def custom_swagger_ui_html() -> HTMLResponse:
+            return get_swagger_ui_html(
+                openapi_url=app.openapi_url or "/openapi.json",
+                title=f"{app.title} - Swagger UI",
+                swagger_js_url="/static/swagger-ui-bundle.js",
+                swagger_css_url="/static/swagger-ui.css",
+            )
 
     app.add_middleware(
         CORSMiddleware,

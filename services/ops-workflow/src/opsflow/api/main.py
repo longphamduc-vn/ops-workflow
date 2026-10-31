@@ -7,7 +7,9 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from opsflow.api.routes import datasets, health, metrics, runs, webhooks, workflows
 from opsflow.core.errors import OpsflowError
@@ -53,10 +55,23 @@ def create_app() -> FastAPI:
         version="1.0.0",
         description="Public REST API for Component 1 (Core Workflow & Integration Engine) of the Operations Management System.",
         openapi_url="/api/v1/openapi.json",
-        docs_url="/docs",
+        docs_url=None,
         redoc_url="/redoc",
         lifespan=lifespan,
     )
+
+    static_dir = Path(__file__).parent / "static"
+    if static_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+        @app.get("/docs", include_in_schema=False)
+        async def custom_swagger_ui_html() -> HTMLResponse:
+            return get_swagger_ui_html(
+                openapi_url=app.openapi_url or "/api/v1/openapi.json",
+                title=f"{app.title} - Swagger UI",
+                swagger_js_url="/static/swagger-ui-bundle.js",
+                swagger_css_url="/static/swagger-ui.css",
+            )
 
     app.add_middleware(
         CORSMiddleware,
