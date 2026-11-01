@@ -38,25 +38,25 @@ class RequestValidator:
                     )
 
                 ds = request.datasets[expected_ds_name]
+                schema = dataset_registry.get(ds_ref.schema_id) if dataset_registry else None
 
-                # Check that dataset has columns defined
+                # Check that dataset has columns defined (unless expected schema allows empty column definitions)
                 if not ds.cols and (not ds.rows or not isinstance(ds.rows[0], dict)):
-                    return (
-                        f"Invalid dataset structure: Dataset '{expected_ds_name}' has no column definitions in ColumnInfo."
-                    )
+                    if not (schema and len(schema.columns) == 0):
+                        return (
+                            f"Invalid dataset structure: Dataset '{expected_ds_name}' has no column definitions in ColumnInfo."
+                        )
 
                 # Validate dataset schema if available in registry
-                if dataset_registry:
-                    schema = dataset_registry.get(ds_ref.schema_id)
-                    if schema and schema.columns:
-                        expected_cols = set(schema.column_names)
-                        actual_cols = set(ds.cols)
-                        # Ensure dataset is not completely mismatched
-                        if not expected_cols.intersection(actual_cols):
-                            return (
-                                f"Invalid dataset schema for '{expected_ds_name}': "
-                                f"none of the provided columns {list(ds.cols)} match expected schema '{schema.id}'."
-                            )
+                if schema and schema.columns:
+                    expected_cols = set(schema.column_names)
+                    actual_cols = set(ds.cols)
+                    # Ensure dataset is not completely mismatched
+                    if not expected_cols.intersection(actual_cols):
+                        return (
+                            f"Invalid dataset schema for '{expected_ds_name}': "
+                            f"none of the provided columns {list(ds.cols)} match expected schema '{schema.id}'."
+                        )
 
         # 2. Validate context parameters if defined
         if req_config.params:

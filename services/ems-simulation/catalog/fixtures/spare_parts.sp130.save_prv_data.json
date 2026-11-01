@@ -1,0 +1,21 @@
+{
+  "id": "fixture.spare_parts.sp130.save_prv_data",
+  "api_id": "spare_parts.sp130.save_prv_data",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "ErrorCode": "0",
+      "errorCode": "1",
+      "ErrorMsg": "",
+      "errorMsg": ""
+    },
+    "datasets": {}
+  }
+}
+

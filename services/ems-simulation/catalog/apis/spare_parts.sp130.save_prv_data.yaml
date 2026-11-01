@@ -1,0 +1,34 @@
+id: spare_parts.sp130.save_prv_data
+name: Save PRV Data
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp102/sp130Nav/save130PrvData.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: spare_parts.sp130.ds_search.schema
+  - name: ds_param
+    schema: spare_parts.sp130.ds_param.schema
+  - name: ds_FileMain
+    schema: spare_parts.sp130.ds_FileMain.schema
+  - name: ds_FileSscs
+    schema: spare_parts.sp130.ds_FileSscs.schema
+execution:
+  type: handler
+  handler: inventory.save_130_prv_data
+  fixture_id: fixture.spare_parts.sp130.save_prv_data
+response:
+  params:
+  - ErrorCode
+  - errorCode
+  - ErrorMsg
+  - errorMsg
+  datasets: []
+

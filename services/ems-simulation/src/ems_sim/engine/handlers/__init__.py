@@ -21,6 +21,8 @@ HANDLER_REGISTRY: dict[str, HandlerFunc] = {
     "inventory.retrieve_item_detail": inventory.retrieve_item_detail,
     "inventory.target_stock_search": inventory.target_stock_search,
     "inventory.estimate_request_list": inventory.estimate_request_list,
+    "inventory.save_130_prv_data": inventory.save_130_prv_data,
+    "inventory.retrieve_po_request": inventory.retrieve_po_request,
     # Popup
     "popup.retrieve_item": popup.retrieve_item,
     "popup.retrieve_item_po_status": popup.retrieve_item_po_status,

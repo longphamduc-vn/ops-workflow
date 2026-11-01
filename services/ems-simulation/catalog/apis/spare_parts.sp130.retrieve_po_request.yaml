@@ -1,0 +1,32 @@
+id: spare_parts.sp130.retrieve_po_request
+name: Retrieve PO Request
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp102/sp130Nav/retrievePoRequest.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: spare_parts.sp130.ds_search.schema
+  - name: ds_param
+    schema: spare_parts.sp130.ds_param.schema
+execution:
+  type: handler
+  handler: inventory.retrieve_po_request
+  fixture_id: fixture.spare_parts.sp130.retrieve_po_request
+response:
+  params:
+  - ErrorCode
+  - errorCode
+  - ErrorMsg
+  - errorMsg
+  datasets:
+  - name: ds_param
+    schema: spare_parts.sp130.ds_param.schema
+

@@ -12,6 +12,7 @@ from ems_sim.models.entities import (
     Inventory,
     Item,
     Organization,
+    PurchaseRequest,
     User,
     WorkOrder,
     WorkOrderHistory,
@@ -98,6 +99,50 @@ class SimulationRepository:
         )
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
+
+    # Purchase Requests
+    async def get_purchase_request(self, prv_no: str) -> PurchaseRequest | None:
+        result = await self.session.execute(
+            select(PurchaseRequest).where(PurchaseRequest.prv_no == prv_no)
+        )
+        return result.scalar_one_or_none()
+
+    async def find_purchase_requests(
+        self,
+        item_id: str | None = None,
+        inventory_item_id: str | None = None,
+        organization_id: str | None = None,
+        limit: int = 10,
+    ) -> list[PurchaseRequest]:
+        query = select(PurchaseRequest)
+        if organization_id:
+            query = query.where(PurchaseRequest.organization_id == organization_id)
+        if item_id:
+            query = query.where(PurchaseRequest.item_id == item_id)
+        if inventory_item_id:
+            query = query.where(PurchaseRequest.inventory_item_id == inventory_item_id)
+        query = query.order_by(desc(PurchaseRequest.created_at)).limit(limit)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+
+    async def save_purchase_request(self, req: PurchaseRequest) -> None:
+        existing = await self.get_purchase_request(req.prv_no)
+        if existing:
+            existing.item_id = req.item_id
+            existing.inventory_item_id = req.inventory_item_id
+            existing.organization_id = req.organization_id
+            existing.request_qty = req.request_qty
+            existing.unit_price = req.unit_price
+            existing.req_amount = req.req_amount
+            existing.requestor_id = req.requestor_id
+            existing.requestor_name = req.requestor_name
+            existing.prv_status = req.prv_status
+            existing.confirm_flag = req.confirm_flag
+            existing.data_payload = req.data_payload
+        else:
+            self.session.add(req)
+        await self.session.commit()
+
 
     # Execution Logs
     async def log_execution(self, log_entry: ApiExecutionLog) -> None:

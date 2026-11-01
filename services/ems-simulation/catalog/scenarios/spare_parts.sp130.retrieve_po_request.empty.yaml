@@ -1,0 +1,114 @@
+id: spare_parts.sp130.retrieve_po_request.empty
+api_id: spare_parts.sp130.retrieve_po_request
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    ErrorCode: '0'
+    errorCode: '1'
+    ErrorMsg: No PO Request records found
+    errorMsg: No PO Request records found
+  datasets:
+    ds_param:
+      cols:
+      - checked
+      - prvNo
+      - confirmFlag
+      - prvStatus
+      - itemType
+      - item
+      - itemDesc
+      - itemStatus
+      - requestQty
+      - overShortageQty
+      - unitPrice
+      - reqAmount
+      - requestorName
+      - requestorDept
+      - requestDate
+      - reviewerName
+      - emNo
+      - emNoDesc
+      - budgetDeptCode
+      - requestComment
+      - reviewComment
+      - emNoBudget
+      - scheduledUseDate
+      - orderTypeDesc
+      - owningDept
+      - bufferZone
+      - wacCode
+      - wacDesc
+      - vendorName
+      - realLeadTime
+      - makerOnHand
+      - supplierStatus
+      - deliveryConfirmDate
+      - unitPriceStatus
+      - poRequestNo
+      - approvalInfo
+      - workOrder
+      - woDesc
+      - poNo
+      - poDate
+      - poQty
+      - poPrice
+      - poAmount
+      - receivingQty
+      - receivingDate
+      - poCancelFlag
+      - confirmDate
+      - confirmName
+      - commonStopFlag
+      - prvStatusCode
+      - itemTypeCode
+      - unitPiceStatusCode
+      - reqEstimateFlag
+      - prvComleteBtnFlag
+      - poRequestBtnFlag
+      - poChageBtnFlag
+      - prvSaveBtnFlag
+      - reviewerId
+      - instanceId
+      - requestorId
+      - requestorDeptCode
+      - inventoryItemId
+      - organizationId
+      - wipEntityId
+      - requisitionLineId
+      - txnGroupId
+      - lineLocationId
+      - "poRequestM asterId"
+      - orderType
+      - vendorId
+      - approverId
+      - attachment
+      - sscsAttachment
+      - budgetDept
+      - poRequestMasterId
+      - owningDepartmentId
+      - owningDeptCode
+      - rfqRequestMasterId
+      - fileCnt
+      - prvNoFlag
+      - sscsFileCnt
+      - reviewItemQty
+      - delayReasonName
+      - reqPoChgFlag
+      - overShortagePrvQty
+      - publicFlag
+      - periodicFlag
+      - addPoReason
+      - equipmentGroup
+      - updateEnable
+      - useDate
+      - reasonDesc
+      - reviewerFlag
+      - waitRepairQty
+      - partsUseTypeCode
+      count: 0
+      rows: []
+

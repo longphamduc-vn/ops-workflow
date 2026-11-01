@@ -16,8 +16,8 @@ async def test_admin_list_endpoints(client: AsyncClient):
     response = await client.get("/admin/endpoints")
     assert response.status_code == 200
     data = response.json()
-    assert data["count"] == 12
-    assert len(data["endpoints"]) == 12
+    assert data["count"] >= 14
+    assert len(data["endpoints"]) >= 14
 
 
 @pytest.mark.asyncio

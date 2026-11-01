@@ -1,0 +1,15 @@
+id: spare_parts.sp130.save_prv_data.error
+api_id: spare_parts.sp130.save_prv_data
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: error
+response:
+  params:
+    ErrorCode: '-1'
+    errorCode: '-1'
+    ErrorMsg: 'Simulated PRV save failure: validation failed'
+    errorMsg: 'Simulated PRV save failure: validation failed'
+  datasets: {}
+

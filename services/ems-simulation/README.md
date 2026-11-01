@@ -50,14 +50,16 @@ flowchart TD
 
 ---
 
-## 2. Supported Data Retrieval Endpoints (12 APIs)
+## 2. Supported Business Endpoints (14 APIs)
 
-All non-data endpoints (such as audit logging `insertStartLog`, `updateEndLog` and UI grid formatting `retrieveGridFormat`) have been excluded. The platform is dedicated exclusively to **Business Data Retrieval APIs**:
+All non-data endpoints (such as audit logging `insertStartLog`, `updateEndLog` and UI grid formatting `retrieveGridFormat`) have been excluded. The platform is dedicated exclusively to **Business Data Retrieval and Mutation APIs**:
 
-| Domain | Method | Endpoint Path | Execution Type | Returned Datasets |
+| Domain | Method | Endpoint Path | Execution Type | Returned Datasets / Output |
 |---|:---:|---|---|---|
 | **Spare Parts** | POST | `/emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn` | Handler (`inventory.search_stock_status`) | `ds_result` |
 | **Spare Parts** | POST | `/emsspareparts/sp101/sp120Nav/RetEstimateRequestList.lgdn` | Handler / Fixture | `ds_list` |
+| **Spare Parts** | POST | `/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn` | Handler (`inventory.save_130_prv_data`) | Success parameters (`ErrorCode: 0`) |
+| **Spare Parts** | POST | `/emsspareparts/sp102/sp130Nav/retrievePoRequest.lgdn` | Handler (`inventory.retrieve_po_request`) | `ds_param` |
 | **Spare Parts** | POST | `/emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn` | Handler (`inventory.retrieve_item_detail`) | `ds_Item`, `ds_Inv`, `ds_Summary` |
 | **Stock Management** | POST | `/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn` | Handler / Fixture | `ds_StockInfomation` |
 | **Stock Management** | POST | `/emsspareparts/sp302/sp335Nav/TargetStockSearchList.lgdn` | Handler / Fixture | `ds_StockInfomation` |

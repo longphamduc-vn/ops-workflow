@@ -136,6 +136,16 @@
       "organizationId": "28753",
       "uom": "SMC CORPORATION",
       "status": "PF2W511-10-1"
+    },
+    {
+      "item": "QCAD38190",
+      "itemDescription": "Pneumatic Cylinder ** MXQ16-100B, SMC CORPORATION, Inner Diameter:16㎜, Applicable Pressure:0.7㎫, Road Method:SLIDE, The Diameter Of A Pipe:, Installation Method:BASIC, Stroke:100㎜, Working Method:DOUBLE ACTING, Cushion:, Pistone Maxim",
+      "maker": "SMC CORPORATION",
+      "model": "MXQ16-100B",
+      "inventoryItemId": "10001",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
     }
   ],
   "wip_entities": [

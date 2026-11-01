@@ -127,3 +127,22 @@ class ApiExecutionLog(Base):
     fixture_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     request_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
     response_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class PurchaseRequest(Base):
+    __tablename__ = "purchase_requests"
+
+    prv_no: Mapped[str] = mapped_column(String(50), primary_key=True)
+    item_id: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
+    inventory_item_id: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
+    organization_id: Mapped[str] = mapped_column(String(50), nullable=False, default="28753")
+    request_qty: Mapped[float] = mapped_column(Float, default=1.0)
+    unit_price: Mapped[float] = mapped_column(Float, default=0.0)
+    req_amount: Mapped[float] = mapped_column(Float, default=0.0)
+    requestor_id: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    requestor_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    prv_status: Mapped[str] = mapped_column(String(50), default="Confirm PO Review")
+    confirm_flag: Mapped[str] = mapped_column(String(10), default="Y")
+    data_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
