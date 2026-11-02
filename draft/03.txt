@@ -23,12 +23,24 @@ Lên ý tưởng chức năng cho Hệ thống quản lý mua bán, sử dụng<
 
  Requestor có thể đăng ký hạng mục mua trả về các thông tin của item.< Qcode< Nó là key của hệ thống EMS - nhưng với hệ thống mới không phải là key> có thể thay đổi Qcode - do ngừng sản xuất thay bằng san phẩm khác hoặc thay thế bằng sản phẩm giá thấp hơn...
  Hạng mục này sẽ được đẩy lên cho LEC, LEC sẽ tiến hành từng bước, nếu cần thay đổi và có bất kì thay đổi nào so với yêu cầu ban đầu, LEC cần phải thông báo lại hoặc yêu cầu cho Requestor để xác nhận lại hoặc cung cấp bổ sung thông tin trước khi tiếp tục.
- 
+ <Phản hồi qua lại giữa 2 bên.
  Requesor có thể đăng ký hàng loạt hoặc từng mục, màn hình đăng ký cung cấp đầy đủ thông tin.
+ Phân loại lý do< Setup, cải tiến, thay thế hỏng, PM, Dự phòng, ..>
+ Lý do
+ vấn đề
+ hiện trạng
+ Logic( được viêt theo format/ rule quy định => tính ra số lượng mua)
+  thông tin PO remain, onhand, ..
 
  LEC cần phải thực hiện lần lượt từng bước để có thể mua hàng( nếu không interlock thì bỏ qua ).
- Báo, hoàn thiện giá
+ Báo, hoàn thiện giá, mở interlock
  
+ Trang đăng ký hạng mục tự động lên đơn mua định kỳ - dựa theo sản lượng hoặc định mức tiêu hao
+
+ Với trường hợp  interlock thì phải thực hiện lần lượt transfer => reject => internal => mua thường
+
+ Với LEC thực hiện lần lượt báo giá => mở lần lượt interlock với xử lý hàng loạt
+
  
 
   
