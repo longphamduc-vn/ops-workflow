@@ -1,0 +1,34 @@
+Lên ý tưởng chức năng cho Hệ thống quản lý mua bán, sử dụng< hệ thống quản lý mua bán song song với hệ thống EMS> - tạo 1 thư mục riêng
+
+* Công ty có các bộ phận cần sử dụng mua bán
+  Mô tả các thành phần trong bộ phận: 
+  Team Requestor:
+    Part
+	Process
+		Enginner Process< người tạo hạng mục>
+    LEC: Quản lý spare part.< xử lý các hạng muc, yêu cầu báo giá, thẩm định, lên PO>
+ 
+  Team Management
+	Assistant Reviewer
+ Process: POL | TAB | DIP | LT | DB | BD
+ Factory: HW
+ Tòa: H1, H2, H3
+ Tầng: 2F, 6F ..
+ Model Product: D111, D222, D333
+ Ngành Smart Watch.
+ Line: #201 ~ #210. #601, #604( Left(Line,1) = Floor.
+
+ Tiền sẽ được tính theo khi xuất kho sử dụng.
+ Budget: SG hàng tháng => Budget mua hàng( 33% tháng thứ nhất + 33% tháng thứ 2 + 34% tháng thứ 3)
+
+ Requestor có thể đăng ký hạng mục mua trả về các thông tin của item.< Qcode< Nó là key của hệ thống EMS - nhưng với hệ thống mới không phải là key> có thể thay đổi Qcode - do ngừng sản xuất thay bằng san phẩm khác hoặc thay thế bằng sản phẩm giá thấp hơn...
+ Hạng mục này sẽ được đẩy lên cho LEC, LEC sẽ tiến hành từng bước, nếu cần thay đổi và có bất kì thay đổi nào so với yêu cầu ban đầu, LEC cần phải thông báo lại hoặc yêu cầu cho Requestor để xác nhận lại hoặc cung cấp bổ sung thông tin trước khi tiếp tục.
+ 
+ Requesor có thể đăng ký hàng loạt hoặc từng mục, màn hình đăng ký cung cấp đầy đủ thông tin.
+
+ LEC cần phải thực hiện lần lượt từng bước để có thể mua hàng( nếu không interlock thì bỏ qua ).
+ Báo, hoàn thiện giá
+ 
+ 
+
+  
