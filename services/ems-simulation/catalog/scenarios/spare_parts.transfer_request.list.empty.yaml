@@ -1,0 +1,79 @@
+id: spare_parts.transfer_request.list.empty
+api_id: spare_parts.transfer_request.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_list:
+      cols:
+      - requestNo
+      - requestMasterId
+      - requestMasterSubId
+      - organizationId
+      - inventoryItemId
+      - item
+      - itemDesc
+      - requestQty
+      - currencyCode
+      - reqOrgCode
+      - reqMngName
+      - requestor
+      - requestorName
+      - requestorDeptCode
+      - requestorDeptName
+      - requestDate
+      - requestReasonDesc
+      - managementNo
+      - progressStatusCode
+      - inventoryUnitPrice
+      - onHandOrgCode
+      - subinventoryCode
+      - subinventoryName
+      - onHandMngName
+      - onHandDeptName
+      - transferQty
+      - transferReasonContent
+      - transferShippingDate
+      - confirmQty
+      - lastUpdatedBy
+      - completeUserName
+      - transferReceivingDate
+      - completionContent
+      - transType
+      - otherSitePoReqNo
+      - otherSiteReqMasterId
+      - otherSitePoReqDate
+      - reviewRequestNo
+      - intPoApprFlag
+      - intPoReqMasterId
+      - poNo
+      - ipoRequestDate
+      - departmentContactName
+      - invOrgId
+      - transferRequestTypeCode
+      - invoiceNo
+      - blNo
+      - arNo
+      - apNo
+      - domesticYn
+      - standardExchangeRate
+      - totalUsdAmount
+      - handoverDate
+      - inputComment
+      - deliveryEndUser
+      - deliveryEndDate
+      - arEndDate
+      - apEndDate
+      - gateRequestMasterId
+      - unitPriceUsd
+      - unitPriceKrw
+      - unitPriceCny
+      - receiver
+      count: 0
+      rows: []

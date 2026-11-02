@@ -1,0 +1,29 @@
+id: spare_parts.other_site_po_review.list
+name: Other Site PO Review Request List
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: spare_parts.other_site_po_review.ds_search.schema
+  - name: ds_item
+    schema: spare_parts.other_site_po_review.ds_item.schema
+execution:
+  type: handler
+  handler: inventory.other_site_po_rev_req_list
+  fixture_id: fixture.spare_parts.other_site_po_review.list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_list
+    schema: spare_parts.other_site_po_review.ds_list.schema

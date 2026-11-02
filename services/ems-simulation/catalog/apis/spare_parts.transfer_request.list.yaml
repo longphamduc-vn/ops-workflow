@@ -1,0 +1,29 @@
+id: spare_parts.transfer_request.list
+name: Parts Transfer Request List
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: spare_parts.transfer_request.ds_search.schema
+  - name: ds_item
+    schema: spare_parts.transfer_request.ds_item.schema
+execution:
+  type: handler
+  handler: inventory.parts_transfer_req_list
+  fixture_id: fixture.spare_parts.transfer_request.list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_list
+    schema: spare_parts.transfer_request.ds_list.schema

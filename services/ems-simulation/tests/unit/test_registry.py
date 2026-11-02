@@ -46,7 +46,7 @@ def test_catalogs_loading():
     fix_reg = FixtureRegistry()
     sc_reg = ScenarioRegistry()
 
-    assert api_reg.load_from_directory(settings.catalog_dir / "apis") == 14
-    assert ds_reg.load_from_directory(settings.catalog_dir / "datasets") >= 14
-    assert fix_reg.load_from_directory(settings.catalog_dir / "fixtures") == 14
-    assert sc_reg.load_from_directory(settings.catalog_dir / "scenarios") == 14
+    assert api_reg.load_from_directory(settings.catalog_dir / "apis") == 18
+    assert ds_reg.load_from_directory(settings.catalog_dir / "datasets") >= 18
+    assert fix_reg.load_from_directory(settings.catalog_dir / "fixtures") == 18
+    assert sc_reg.load_from_directory(settings.catalog_dir / "scenarios") == 18

@@ -1,0 +1,86 @@
+{
+  "id": "fixture.spare_parts.emergency_po.list",
+  "api_id": "spare_parts.emergency_po.list",
+  "match": {
+    "params": {
+      "_ems_userId": "658359",
+      "_ems_organizationId": "28753",
+      "_ems_language": "EN"
+    }
+  },
+  "response": {
+    "params": {
+      "errorCode": "1",
+      "errorMsg": ""
+    },
+    "datasets": {
+      "ds_result": {
+        "cols": [
+          "emrgPoType",
+          "wipEntityName",
+          "poRequestNo",
+          "poRequestMasterId",
+          "item",
+          "itemDescription",
+          "requestQty",
+          "poNo",
+          "receivingQty",
+          "issueQty",
+          "issueFlag",
+          "requestedDate",
+          "requestor",
+          "supplierName",
+          "maker",
+          "itemCategory",
+          "makerPart",
+          "vendorId",
+          "catalogGroupId",
+          "inventoryItemId",
+          "wipEntityId",
+          "reqPoChgFlag",
+          "poCancelFlag",
+          "attachment",
+          "sscsAttachment",
+          "prvNo",
+          "filePrvNo",
+          "requestorDepartment",
+          "budgetDept"
+        ],
+        "count": 1,
+        "rows": [
+          [
+            "EMERGENCY PO",
+            "WO-248926091",
+            "WOP-18090530",
+            "18090530",
+            "QDAD12236",
+            "Board ** 2912146, TRUMPF, Application:CENTRAL PROCESSOR(CPX) CONTROLS, Remark:CPX V4 STANDARD",
+            "1",
+            "854730-1-1",
+            "0",
+            "",
+            "N",
+            "20261017112808000",
+            "Pham Duc Long",
+            "LGDVN_CÔNG TY TNHH SERVEONE (VIỆT NAM)_VN000562",
+            "TRUMPF",
+            "Q4.Board",
+            "2912146",
+            "1160150",
+            "1034",
+            "3808802",
+            "337037120",
+            "N",
+            "N",
+            "0",
+            "0",
+            "Q2610-3098992",
+            "Q2610-3098992",
+            "NY SW PO M Technology DB/BD Unit B2",
+            "PO Module Technology Team 2"
+          ]
+        ]
+      }
+    }
+  }
+}

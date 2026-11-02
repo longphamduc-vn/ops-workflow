@@ -1,0 +1,6 @@
+id: spare_parts.sp130.retrieve_buy_main.ds_PoRvNo.schema
+name: ds_PoRvNo Dataset Schema
+version: 1.0.0
+columns:
+- name: reviewRequestNo
+  type: string

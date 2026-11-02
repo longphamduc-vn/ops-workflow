@@ -1,0 +1,54 @@
+id: spare_parts.other_site_po_review.ds_search.schema
+name: ds_search Dataset Schema
+version: 1.0.0
+columns:
+- name: organizationId
+  type: string
+- name: userId
+  type: string
+- name: responsibilityId
+  type: string
+- name: employeeNumber
+  type: string
+- name: employeeNo
+  type: string
+- name: employeeName
+  type: string
+- name: reqFromDate
+  type: string
+- name: reqToDate
+  type: string
+- name: reviewRequestNo
+  type: string
+- name: otherSitePoReqNo
+  type: string
+- name: poStatusCode
+  type: string
+- name: reqSite
+  type: string
+- name: poSite
+  type: string
+- name: reqDepartmentCode
+  type: string
+- name: reqDepartmentName
+  type: string
+- name: reqSiteMngName
+  type: string
+- name: reqSiteMngId
+  type: string
+- name: poSiteMngName
+  type: string
+- name: poSiteMngId
+  type: string
+- name: requestorName
+  type: string
+- name: requestorId
+  type: string
+- name: requestMasterId
+  type: string
+- name: requestMasterSubId
+  type: string
+- name: itemYn
+  type: string
+- name: reqStatusCode
+  type: string

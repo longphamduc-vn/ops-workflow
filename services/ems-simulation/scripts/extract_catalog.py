@@ -96,6 +96,30 @@ ENDPOINT_MAP = {
         "domain": "common",
         "handler": "common.com_code_list",
     },
+    "/emsspareparts/sp105/sp180Nav/EmergencyPoList.lgdn": {
+        "id": "spare_parts.emergency_po.list",
+        "name": "Emergency PO List",
+        "domain": "spare_parts",
+        "handler": "inventory.emergency_po_list",
+    },
+    "/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn": {
+        "id": "spare_parts.transfer_request.list",
+        "name": "Parts Transfer Request List",
+        "domain": "spare_parts",
+        "handler": "inventory.parts_transfer_req_list",
+    },
+    "/emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn": {
+        "id": "spare_parts.other_site_po_review.list",
+        "name": "Other Site PO Review Request List",
+        "domain": "spare_parts",
+        "handler": "inventory.other_site_po_rev_req_list",
+    },
+    "/emsspareparts/sp102/sp130Nav/retrieveItemBuyMainList.lgdn": {
+        "id": "spare_parts.sp130.retrieve_buy_main_list",
+        "name": "Retrieve Item Buy Main List",
+        "domain": "spare_parts",
+        "handler": "inventory.retrieve_item_buy_main_list",
+    },
 }
 
 

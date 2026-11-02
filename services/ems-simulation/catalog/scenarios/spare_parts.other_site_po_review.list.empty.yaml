@@ -1,0 +1,42 @@
+id: spare_parts.other_site_po_review.list.empty
+api_id: spare_parts.other_site_po_review.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_list:
+      cols:
+      - requestNo
+      - requestMasterId
+      - requestMasterSubId
+      - organizationId
+      - inventoryItemId
+      - item
+      - itemDesc
+      - lowestUnitPriceOrgCode
+      - requestQty
+      - usdUnitPrice
+      - reqSiteUnitPrice
+      - poSiteUnitPrice
+      - reqSiteCurrencyCode
+      - purchaseUnitPrice
+      - poSiteCurrencyCode
+      - requestorName
+      - requestDeptName
+      - purchaserName
+      - purchaseDeptName
+      - requestDate
+      - prvStatus
+      - reviewRequestNo
+      - itrRequestNo
+      - itrRequestMasterId
+      - itrAttribute1
+      - reqStatus
+      count: 0
+      rows: []

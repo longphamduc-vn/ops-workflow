@@ -146,6 +146,126 @@
       "organizationId": "28753",
       "uom": "EA",
       "status": "Active"
+    },
+    {
+      "item": "QDAD12236",
+      "itemDescription": "Board ** 2912146, TRUMPF, Application:CENTRAL PROCESSOR(CPX) CONTROLS, Remark:CPX V4 STANDARD",
+      "maker": "TRUMPF",
+      "model": "2912146",
+      "inventoryItemId": "3808802",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAC01233",
+      "itemDescription": "AC Adapter ** DAD12050DKA, DREAM ELECTRONICS INC., Output Voltage:12VDC, Output Current:500㎃, Input Supply Voltage:100~240VAC, Addition Specification:, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "2989049",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAB03011",
+      "itemDescription": "Photo Sensor ** EE-SX670, OMRON CORPORATION, Detection Target:ETC., Detection Method:, Detection Object Type:NONCLEANING MATRIAL 2*0.8㎜↑, Measuring Range:5㎜, Amp(Separate/Integral):ETC., Response Time:, Output(Current/Voltage):35㎃,",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "375673",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAB38882",
+      "itemDescription": "Non-contacting Relay/Terminal Relay ** G6DN-1A-24VDC, OMRON CORPORATION, Voltage Rating:24VDC, Current Rating:4.6㎃, Contact Arrangement:1A, Type:POWER RELAY, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "2372893",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAB35621",
+      "itemDescription": "Sensor Accessory ** EE-1006-2M, OMRON CORPORATION, Feature:, Set Item Maker Part No:EE SERIES PHOTO SENSOR, Shape Size:, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "1980398",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC30474",
+      "itemDescription": "Solenoid Valve ** VQ21M1-5GZ-C6, SMC CORPORATION, Voltage:24VDC, The Diameter Of A Pipe:, Wiring Method:GROMMET, Conversion Method:2PORT 2WAY NORMAL CLOSED, Remark:VQ20/MANIFOLD USE",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "801480",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAB35218",
+      "itemDescription": "Selector Switch ** STK-22-TOR-S, SAFECT CO.,LTD, Voltage Rating:24VDC, Impeller Stage No.:2STAGE, Current Rating:89㎃, Switch Type:MANUAL OPERATION RETURN TYPE, A Species Of Handle:, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "1899215",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC67103",
+      "itemDescription": "Speed Con ** AS1002F-06A, SMC CORPORATION, Connection Mode:SCREW CONNECTION, The Diameter Of A Pipe:6㎜, Control Method:METER OUT, Species:STRAIGHT, Remark:, Detail Outside Diameter(mm):",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "2446988",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC60402",
+      "itemDescription": "Hose/Tube ** HOSAJ2-10-1-C1, MISUMI CORPORATION, Diameter:16㎜, Inner Diameter:6.3㎜, Material:POM, Shape:, Application:AIR FLOW, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "2200843",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QDAA02724",
+      "itemDescription": "Power Cable ** MR-BKS1CBL10M-A1-H, MITSUBISHI ELECTRIC CORPORATION, Cross Section Diameter:6㎜, Cable Length:10M, Material:, Number Of Core:2C, Voltage:, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "351458",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC25281",
+      "itemDescription": "Fitting/One Touch Fitting ** KQ2U04-06A, SMC CORPORATION, Diameter:, Connection Mode:TUBE CONNECTION, The Diameter Of A Pipe:6㎜, Species:DIFFERENT DIAMETER UNION-Y, Remark:",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "363348",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
+    },
+    {
+      "item": "QCAC17191",
+      "itemDescription": "Cable Duct ** 2-KSH-24-42-28-HD-HD, KUNIMORI KAGAKU CO.,LTD, Face Width:40㎜, Material:ENGINEERING PLASTIC, Pitch:24㎜, Curvature Radius:R42, Remark:L:672㎜",
+      "maker": "",
+      "model": "",
+      "inventoryItemId": "3233069",
+      "organizationId": "28753",
+      "uom": "EA",
+      "status": "Active"
     }
   ],
   "wip_entities": [
@@ -201,6 +321,38 @@
       "wipEntityId": "262871989",
       "wipEntityName": "WO-198345359",
       "workOrderType": "12",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337037120",
+      "wipEntityName": "WO-248926091",
+      "workOrderType": "BM",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337561741",
+      "wipEntityName": "WO-249319105",
+      "workOrderType": "BM",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337561728",
+      "wipEntityName": "WO-249319092",
+      "workOrderType": "BM",
+      "workOrderTypeDesc": "Breakdown Maintenance",
+      "organizationId": "28753",
+      "status": "Released"
+    },
+    {
+      "wipEntityId": "337561729",
+      "wipEntityName": "WO-249319093",
+      "workOrderType": "BM",
       "workOrderTypeDesc": "Breakdown Maintenance",
       "organizationId": "28753",
       "status": "Released"

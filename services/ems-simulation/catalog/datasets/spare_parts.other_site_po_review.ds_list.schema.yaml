@@ -1,0 +1,56 @@
+id: spare_parts.other_site_po_review.ds_list.schema
+name: ds_list Dataset Schema
+version: 1.0.0
+columns:
+- name: requestNo
+  type: string
+- name: requestMasterId
+  type: string
+- name: requestMasterSubId
+  type: string
+- name: organizationId
+  type: string
+- name: inventoryItemId
+  type: string
+- name: item
+  type: string
+- name: itemDesc
+  type: string
+- name: lowestUnitPriceOrgCode
+  type: string
+- name: requestQty
+  type: string
+- name: usdUnitPrice
+  type: string
+- name: reqSiteUnitPrice
+  type: string
+- name: poSiteUnitPrice
+  type: string
+- name: reqSiteCurrencyCode
+  type: string
+- name: purchaseUnitPrice
+  type: string
+- name: poSiteCurrencyCode
+  type: string
+- name: requestorName
+  type: string
+- name: requestDeptName
+  type: string
+- name: purchaserName
+  type: string
+- name: purchaseDeptName
+  type: string
+- name: requestDate
+  type: string
+- name: prvStatus
+  type: string
+- name: reviewRequestNo
+  type: string
+- name: itrRequestNo
+  type: string
+- name: itrRequestMasterId
+  type: string
+- name: itrAttribute1
+  type: string
+- name: reqStatus
+  type: string

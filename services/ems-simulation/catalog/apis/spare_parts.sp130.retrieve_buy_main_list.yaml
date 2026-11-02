@@ -1,0 +1,31 @@
+id: spare_parts.sp130.retrieve_buy_main_list
+name: Retrieve Item Buy Main List
+domain: spare_parts
+version: 1.0.0
+enabled: true
+endpoint:
+  method: POST
+  path: /emsspareparts/sp102/sp130Nav/retrieveItemBuyMainList.lgdn
+request:
+  params:
+  - _ems_userId
+  - _ems_organizationId
+  - _ems_language
+  datasets:
+  - name: ds_search
+    schema: spare_parts.sp130.retrieve_buy_main.ds_search.schema
+  - name: ds_ItemInfo
+    schema: spare_parts.sp130.retrieve_buy_main.ds_ItemInfo.schema
+  - name: ds_PoRvNo
+    schema: spare_parts.sp130.retrieve_buy_main.ds_PoRvNo.schema
+execution:
+  type: handler
+  handler: inventory.retrieve_item_buy_main_list
+  fixture_id: fixture.spare_parts.sp130.retrieve_buy_main_list
+response:
+  params:
+  - errorCode
+  - errorMsg
+  datasets:
+  - name: ds_list
+    schema: spare_parts.sp130.retrieve_buy_main.ds_list.schema

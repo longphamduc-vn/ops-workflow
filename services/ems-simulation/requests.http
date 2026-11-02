@@ -1038,3 +1038,324 @@ Accept: {{xmlContentType}}
         <Parameter id="_ems_userId" type="string">{{userId}}</Parameter>
     </Parameters>
 </Root>
+
+
+### ------------------------------------------------------------------------------
+### 7. EXTENDED SPARE PARTS & LOGISTICS DATA RETRIEVAL (FROM 02.TXT)
+### ------------------------------------------------------------------------------
+
+### 7.1 Emergency PO List (EmergencyPoList)
+# XML Request & XML Response returning ds_result with emergency PO records
+POST {{baseUrl}}/emsspareparts/sp105/sp180Nav/EmergencyPoList.lgdn
+Content-Type: {{xmlContentType}}
+Accept: {{xmlContentType}}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="_ems_userId" type="string">{{userId}}</Parameter>
+        <Parameter id="_ems_organizationId" type="string">{{orgId}}</Parameter>
+        <Parameter id="_ems_language" type="string">{{language}}</Parameter>
+    </Parameters>
+    <Dataset id="ds_search">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
+            <Column id="requestMasterId" type="STRING" size="256"/>
+            <Column id="requestFrmDate" type="STRING" size="256"/>
+            <Column id="requestToDate" type="STRING" size="256"/>
+            <Column id="actionTypeCode" type="STRING" size="256"/>
+            <Column id="emergencyActionNo" type="STRING" size="256"/>
+            <Column id="requestorId" type="STRING" size="256"/>
+            <Column id="statusCode" type="STRING" size="256"/>
+            <Column id="requestorName" type="STRING" size="256"/>
+            <Column id="itemCategory" type="STRING" size="256"/>
+            <Column id="prvNo" type="STRING" size="256"/>
+            <Column id="workOrder" type="STRING" size="256"/>
+            <Column id="issueWo" type="STRING" size="256"/>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="vendorId" type="STRING" size="256"/>
+            <Column id="catelogGroupId" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="itemYn" type="STRING" size="256"/>
+            <Column id="receiptYn" type="STRING" size="256"/>
+            <Column id="poRequestMasterId" type="STRING" size="256"/>
+            <Column id="reviewRequestNo" type="STRING" size="256"/>
+            <Column id="requestDept" type="STRING" size="256"/>
+            <Column id="requestDeptCode" type="STRING" size="256"/>
+            <Column id="budgetDept" type="STRING" size="256"/>
+            <Column id="budgetDeptCode" type="STRING" size="256"/>
+            <Column id="wipEntityId" type="STRING" size="256"/>
+            <Column id="emergencyNo" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">{{orgId}}</Col>
+                <Col id="userId">{{userId}}</Col>
+                <Col id="requestMasterId"></Col>
+                <Col id="requestFrmDate">20261001</Col>
+                <Col id="requestToDate">20261102</Col>
+                <Col id="itemYn">N</Col>
+                <Col id="budgetDept">PO Module Technology Team 2</Col>
+                <Col id="budgetDeptCode">87321</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_ItemInfo">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+    <Dataset id="ds_PoRvNo">
+        <ColumnInfo>
+            <Column id="reviewRequestNo" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+</Root>
+
+### 7.2 Parts Transfer Request List (retPartsTransferReqList)
+# XML Request & XML Response returning ds_list with intra-plant stock transfer requests
+POST {{baseUrl}}/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn
+Content-Type: {{xmlContentType}}
+Accept: {{xmlContentType}}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="_ems_userId" type="string">{{userId}}</Parameter>
+        <Parameter id="_ems_organizationId" type="string">{{orgId}}</Parameter>
+        <Parameter id="_ems_language" type="string">{{language}}</Parameter>
+    </Parameters>
+    <Dataset id="ds_search">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
+            <Column id="responsibilityId" type="STRING" size="256"/>
+            <Column id="employeeNumber" type="STRING" size="256"/>
+            <Column id="equipmentGroup" type="STRING" size="256"/>
+            <Column id="partsCode" type="STRING" size="256"/>
+            <Column id="partsName" type="STRING" size="256"/>
+            <Column id="inspectItem" type="STRING" size="256"/>
+            <Column id="measure" type="STRING" size="256"/>
+            <Column id="employeeNo" type="STRING" size="256"/>
+            <Column id="employeeName" type="STRING" size="256"/>
+            <Column id="useYn" type="STRING" size="256"/>
+            <Column id="checkBasisId" type="STRING" size="256"/>
+            <Column id="sSchFromDate" type="STRING" size="256"/>
+            <Column id="sSchToDate" type="STRING" size="256"/>
+            <Column id="managementNo" type="STRING" size="256"/>
+            <Column id="requestNo" type="STRING" size="256"/>
+            <Column id="statusCode" type="STRING" size="256"/>
+            <Column id="reqSite" type="STRING" size="256"/>
+            <Column id="onHandSite" type="STRING" size="256"/>
+            <Column id="departmentCode" type="STRING" size="256"/>
+            <Column id="departmentName" type="STRING" size="256"/>
+            <Column id="reqSiteMngName" type="STRING" size="256"/>
+            <Column id="reqSiteMngId" type="STRING" size="256"/>
+            <Column id="onHandSiteMngName" type="STRING" size="256"/>
+            <Column id="onHandSiteMngId" type="STRING" size="256"/>
+            <Column id="requestorName" type="STRING" size="256"/>
+            <Column id="requestorId" type="STRING" size="256"/>
+            <Column id="requestMasterId" type="STRING" size="256"/>
+            <Column id="requestMasterSubId" type="STRING" size="256"/>
+            <Column id="itemYn" type="STRING" size="256"/>
+            <Column id="reviewRequestNo" type="STRING" size="256"/>
+            <Column id="otherSitePoReqNo" type="STRING" size="256"/>
+            <Column id="transReqTypeCode" type="STRING" size="256"/>
+            <Column id="poNo" type="STRING" size="256"/>
+            <Column id="invoiceNo" type="STRING" size="256"/>
+            <Column id="blNo" type="STRING" size="256"/>
+            <Column id="arNo" type="STRING" size="256"/>
+            <Column id="apNo" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">{{orgId}}</Col>
+                <Col id="userId">{{userId}}</Col>
+                <Col id="responsibilityId">69972</Col>
+                <Col id="employeeNumber">VH081996</Col>
+                <Col id="sSchFromDate">20261001000000000</Col>
+                <Col id="sSchToDate">20261102235959</Col>
+                <Col id="reqSite">{{orgId}}</Col>
+                <Col id="requestorName">Pham Duc Long</Col>
+                <Col id="requestorId">{{userId}}</Col>
+                <Col id="itemYn">N</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_item">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+</Root>
+
+### 7.3 Other Site PO Review Request List (retOtherSitePoRevReqList)
+# XML Request & XML Response returning ds_list with cross-site purchase orders
+POST {{baseUrl}}/emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn
+Content-Type: {{xmlContentType}}
+Accept: {{xmlContentType}}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="_ems_userId" type="string">{{userId}}</Parameter>
+        <Parameter id="_ems_organizationId" type="string">{{orgId}}</Parameter>
+        <Parameter id="_ems_language" type="string">{{language}}</Parameter>
+    </Parameters>
+    <Dataset id="ds_search">
+        <ColumnInfo>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
+            <Column id="responsibilityId" type="STRING" size="256"/>
+            <Column id="employeeNumber" type="STRING" size="256"/>
+            <Column id="employeeNo" type="STRING" size="256"/>
+            <Column id="employeeName" type="STRING" size="256"/>
+            <Column id="reqFromDate" type="STRING" size="256"/>
+            <Column id="reqToDate" type="STRING" size="256"/>
+            <Column id="reviewRequestNo" type="STRING" size="256"/>
+            <Column id="otherSitePoReqNo" type="STRING" size="256"/>
+            <Column id="poStatusCode" type="STRING" size="256"/>
+            <Column id="reqSite" type="STRING" size="256"/>
+            <Column id="poSite" type="STRING" size="256"/>
+            <Column id="reqDepartmentCode" type="STRING" size="256"/>
+            <Column id="reqDepartmentName" type="STRING" size="256"/>
+            <Column id="reqSiteMngName" type="STRING" size="256"/>
+            <Column id="reqSiteMngId" type="STRING" size="256"/>
+            <Column id="poSiteMngName" type="STRING" size="256"/>
+            <Column id="poSiteMngId" type="STRING" size="256"/>
+            <Column id="requestorName" type="STRING" size="256"/>
+            <Column id="requestorId" type="STRING" size="256"/>
+            <Column id="requestMasterId" type="STRING" size="256"/>
+            <Column id="requestMasterSubId" type="STRING" size="256"/>
+            <Column id="itemYn" type="STRING" size="256"/>
+            <Column id="reqStatusCode" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="organizationId">{{orgId}}</Col>
+                <Col id="userId">{{userId}}</Col>
+                <Col id="responsibilityId">69972</Col>
+                <Col id="employeeNumber">VH081996</Col>
+                <Col id="reqFromDate">20261001000000000</Col>
+                <Col id="reqToDate">20261102235959</Col>
+                <Col id="reqSite">{{orgId}}</Col>
+                <Col id="requestorName">Pham Duc Long</Col>
+                <Col id="requestorId">{{userId}}</Col>
+                <Col id="itemYn">N</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_item">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+</Root>
+
+### 7.4 Retrieve Item Buy Main List (retrieveItemBuyMainList)
+# XML Request & XML Response returning ds_list with PRV review and confirmation records
+POST {{baseUrl}}/emsspareparts/sp102/sp130Nav/retrieveItemBuyMainList.lgdn
+Content-Type: {{xmlContentType}}
+Accept: {{xmlContentType}}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="http://www.nexacroplatform.com/platform/dataset">
+    <Parameters>
+        <Parameter id="_ems_userId" type="string">{{userId}}</Parameter>
+        <Parameter id="_ems_organizationId" type="string">{{orgId}}</Parameter>
+        <Parameter id="_ems_language" type="string">{{language}}</Parameter>
+    </Parameters>
+    <Dataset id="ds_search">
+        <ColumnInfo>
+            <Column id="itemTypeCode" type="STRING" size="256"/>
+            <Column id="prvStatusCode" type="STRING" size="256"/>
+            <Column id="prvNo" type="STRING" size="256"/>
+            <Column id="overShortageQty" type="STRING" size="256"/>
+            <Column id="unitPriceStatusCode" type="STRING" size="256"/>
+            <Column id="itemStatus" type="STRING" size="256"/>
+            <Column id="confirmFlag" type="STRING" size="256"/>
+            <Column id="reviewerId" type="STRING" size="256"/>
+            <Column id="instanceId" type="STRING" size="256"/>
+            <Column id="requestorId" type="STRING" size="256"/>
+            <Column id="requestorDeptCode" type="STRING" size="256"/>
+            <Column id="requestFrmDate" type="STRING" size="256"/>
+            <Column id="requestToDate" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="organizationItemId" type="STRING" size="256"/>
+            <Column id="organizationId" type="STRING" size="256"/>
+            <Column id="txnGroupId" type="STRING" size="256"/>
+            <Column id="itemYn" type="STRING" size="256"/>
+            <Column id="reviewerName" type="STRING" size="256"/>
+            <Column id="requestorName" type="STRING" size="256"/>
+            <Column id="emNoDesc" type="STRING" size="256"/>
+            <Column id="budgetDeptCode" type="STRING" size="256"/>
+            <Column id="budgetDept" type="STRING" size="256"/>
+            <Column id="emNo" type="STRING" size="256"/>
+            <Column id="requestDept" type="STRING" size="256"/>
+            <Column id="requestDeptCode" type="STRING" size="256"/>
+            <Column id="chkInclude" type="STRING" size="256"/>
+            <Column id="userId" type="STRING" size="256"/>
+            <Column id="poRequestMasterId" type="STRING" size="256"/>
+            <Column id="rfqRequestMasterId" type="STRING" size="256"/>
+            <Column id="tPrvNo" type="STRING" size="256"/>
+            <Column id="vendorName" type="STRING" size="256"/>
+            <Column id="vendorId" type="STRING" size="256"/>
+            <Column id="workOrder" type="STRING" size="256"/>
+            <Column id="prvTypeCode" type="STRING" size="256"/>
+            <Column id="excelExportFlag" type="STRING" size="256"/>
+            <Column id="publicFlag" type="STRING" size="256"/>
+            <Column id="periodicFlag" type="STRING" size="256"/>
+            <Column id="dateType" type="STRING" size="256"/>
+            <Column id="requisitionLineId" type="STRING" size="256"/>
+            <Column id="authWipEntityId" type="STRING" size="256"/>
+            <Column id="cancelPrvNo" type="STRING" size="256"/>
+            <Column id="type" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row>
+                <Col id="requestFrmDate">20261001</Col>
+                <Col id="requestToDate">20261102</Col>
+                <Col id="organizationId">{{orgId}}</Col>
+                <Col id="itemYn">N</Col>
+                <Col id="userId">{{userId}}</Col>
+                <Col id="dateType">REQUEST</Col>
+                <Col id="type">REV_CONFIRM_Q</Col>
+            </Row>
+        </Rows>
+    </Dataset>
+    <Dataset id="ds_ItemInfo">
+        <ColumnInfo>
+            <Column id="item" type="STRING" size="256"/>
+            <Column id="itemDesc" type="STRING" size="256"/>
+            <Column id="inventoryItemId" type="STRING" size="256"/>
+            <Column id="remark" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows/>
+    </Dataset>
+    <Dataset id="ds_PoRvNo">
+        <ColumnInfo>
+            <Column id="reviewRequestNo" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+            <Row><Col id="reviewRequestNo">Q2610-3100832</Col></Row>
+            <Row><Col id="reviewRequestNo">Q2610-3100836</Col></Row>
+            <Row><Col id="reviewRequestNo">Q2610-3100845</Col></Row>
+            <Row><Col id="reviewRequestNo">Q2610-3100849</Col></Row>
+        </Rows>
+    </Dataset>
+</Root>
+

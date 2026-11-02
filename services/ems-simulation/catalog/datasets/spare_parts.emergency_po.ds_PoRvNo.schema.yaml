@@ -1,0 +1,6 @@
+id: spare_parts.emergency_po.ds_PoRvNo.schema
+name: ds_PoRvNo Dataset Schema
+version: 1.0.0
+columns:
+- name: reviewRequestNo
+  type: string

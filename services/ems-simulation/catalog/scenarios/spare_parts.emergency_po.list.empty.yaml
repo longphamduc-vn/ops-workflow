@@ -1,0 +1,45 @@
+id: spare_parts.emergency_po.list.empty
+api_id: spare_parts.emergency_po.list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_result:
+      cols:
+      - emrgPoType
+      - wipEntityName
+      - poRequestNo
+      - poRequestMasterId
+      - item
+      - itemDescription
+      - requestQty
+      - poNo
+      - receivingQty
+      - issueQty
+      - issueFlag
+      - requestedDate
+      - requestor
+      - supplierName
+      - maker
+      - itemCategory
+      - makerPart
+      - vendorId
+      - catalogGroupId
+      - inventoryItemId
+      - wipEntityId
+      - reqPoChgFlag
+      - poCancelFlag
+      - attachment
+      - sscsAttachment
+      - prvNo
+      - filePrvNo
+      - requestorDepartment
+      - budgetDept
+      count: 0
+      rows: []

@@ -1,0 +1,82 @@
+id: spare_parts.sp130.retrieve_buy_main_list.empty
+api_id: spare_parts.sp130.retrieve_buy_main_list
+enabled: true
+priority: 10
+match:
+  params:
+    _scenario: empty
+response:
+  params:
+    errorCode: '1'
+    errorMsg: No records found
+  datasets:
+    ds_list:
+      cols:
+      - checked
+      - prvNo
+      - prvNoFlag
+      - reviewerFlag
+      - confirmFlag
+      - prvStatus
+      - itemType
+      - item
+      - itemDesc
+      - requestQty
+      - unitPrice
+      - reqAmount
+      - requestorName
+      - requestorDept
+      - requestDate
+      - reviewerName
+      - emNo
+      - budgetDept
+      - requestComment
+      - reviewComment
+      - emNoBudget
+      - scheduledUseDate
+      - orderTypeDesc
+      - owningDept
+      - realLeadTime
+      - makerOnHand
+      - supplierStatus
+      - deliveryConfirmDate
+      - unitPriceStatus
+      - approvalInfo
+      - workOrder
+      - poNo
+      - poDate
+      - poQty
+      - receivingQty
+      - receivingDate
+      - confirmDate
+      - prvStatusCode
+      - itemTypeCode
+      - unitPriceStatusCode
+      - reviewerId
+      - instanceId
+      - requestorId
+      - requestorDeptCode
+      - inventoryItemId
+      - organizationId
+      - wipEntityId
+      - requisitionLineId
+      - txnGroupId
+      - lineLocationId
+      - poRequestMasterId
+      - orderType
+      - vendorId
+      - approverId
+      - owningDepartmentId
+      - reviewItemQty
+      - delayReasonName
+      - addPoReason
+      - publicFlag
+      - periodicFlag
+      - equipmentGroup
+      - updateEnable
+      - useDate
+      - reasonDesc
+      - waitRepairQty
+      - partsUseTypeCode
+      count: 0
+      rows: []

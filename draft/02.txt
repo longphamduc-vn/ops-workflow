@@ -1,0 +1,277 @@
+apis:
+
+  - index: 1
+
+    method: POST
+
+    url: "http://ems.lgdisplay.com:9000/emsspareparts/sp105/sp180Nav/EmergencyPoList.lgdn"
+
+    status: 200
+
+    request:
+
+      params:
+
+        _ems_userId: "658359"
+
+        _ems_organizationId: "28753"
+
+        _ems_language: EN
+
+      datasets:
+
+        ds_search:
+
+          cols: [organizationId, userId, requestMasterId, requestFrmDate, requestToDate, actionTypeCode, emergencyActionNo, requestorId, statusCode, requestorName, itemCategory, prvNo, workOrder, issueWo, item, vendorId, catelogGroupId, inventoryItemId, itemYn, receiptYn, poRequestMasterId, reviewRequestNo, requestDept, requestDeptCode, budgetDept, budgetDeptCode, wipEntityId, emergencyNo]
+
+          count: 1
+
+          rows:
+
+            - ["28753", "658359", "", "20261001", "20261102", "", "", "", "", "", "", "", "", "", "", "", "", "", N, "", "", "", "", "", PO Module Technology Team 2, "87321", "", ""]
+
+        ds_ItemInfo:
+
+          cols: [item, itemDesc, inventoryItemId, remark]
+
+          count: 0
+
+          rows: []
+
+        ds_PoRvNo:
+
+          cols: [reviewRequestNo]
+
+          count: 0
+
+          rows: []
+
+    response:
+
+      params:
+
+        errorCode: "1"
+
+        errorMsg: ""
+
+      datasets:
+
+        ds_result:
+
+          cols: [emrgPoType, wipEntityName, poRequestNo, poRequestMasterId, item, itemDescription, requestQty, poNo, receivingQty, issueQty, issueFlag, requestedDate, requestor, supplierName, maker, itemCategory, makerPart, vendorId, catalogGroupId, inventoryItemId, wipEntityId, reqPoChgFlag, poCancelFlag, attachment, sscsAttachment, prvNo, filePrvNo, requestorDepartment, budgetDept]
+
+          count: 1
+
+          rows:
+
+            - [EMERGENCY PO, WO-248926091, WOP-18090530, "18090530", QDAD12236, "Board ** 2912146, TRUMPF, Application:CENTRAL PROCESSOR(CPX) CONTROLS, Remark:CPX V4 STANDARD", "1", 854730-1-1, "0", "", N, "20261017112808000", Pham Duc Long, LGDVN_CÔNG TY TNHH SERVEONE (VIỆT NAM)_VN000562, TRUMPF, Q4.Board, "2912146", "1160150", "1034", "3808802", "337037120", N, N, "0", "0", Q2610-3098992, Q2610-3098992, NY SW PO M Technology DB/BD Unit B2, PO Module Technology Team 2]
+
+  - index: 2
+
+    method: POST
+
+    url: "http://ems.lgdisplay.com:9000/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn"
+
+    status: 200
+
+    request:
+
+      params:
+
+        _ems_userId: "658359"
+
+        _ems_organizationId: "28753"
+
+        _ems_language: EN
+
+      datasets:
+
+        ds_search:
+
+          cols: [organizationId, userId, responsibilityId, employeeNumber, equipmentGroup, partsCode, partsName, inspectItem, measure, employeeNo, employeeName, useYn, checkBasisId, sSchFromDate, sSchToDate, managementNo, requestNo, statusCode, reqSite, onHandSite, departmentCode, departmentName, reqSiteMngName, reqSiteMngId, onHandSiteMngName, onHandSiteMngId, requestorName, requestorId, requestMasterId, requestMasterSubId, itemYn, reviewRequestNo, otherSitePoReqNo, transReqTypeCode, poNo, invoiceNo, blNo, arNo, apNo]
+
+          count: 1
+
+          rows:
+
+            - ["28753", "658359", "69972", VH081996, "", "", "", "", "", "", "", "", "", "20261001000000000", "20261102235959", "", "", "", "28753", "", "", "", "", "", "", "", Pham Duc Long, "658359", "", "", N, "", "", "", "", "", "", "", ""]
+
+        ds_item:
+
+          cols: [item, itemDesc, inventoryItemId, remark]
+
+          count: 0
+
+          rows: []
+
+    response:
+
+      params:
+
+        errorCode: "1"
+
+        errorMsg: ""
+
+      datasets:
+
+        ds_list:
+
+          cols: [requestNo, requestMasterId, requestMasterSubId, organizationId, inventoryItemId, item, itemDesc, requestQty, currencyCode, reqOrgCode, reqMngName, requestor, requestorName, requestorDeptCode, requestorDeptName, requestDate, requestReasonDesc, managementNo, progressStatusCode, inventoryUnitPrice, onHandOrgCode, subinventoryCode, subinventoryName, onHandMngName, onHandDeptName, transferQty, transferReasonContent, transferShippingDate, confirmQty, lastUpdatedBy, completeUserName, transferReceivingDate, completionContent, transType, otherSitePoReqNo, otherSiteReqMasterId, otherSitePoReqDate, reviewRequestNo, intPoApprFlag, intPoReqMasterId, poNo, ipoRequestDate, departmentContactName, invOrgId, transferRequestTypeCode, invoiceNo, blNo, arNo, apNo, domesticYn, standardExchangeRate, totalUsdAmount, handoverDate, inputComment, deliveryEndUser, deliveryEndDate, arEndDate, apEndDate, gateRequestMasterId, unitPriceUsd, unitPriceKrw, unitPriceCny, receiver]
+
+          count: 4
+
+          rows:
+
+            - [WOP-18097541, "18097541", "7227", "28753", "2989049", QDAC01233, "AC Adapter ** DAD12050DKA, DREAM ELECTRONICS INC., Output Voltage:12VDC, Output Current:500㎃, Input Supply Voltage:100~240VAC, Addition Specification:, Remark:", "7", USD, A13, Vu Thi Thom, "658359", Pham Duc Long, "87479", NY SW PO M Technology DB/BD Unit B2, "20261019174924000", T001, P18097541-1, S007, "649.5", A14, SP-C-NEW, 통합창고, 王晓东, "", "", "", "", "", "279437", "", "", "", Site 간 재고 이동, "", "", "", "", N, "", "", "", "", "32248", RT001, -, "", "", "", Overseas, "", "", "", "", "", "", "", "", "", "96.6", "129560.4", "649.5", -]
+
+            - [WOP-18097545, "18097545", "7254", "28753", "375673", QDAB03011, "Photo Sensor ** EE-SX670, OMRON CORPORATION, Detection Target:ETC., Detection Method:, Detection Object Type:NONCLEANING MATRIAL 2*0.8㎜↑, Measuring Range:5㎜, Amp(Separate/Integral):ETC., Response Time:, Output(Current/Voltage):35㎃,", "15", USD, A13, Vu Thi Thom, "658359", Pham Duc Long, "87479", NY SW PO M Technology DB/BD Unit B2, "20261019175016000", T001, P18097545-1, S007, "26.0", A03, SP-C-NEW, 통합창고, 吕小健, "", "", "", "", "", "279437", "", "", "", Site 간 재고 이동, "", "", "", "", N, "", "", "", "", "297", RT001, -, "", "", "", Overseas, "", "", "", "", "", "", "", "", "", "3.9", "5186.2", "26.0", -]
+
+            - [WOP-18097565, "18097565", "7228", "28753", "356327", QDAB03583, "Sensor Accessory ** CN-73-C2, PANASONIC CORPORATION, Feature:SQUARE, Set Item Maker Part No:FX-300 FIBER AMP SERIES, Shape Size:, Remark:", "4", USD, A13, Vu Thi Thom, "658359", Pham Duc Long, "87479", NY SW PO M Technology DB/BD Unit B2, "20261019175112000", T001, P18097565-1, S007, "27.0", A03, SP-C-NEW, 통합창고, 吕小健, "", "", "", "", "", "279437", "", "", "", Site 간 재고 이동, "", "", "", "", N, "", "", "", "", "297", RT001, -, "", "", "", Overseas, "", "", "", "", "", "", "", "", "", "4.0", "5385.7", "27.0", -]
+
+            - [WOP-18097577, "18097577", "7248", "28753", "2372893", QDAB38882, "Non-contacting Relay/Terminal Relay ** G6DN-1A-24VDC, OMRON CORPORATION, Voltage Rating:24VDC, Current Rating:4.6㎃, Contact Arrangement:1A, Type:POWER RELAY, Remark:", "50", USD, A13, Vu Thi Thom, "658359", Pham Duc Long, "87479", NY SW PO M Technology DB/BD Unit B2, "20261019175651000", T001, P18097577-1, S007, "16.6", A14, SP-C-NEW, Kho tổng, 王晓东, "", "", "", "", "", "279437", "", "", "", Site 간 재고 이동, "", "", "", "", N, "", "", "", "", "32248", RT001, -, "", "", "", Overseas, "", "", "", "", "", "", "", "", "", "2.5", "3318.9", "16.6", -]
+
+  - index: 3
+
+    method: POST
+
+    url: "http://ems.lgdisplay.com:9000/emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn"
+
+    status: 200
+
+    request:
+
+      params:
+
+        _ems_userId: "658359"
+
+        _ems_organizationId: "28753"
+
+        _ems_language: EN
+
+      datasets:
+
+        ds_search:
+
+          cols: [organizationId, userId, responsibilityId, employeeNumber, employeeNo, employeeName, reqFromDate, reqToDate, reviewRequestNo, otherSitePoReqNo, poStatusCode, reqSite, poSite, reqDepartmentCode, reqDepartmentName, reqSiteMngName, reqSiteMngId, poSiteMngName, poSiteMngId, requestorName, requestorId, requestMasterId, requestMasterSubId, itemYn, reqStatusCode]
+
+          count: 1
+
+          rows:
+
+            - ["28753", "658359", "69972", VH081996, "", "", "20261001000000000", "20261102235959", "", "", "", "28753", "", "", "", "", "", "", "", Pham Duc Long, "658359", "", "", N, ""]
+
+        ds_item:
+
+          cols: [item, itemDesc, inventoryItemId, remark]
+
+          count: 0
+
+          rows: []
+
+    response:
+
+      params:
+
+        errorCode: "1"
+
+        errorMsg: ""
+
+      datasets:
+
+        ds_list:
+
+          cols: [requestNo, requestMasterId, requestMasterSubId, organizationId, inventoryItemId, item, itemDesc, lowestUnitPriceOrgCode, requestQty, usdUnitPrice, reqSiteUnitPrice, poSiteUnitPrice, reqSiteCurrencyCode, purchaseUnitPrice, poSiteCurrencyCode, requestorName, requestDeptName, purchaserName, purchaseDeptName, requestDate, prvStatus, reviewRequestNo, itrRequestNo, itrRequestMasterId, itrAttribute1, reqStatus]
+
+          count: 5
+
+          rows:
+
+            - [WOP-18097482, "18097482", "1705", "28753", "1980398", QDAB35621, "Sensor Accessory ** EE-1006-2M, OMRON CORPORATION, Feature:, Set Item Maker Part No:EE SERIES PHOTO SENSOR, Shape Size:, Remark:", A02, "108", "2.5", "4.7", "2.5", USD, "3300", KRW, Pham Duc Long, NY SW PO M Technology DB/BD Unit B2, 정민재, 파주 S/Parts 운영기술반, 2026-10-19, PO(Remained), Q2610-3106346, "", "", "", Approved]
+
+            - [WOP-18097568, "18097568", "1698", "28753", "801480", QCAC30474, "Solenoid Valve ** VQ21M1-5GZ-C6, SMC CORPORATION, Voltage:24VDC, The Diameter Of A Pipe:, Wiring Method:GROMMET, Conversion Method:2PORT 2WAY NORMAL CLOSED, Remark:VQ20/MANIFOLD USE", A02, "28", "11.3", "13.7", "11.3", USD, "15126", KRW, Pham Duc Long, NY SW PO M Technology DB/BD Unit B2, 정민재, 파주 S/Parts 운영기술반, 2026-10-19, "", "", "", "", "", Reject]
+
+            - [WOP-18097570, "18097570", "1704", "28753", "1899215", QDAB35218, "Selector Switch ** STK-22-TOR-S, SAFECT CO.,LTD, Voltage Rating:24VDC, Impeller Stage No.:2STAGE, Current Rating:89㎃, Switch Type:MANUAL OPERATION RETURN TYPE, A Species Of Handle:, Remark:", A02, "4", "131.7", "150.7", "131.7", USD, "176800", KRW, Pham Duc Long, NY SW PO M Technology DB/BD Unit B2, 정민재, 파주 S/Parts 운영기술반, 2026-10-19, "", "", "", "", "", Reject]
+
+            - [WOP-18097580, "18097580", "1699", "28753", "2446988", QCAC67103, "Speed Con ** AS1002F-06A, SMC CORPORATION, Connection Mode:SCREW CONNECTION, The Diameter Of A Pipe:6㎜, Control Method:METER OUT, Species:STRAIGHT, Remark:, Detail Outside Diameter(mm):", A02, "36", "5", "7.7", "5", USD, "6659", KRW, Pham Duc Long, NY SW PO M Technology DB/BD Unit B2, 정민재, 파주 S/Parts 운영기술반, 2026-10-19, "", "", "", "", "", Reject]
+
+            - [WOP-18109221, "18109221", "1718", "28753", "801480", QCAC30474, "Solenoid Valve ** VQ21M1-5GZ-C6, SMC CORPORATION, Voltage:24VDC, The Diameter Of A Pipe:, Wiring Method:GROMMET, Conversion Method:2PORT 2WAY NORMAL CLOSED, Remark:VQ20/MANIFOLD USE", A02, "28", "11.4", "13.7", "11.4", USD, "15126", KRW, Pham Duc Long, NY SW PO M Technology DB/BD Unit B2, 정민재, 파주 S/Parts 운영기술반, 2026-10-22, "", "", "", "", "", Reject]
+
+  - index: 4
+
+    method: POST
+
+    url: "http://ems.lgdisplay.com:9000/emsspareparts/sp102/sp130Nav/retrieveItemBuyMainList.lgdn"
+
+    status: 200
+
+    request:
+
+      params:
+
+        _ems_userId: "658359"
+
+        _ems_organizationId: "28753"
+
+        _ems_language: EN
+
+      datasets:
+
+        ds_search:
+
+          cols: [itemTypeCode, prvStatusCode, prvNo, overShortageQty, unitPriceStatusCode, itemStatus, confirmFlag, reviewerId, instanceId, requestorId, requestorDeptCode, requestFrmDate, requestToDate, inventoryItemId, organizationItemId, organizationId, txnGroupId, itemYn, reviewerName, requestorName, emNoDesc, budgetDeptCode, budgetDept, emNo, requestDept, requestDeptCode, chkInclude, userId, poRequestMasterId, rfqRequestMasterId, tPrvNo, vendorName, vendorId, workOrder, prvTypeCode, excelExportFlag, publicFlag, periodicFlag, dateType, requisitionLineId, authWipEntityId, cancelPrvNo, type]
+
+          count: 1
+
+          rows:
+
+            - ["", "", "", "", "", "", "", "", "", "", "", "20261001", "20261102", "", "", "28753", "", N, "", "", "", "", "", "", "", "", "", "658359", "", "", "", "", "", "", "", "", "", "", REQUEST, "", "", "", REV_CONFIRM_Q]
+
+        ds_ItemInfo:
+
+          cols: [item, itemDesc, inventoryItemId, remark]
+
+          count: 0
+
+          rows: []
+
+        ds_PoRvNo:
+
+          cols: [reviewRequestNo]
+
+          count: 4
+
+          rows:
+
+            - [Q2610-3100832]
+
+            - [Q2610-3100836]
+
+            - [Q2610-3100845]
+
+            - [Q2610-3100849]
+
+    response:
+
+      params:
+
+        errorCode: "1"
+
+        errorMsg: ""
+
+      datasets:
+
+        ds_list:
+
+          cols: [checked, prvNo, prvNoFlag, reviewerFlag, confirmFlag, prvStatus, itemType, item, itemDesc, requestQty, unitPrice, reqAmount, requestorName, requestorDept, requestDate, reviewerName, emNo, budgetDept, requestComment, reviewComment, emNoBudget, scheduledUseDate, orderTypeDesc, owningDept, realLeadTime, makerOnHand, supplierStatus, deliveryConfirmDate, unitPriceStatus, approvalInfo, workOrder, poNo, poDate, poQty, receivingQty, receivingDate, confirmDate, prvStatusCode, itemTypeCode, unitPriceStatusCode, reviewerId, instanceId, requestorId, requestorDeptCode, inventoryItemId, organizationId, wipEntityId, requisitionLineId, txnGroupId, lineLocationId, poRequestMasterId, orderType, vendorId, approverId, owningDepartmentId, reviewItemQty, delayReasonName, addPoReason, publicFlag, periodicFlag, equipmentGroup, updateEnable, useDate, reasonDesc, waitRepairQty, partsUseTypeCode]
+
+          count: 4
+
+          rows:
+
+            - ["0", Q2610-3100832, N, N, Y, PO(Remained), Invidual Management, QCAC60402, "Hose/Tube ** HOSAJ2-10-1-C1, MISUMI CORPORATION, Diameter:16㎜, Inner Diameter:6.3㎜, Material:POM, Shape:, Application:AIR FLOW, Remark:", "56", "13.95", "781.2", Nguyen Ngoc Tan, NY SW PO M Advanced CP/LT Part, "20261019164116000", Pham Duc Long, HWBMTL6310, PO Module Technology Team 2, "Name: Blow\nRequestor: Nguyen Ngoc Tan\n1. Lý do: Setup X410x\n2. Line: #603,#604, Công đoạn: POL\n3. Vấn đề: Part YT\n4. Hiện trạng( line): Do part lâu ngày bị vỡ\n5. Logic: 8ea/1line*2line\n6. PO remaind & Stock: \n---\nName: Blow\nRequestor: Nguyen Ngoc Tan\n1. Lý do: Setup X410x\n2. Line: #603,#604, Công đoạn: POL\n3. Vấn đề: Cải tiến: issue POL crack do dị vật \n4. Hiện trạng( line): issue POL crack do dị vật \n5. Logic: 4ea/1line*2line\n6. PO remaind & Stock: \n---\nName: Blow\nRequestor: Do Van Toan\n1. Lý do: Cải tiến dị vật POL\n2. Line: All line, Công đoạn: POL\n3. Vấn đề: issue POL crack do dị vật \n4. Hiện trạng( line): issue POL crack do dị vật \n5. Logic: 4ea/1line * 8line\n6. PO remaind & Stock:", "", PO Module Technology Team 2, "20261025000000000", 즉사용(Ready-to-use), NY SW PO M Technology DB/BD Unit B1, "", "", "", "", Price Registration, "1.Le Khac Ninh[20261019 19:47], 2.Doan Ngoc Loi[20261020 07:52], 3.Nguyen Van Duc[20261020 08:44], 4.Phi Minh Duc[20261020 16:40], 5.Hoang Trung Kien[20261020 17:48], 6.Yeong-Jin Jung[20261020 18:29], 7.Bui Van Duy[20261021 14:09], 8.Nguyen Thi Hue[20261022 16:54], 9.김형락[20261023 16:32], 10.허진호[20261026 09:19]", WO-249319105, PA01H013203, "20261030134420000", "56", "0", "", "20261019000000000", QP011, N001, UP001, "658359", "8838239", "736342", "87377", "2200843", "28753", "337561741", "21972216", "421510797", "43252759", "18097401", T001, "1160150", "658359", "1299584", "56", "", "", N, Y, MTL, N, "20261118", R001, "0", N001]
+
+            - ["0", Q2610-3100836, N, N, Y, PO(Remained), Total Management, QDAA02724, "Power Cable ** MR-BKS1CBL10M-A1-H, MITSUBISHI ELECTRIC CORPORATION, Cross Section Diameter:6㎜, Cable Length:10M, Material:, Number Of Core:2C, Voltage:, Remark:", "5", "48.55", "242.75", Tran Van Trung, NY SW PO M Technology TAB/DIP Part, "20261019164117000", Nguyen Thi Hue, HWBMTL2ABP, PO Module Technology Team 2, 2610A05_PO Module Technology Team 2, "Name: Brake cable servo 10M H\nRequestor: Tran Van Trung\n1. Lý do: Thay thế phụ tùng hỏng\n2. Line: All, Công đoạn: DIP\n3. Vấn đề: Mất tín hiệu, chập chờn\n4. Hiện trạng( line): Driver báo lỗi\n5. Logic: Broken 5ea\n6. PO remaind & Stock:", PO Module Technology Team 2, "20270408000000000", 즉사용(Ready-to-use), NY SW PO M Technology DB/BD Unit B1, "", "", "", "", Price Registration, "", "", PA01H012812, "20261030134359000", "5", "0", "", "20261022000000000", QP011, N002, UP001, "613813", "6065094", "564568", "87473", "351458", "28753", "", "21972147", "421510797", "43252497", "", T001, "863381", "613813", "1299584", "5", "", "", Y, Y, MTL, N, "20270123", R001, "0", N002]
+
+            - ["0", Q2610-3100845, N, N, Y, PO(Remained), Invidual Management, QCAC25281, "Fitting/One Touch Fitting ** KQ2U04-06A, SMC CORPORATION, Diameter:, Connection Mode:TUBE CONNECTION, The Diameter Of A Pipe:6㎜, Species:DIFFERENT DIAMETER UNION-Y, Remark:", "100", "2.07", "207", Pham Minh Duc, NY SW PO M Advanced CP/LT Part, "20261019164117000", Pham Duc Long, HWBMTL63HE, PO Module Technology Team 2, "Name: Different Diameter Union-Y 6mm\nRequestor: Pham Minh Duc\n1. Lý do: Setup X410X\n2. Line: #603,#604, Công đoạn: TAB\n3. Vấn đề: Chuẩn bị setup X1407\n4. Hiện trạng( line): Ejector bị dò khí\n5. Logic: Spare 200ea\n6. PO remaind & Stock:", "", PO Module Technology Team 2, "20261103000000000", 즉사용(Ready-to-use), NY SW PO M Technology DB/BD Unit B1, "", "", "", "", Price Registration, "1.Le Khac Ninh[20261019 19:47], 2.Doan Ngoc Loi[20261020 07:52], 3.Nguyen Van Duc[20261020 08:44], 4.Phi Minh Duc[20261020 16:40], 5.Hoang Trung Kien[20261020 17:48], 6.Yeong-Jin Jung[20261020 18:29], 7.Bui Van Duy[20261021 14:09], 8.Nguyen Thi Hue[20261022 16:54], 9.김형락[20261023 16:32], 10.허진호[20261026 09:19]", WO-249319092, 282568-108-1, "20261030134319000", "100", "0", "", "20261019000000000", QP011, N001, UP001, "658359", "8838224", "682838", "87377", "363348", "28753", "337561728", "21972286", "421510797", "43252077", "18097401", T001, "1160150", "658359", "1299584", "100", "", "", Y, Y, MTL, N, "20261215", R001, "0", N001]
+
+            - ["0", Q2610-3100849, N, N, Y, PO(Remained), Invidual Management, QCAC17191, "Cable Duct ** 2-KSH-24-42-28-HD-HD, KUNIMORI KAGAKU CO.,LTD, Face Width:40㎜, Material:ENGINEERING PLASTIC, Pitch:24㎜, Curvature Radius:R42, Remark:L:672㎜", "1", "166.8", "166.8", Nguyen Ngoc Tan, NY SW PO M Advanced CP/LT Part, "20261019164117000", Pham Duc Long, HWBMTL6310, PO Module Technology Team 2, "Name: Cable duct\nRequestor: Nguyen Ngoc Tan\n1. Lý do: Setup X410x\n2. Line: #603, Công đoạn: POL\n3. Vấn đề: Part YT\n4. Hiện trạng( line): Cable duct bị hỏng\n5. Logic: 1ea/1line\n6. PO remaind & Stock:", "", PO Module Technology Team 2, "20270108000000000", 즉사용(Ready-to-use), NY SW PO M Technology DB/BD Unit B1, "", "", "", "", Price Registration, "1.Le Khac Ninh[20261019 19:47], 2.Doan Ngoc Loi[20261020 07:52], 3.Nguyen Van Duc[20261020 08:44], 4.Phi Minh Duc[20261020 16:40], 5.Hoang Trung Kien[20261020 17:48], 6.Yeong-Jin Jung[20261020 18:29], 7.Bui Van Duy[20261021 14:09], 8.Nguyen Thi Hue[20261022 16:54], 9.김형락[20261023 16:32], 10.허진호[20261026 09:19]", WO-249319093, PA01H012714, "20261030134416000", "1", "0", "", "20261019000000000", QP011, N001, UP001, "658359", "8838239", "736342", "87377", "3233069", "28753", "337561729", "21971879", "421510797", "43252706", "18097401", T001, "863381", "658359", "1299584", "1", "", "", N, N, MTL, N, "20270201", R001, "0", N001]

@@ -418,3 +418,32 @@ async def retrieve_po_request(
         datasets={"ds_param": ds_out},
     )
 
+
+async def emergency_po_list(
+    request: NexacroRequest, repo: SimulationRepository, api_def: ApiDefinition
+) -> NexacroResponse | None:
+    """Simulate Emergency PO search (EmergencyPoList.lgdn)."""
+    return None
+
+
+async def parts_transfer_req_list(
+    request: NexacroRequest, repo: SimulationRepository, api_def: ApiDefinition
+) -> NexacroResponse | None:
+    """Simulate Parts Transfer Request search (retPartsTransferReqList.lgdn)."""
+    return None
+
+
+async def other_site_po_rev_req_list(
+    request: NexacroRequest, repo: SimulationRepository, api_def: ApiDefinition
+) -> NexacroResponse | None:
+    """Simulate Other Site PO Review Request search (retOtherSitePoRevReqList.lgdn)."""
+    return None
+
+
+async def retrieve_item_buy_main_list(
+    request: NexacroRequest, repo: SimulationRepository, api_def: ApiDefinition
+) -> NexacroResponse | None:
+    """Simulate Item Buy Main List search (retrieveItemBuyMainList.lgdn)."""
+    return None
+
+
