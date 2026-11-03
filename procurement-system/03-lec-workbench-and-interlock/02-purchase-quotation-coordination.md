@@ -1,74 +1,74 @@
-# 02. Theo Dõi Báo Giá RFQ, Các Mốc Tiến Độ (Vendor Confirm, ETA) & Phân Bổ Chi Phí
-> *Kiểm Soát unitPriceFlag, Theo Dõi Vendor Confirm Ngày Nhận, Ngày Dự Kiến ETA, Kế Hoạch Sắp Xếp Phân Bổ Chi Phí Sử Dụng Hàng Tháng & Xử Lý Bất Thường Từ Email Purchase*
+# 02. RFQ Quotation Tracking, Delivery Milestones (Vendor Confirm, ETA) & Expense Allocation Planning
+> *Monitoring unitPriceFlag, Tracking Vendor Confirmation Date, Estimated Time of Arrival (ETA), Monthly Expense Allocation Planning & Handling Exceptions from Purchase Department Inquiries*
 
 ---
 
-## 1. Ranh Giới Nghiệp Vụ & Các Mốc Tiến Độ Cốt Lõi Cần Kiểm Soát
+## 1. Business Boundaries & Core Milestones Under Control
 
-Trong quy trình mua sắm tại LG Display:
-- **Bộ Phận Mua Hàng Ngoài (Purchase Dept)**: Là đơn vị chuyên trách thương mại, trực tiếp làm việc với các nhà cung cấp (ServeOne, SMC, Keyence, Trumpf...), chịu trách nhiệm đàm phán hợp đồng, chiết khấu và đơn giá.
-- **Hệ thống EMS**: Là nơi ghi nhận chính thức khi hàng về kho vật lý (`notReceivingQty` chuyển thành `receivingQty`). Do đó **thông tin hàng về chỉ cần kiểm tra trực tiếp trong hệ thống EMS**.
-- **Hệ Thống Mới Đóng Vai Trò Kiểm Soát Các Giai Đoạn Trước Khi Hàng Về**:
-  1. **Tình trạng giá (`unitPriceFlag`)**: Nhận diện mã hàng đã có biểu giá hợp đồng (`Y`) hay chưa có giá (`N` - cần chờ báo giá RFQ).
-  2. **Vendor Confirm Ngày Nhận (Vendor Confirmation Date)**: Ngày nhà cung cấp chính thức xác nhận đơn đặt hàng và cam kết thời gian sản xuất.
-  3. **ETA (Estimated Time of Arrival)**: Ngày dự kiến hàng cập bến kho nhà máy HW (phục vụ kỹ sư chủ động lịch sửa máy).
-  4. **Sắp xếp phân bổ sử dụng hàng tháng (Monthly Expense Allocation Planning)**:
-     - Đối với các lô hàng mua số lượng lớn hoặc theo hợp đồng khung: LEC và Kỹ sư lập kế hoạch **dự kiến tháng nào sẽ xuất kho sử dụng bao nhiêu chiếc**.
-     - Mục đích: **Phân bổ chi phí sản xuất thực tế (`Issue Expense`) dàn đều theo từng tháng**, tránh dồn cục chi phí vào một tháng làm vỡ ngân sách SG của Team.
+Within the procurement operating model at LG Display:
+- **External Purchase Department (Purchase Dept)**: Serves as the dedicated commercial unit directly interfacing with vendors (ServeOne, SMC, Keyence, Trumpf, etc.), responsible for contract execution, volume discounts, and unit price negotiations.
+- **EMS System**: Serves as the official system of record where physical goods receipts are registered (`notReceivingQty` converts into `receivingQty`). Consequently, **physical goods receipt status is verified directly within the core EMS system**.
+- **The New System Tracks and Controls Upstream Milestones Prior to Receipt**:
+  1. **Pricing Status (`unitPriceFlag`)**: Identifies whether an item has an active framework contract price (`Y`) or lacks pricing (`N` — awaiting quotation RFQ).
+  2. **Vendor Confirmation Date**: The date the vendor officially confirms acceptance of the purchase order and commits to production and delivery timelines.
+  3. **ETA (Estimated Time of Arrival)**: The projected date goods arrive at the HW plant warehouse (allowing engineers to proactively schedule machine overhaul windows).
+  4. **Monthly Expense Allocation Planning**:
+     - For large bulk purchases or framework contract orders, the LEC and engineers formulate a plan detailing **how many units are projected to be issued and consumed in each month**.
+     - Objective: **Smooth out actual production expenses (`Issue Expense`) across consecutive months**, preventing single-month expense spikes that could breach the Team's SG budget.
 
 ```mermaid
 flowchart LR
-    subgraph PurchaseFlow["1. Đàm Phán & Phát Hành PO"]
-        RFQ["1. Theo dõi RFQ\n(unitPriceFlag: Y/N)"] --> PO["2. Phát Hành PO trên EMS\n(Purchase thực hiện)"]
+    subgraph PurchaseFlow["1. Quotation & PO Issuance"]
+        RFQ["1. Monitor RFQ Status\n(unitPriceFlag: Y/N)"] --> PO["2. Issue PO on EMS\n(Executed by Purchase Dept)"]
     end
 
-    subgraph MilestoneTrack["2. Kiểm Soát Các Mốc Tiến Độ (Trên Hệ Thống Mới)"]
-        PO --> V_Conf["3. Vendor Confirm Ngày Nhận\n(NCC xác nhận lịch giao)"]
-        V_Conf --> ETA_Track["4. Cập Nhật ETA\n(Ngày dự kiến về xưởng)"]
-        ETA_Track --> Plan_Alloc["5. Sắp Xếp Phân Bổ Hàng Tháng\n(Kế hoạch xuất để phân bổ chi phí)"]
+    subgraph MilestoneTrack["2. Milestone Tracking (On New System)"]
+        PO --> V_Conf["3. Vendor Confirm Date\n(Supplier commits delivery date)"]
+        V_Conf --> ETA_Track["4. Update ETA\n(Projected arrival at HW warehouse)"]
+        ETA_Track --> Plan_Alloc["5. Monthly Expense Allocation Plan\n(Phased issuance to smooth cost)"]
     end
 
-    subgraph EMSReceipt["3. Nhận Hàng & Xuất Kho (Trên EMS)"]
-        Plan_Alloc --> Rec_EMS["6. Hàng Về Kho HW\n(Kiểm tra đối soát trên EMS)"]
-        Rec_EMS --> Issue_EMS["7. Kỹ Sư Xuất Kho Lắp Máy\n(EMS tự hạch toán chi phí vào máy)"]
+    subgraph EMSReceipt["3. Physical Receipt & Issuance (On EMS)"]
+        Plan_Alloc --> Rec_EMS["6. Physical Receipt at HW Warehouse\n(Audited & verified directly on EMS)"]
+        Rec_EMS --> Issue_EMS["7. Engineer Issues Part for Machine Installation\n(EMS automatically posts expense to machine)"]
     end
 ```
 
 ---
 
-## 2. Giao Diện Theo Dõi Mốc Tiến Độ & Phân Bổ Chi Phí Hàng Tháng
+## 2. Milestone Tracking & Monthly Expense Allocation Interface
 
-Trên Bàn làm việc của LEC, tab **Tiến Độ Đơn Hàng & Phân Bổ Chi Phí** cung cấp các trường theo dõi chi tiết:
+On the LEC Workbench, the **Order Milestones & Expense Allocation** panel provides structured tracking fields:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  BẢNG THEO DÕI CÁC MỐC TIẾN ĐỘ & KẾ HOẠCH PHÂN BỔ CHI PHÍ SỬ DỤNG HÀNG THÁNG                                     [X Đóng]          │
+│  DELIVERY MILESTONES & MONTHLY EXPENSE ALLOCATION TRACKING CONSOLE                                                 [X Close]     │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  Mã Hạng Mục: PR-2611-0082  |  QCode: QCAD38190  |  Linh kiện: Xylanh trượt kép SMC MXQ16-100B  |  SL Đặt: 10 EA                 │
+│  Item Code: PR-2611-0082  |  QCode: QCAD38190  |  Part: SMC Dual Rod Cylinder MXQ16-100B  |  Order Qty: 10 EA                    │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 1. CÁC MỐC TIẾN ĐỘ GIAO HÀNG (MILESTONES TRACKING):                                                                              │
-│ • Tình trạng đơn giá (unitPriceFlag):    🟢 ĐÃ CÓ GIÁ (UP001 - Đơn giá: $220.00 USD)                                             │
-│ • Vendor Confirm Ngày Nhận:             [ 2026-11-08 ] (Nhà cung cấp SMC xác nhận ngày giao hàng)                                │
-│ • ETA (Dự Kiến Cập Bến Kho HW):         [ 2026-11-15 ] (Thời gian dự kiến về đến kho H1-2F)                                      │
-│ • Tình trạng hàng về (Kiểm tra từ EMS): ⏳ Đang vận chuyển (PO Remained trên EMS: 10 EA)                                         │
+│ 1. DELIVERY MILESTONES TRACKING:                                                                                                 │
+│ • Unit Price Status (unitPriceFlag):     🟢 PRICED (UP001 - Contract Price: $220.00 USD)                                         │
+│ • Vendor Confirm Date:                   [ 2026-11-08 ] (Vendor SMC confirmed manufacturing & dispatch date)                     │
+│ • ETA (Projected HW Warehouse Arrival):  [ 2026-11-15 ] (Projected dock arrival at warehouse H1-2F)                              │
+│ • Physical Goods Receipt (Checked on EMS): ⏳ In Transit (PO Remained on EMS: 10 EA)                                             │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 2. KẾ HOẠCH PHÂN BỔ SỬ DỤNG HÀNG THÁNG (ĐỂ PHÂN BỔ CHI PHÍ SẢN XUẤT):                                                            │
+│ 2. MONTHLY EXPENSE ALLOCATION PLAN (FOR PRODUCTION COST RECOGNITION):                                                            │
 │ ┌─────────────────────────┬─────────────────────────┬─────────────────────────┬──────────────────────────────────────────────┐ │
-│ │ Tháng 11/2026 (Kỳ này)  │ Tháng 12/2026 (Kỳ tới)  │ Tháng 01/2027 (Kỳ sau)  │ Tổng Phân Bổ Dự Kiến                         │ │
+│ │ Nov 2026 (Current Month)│ Dec 2026 (Next Month)   │ Jan 2027 (Future Month) │ Total Projected Allocation                   │ │
 │ ├─────────────────────────┼─────────────────────────┼─────────────────────────┼──────────────────────────────────────────────┤ │
-│ │ Xuất: [ 4 ] EA (@$220)  │ Xuất: [ 3 ] EA (@$220)  │ Xuất: [ 3 ] EA (@$220)  │ 10 EA = $2,200.00 USD                        │ │
-│ │ Chi phí: $880.00 USD    │ Chi phí: $660.00 USD    │ Chi phí: $660.00 USD    │ ↳ Kế hoạch phân bổ chi phí dàn đều hợp lý    │ │
+│ │ Plan: [ 4 ] EA (@$220)  │ Plan: [ 3 ] EA (@$220)  │ Plan: [ 3 ] EA (@$220)  │ 10 EA = $2,200.00 USD                        │ │
+│ │ Expense: $880.00 USD    │ Expense: $660.00 USD    │ Expense: $660.00 USD    │ ↳ Phased expense allocation balanced evenly  │ │
 │ └─────────────────────────┴─────────────────────────┴─────────────────────────┴──────────────────────────────────────────────┘ │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│                                        [↩️ HỦY BỎ]   [💾 LƯU CẬP NHẬT MỐC TIẾN ĐỘ & PHÂN BỔ CHI PHÍ]                              │
+│                                        [↩️ CANCEL]   [💾 SAVE MILESTONES & EXPENSE ALLOCATION]                                   │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Xử Lý Bất Thường Nhận Qua Email Từ Purchase
+## 3. Handling Anomalies Communicated via Purchase Department Emails
 
-Khi Purchase Dept gửi email cảnh báo bất thường:
-- Hãng báo **Ngừng sản xuất (EOL)** $\rightarrow$ LEC bấm nút chuyển trạng thái sang `EOL` trên hệ thống và gửi thông báo đổi mã cho Kỹ sư.
-- Hãng báo **Lead-time quá dài (> 120 ngày)** $\rightarrow$ LEC cập nhật lại ngày ETA và cảnh báo nguy cơ dừng chuyền cho Kỹ sư và Cost Management.
-- Hãng báo **Tăng đơn giá đột biến** $\rightarrow$ LEC ghi chú lý do và xếp hạng mục vào danh mục `🔴 OVER NGOÀI KẾ HOẠCH (Mã OVR-05)` để thẩm định đầu tháng.
+When the Purchase Department notifies the engineering team of commercial or logistics anomalies via email:
+- **Discontinued / End-of-Life (EOL)**: The LEC toggles the item status to `EOL` within the system and issues an engineering change notice to the requestor engineer to identify replacement models.
+- **Excessive Lead-Time (> 120 Days)**: The LEC updates the ETA, flags production line-stoppage risks, and coordinates with Cost Management and production planners.
+- **Unanticipated Price Increase**: The LEC documents the price variance rationale and reclassifies the procurement line as `🔴 UNPLANNED OVER (Reason Code: OVR-05)` for review in the Beginning-of-Month Audit.

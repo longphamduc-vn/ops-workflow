@@ -1,116 +1,116 @@
-# 01. Sơ Đồ Quy Trình Tổng Thể Đầu - Cuối (End-to-End Procurement Progress Workflow)
-> *Kiến trúc kiểm soát tiến độ mua sắm phụ tùng Factory HW (Smart Watch)*  
-> *Nguyên tắc cốt lõi: Hệ thống mới kiểm soát tiến độ (KHÔNG PHÊ DUYỆT); Mọi phê duyệt ký tá ngân sách diễn ra trên EMS; Bỏ qua Cổng thủ kho (xuất kho lấy từ EMS); Kỹ sư ngang hàng trong Part/Team; Thẩm định ĐẦU THÁNG với Cost Management (1 người); Luồng phản hồi 3 bên; Bắt buộc có QCode để thẩm định; Nhập tiến độ Vendor Confirm / ETA thủ công.*
+# 01. End-to-End Procurement Progress Workflow
+> *Procurement progress tracking architecture for Factory HW (Smart Watch) spare parts*  
+> *Core Principles: The new system tracks progress ONLY (NO APPROVALS); All financial budget sign-offs occur exclusively on EMS; No Warehouse Portal (issuance synced from EMS); Peer engineers in Part/Team; BEGINNING-OF-MONTH audit with Cost Management (1 single person); 3-party clarification loop; Mandatory official QCode for audit; Manual entry for Vendor Confirm Date / ETA tracking.*
 
 ---
 
-## 1. Sơ Đồ Quy Trình Hoạt Động (Swimlane Sequence Diagram)
+## 1. Swimlane Sequence Diagram
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor REQ as 1. Kỹ Sư Hiện Trường (Peers)
-    actor LDR as 2. Leader Team / Part
-    actor LEC as 3. LEC Quản Lý Phụ Tùng (Pham Duc Long)
-    actor PUR as 4. Chuyên Viên Purchase
-    actor CST as 5. Cost Management (1 Người)
-    participant SYS as Hệ Thống Tiến Độ Mới
+    actor REQ as 1. Field Engineers (Peers)
+    actor LDR as 2. Part / Team Leader
+    actor LEC as 3. Spare Parts LEC (Pham Duc Long)
+    actor PUR as 4. Purchase Specialist
+    actor CST as 5. Cost Management (Single Reviewer)
+    participant SYS as New Progress Tracking System
     participant EMS as 6. Core LG Display EMS
 
-    %% Giai đoạn 1: Chuẩn bị dữ liệu & Tạo yêu cầu
-    opt Đăng ký phụ tùng mới chưa có QCode
-        REQ->>SYS: Kéo thả folder CAD/Doc/Ảnh -> Nhập thông số sơ bộ (Mã tạm TMP-HW-xxxx)
-        SYS-->>LEC: Chuyển dữ liệu kỹ thuật để LEC đăng ký QCode trên ERP/EMS
-        LEC->>EMS: Đăng ký mã QCode chính thức ngoài ERP/EMS
-        LEC->>SYS: Cập nhật mã QCode chính thức thay thế mã tạm TMP
+    %% Phase 1: Data Preparation & Requisition Creation
+    opt New spare part registration without QCode
+        REQ->>SYS: Drag & drop CAD/Doc/Image folder -> Enter preliminary specs (Temporary code TMP-HW-xxxx)
+        SYS-->>LEC: Forward technical data for LEC to register QCode on ERP/EMS
+        LEC->>EMS: Register official QCode externally on ERP/EMS
+        LEC->>SYS: Update official QCode replacing temporary TMP code
     end
 
-    REQ->>SYS: Tạo yêu cầu mua (Tên máy thân thiện, QCode chuẩn, số lượng, Work Order)
-    alt Phát hiện tồn kho lâu ngày của Team khác (agingInterlockFlag == 'Y')
-        SYS-->>REQ: ⚠️ Bắn Banner CẢNH BÁO TỨC THÌ & Mở Task Bắt Buộc mượn/xuất dùng
-        Note over REQ,SYS: Task mượn tồn kho LUÔN LUÔN DUY TRÌ cho đến khi EMS đồng bộ 'N'
+    REQ->>SYS: Create purchase request (Friendly machine name, standard QCode, quantity, Work Order)
+    alt Cross-team aging stock detected (agingInterlockFlag == 'Y')
+        SYS-->>REQ: ⚠️ Trigger INSTANT WARNING Banner & Open Mandatory Task to borrow/use existing stock
+        Note over REQ,SYS: Stock borrow task PERSISTS MANDATORILY until EMS re-sync confirms 'N'
     end
 
-    %% Giai đoạn 2: Leader giám sát & LEC gom đơn
-    SYS-->>LDR: Hiển thị tiến độ mua sắm nội bộ Part/Team (Giám sát, không có nút duyệt)
-    SYS-->>LEC: Hàng đợi gom đơn toàn team & Quét Interlock 4 bước
-    LEC->>SYS: Thiết lập hạn Deadline giải trình & Đánh dấu thủ công [TRONG TARGET] hoặc [OVER PHÁT SINH]
+    %% Phase 2: Leader Monitoring & LEC Requisition Consolidation
+    SYS-->>LDR: Display internal Part/Team procurement progress (Monitoring only, no approval buttons)
+    SYS-->>LEC: Team-wide consolidation queue & 4-step Interlock scan
+    LEC->>SYS: Set justification deadlines & manually flag [IN TARGET] or [OVER UNPLANNED]
 
-    %% Giai đoạn 3: Phối hợp RFQ với Purchase
-    alt unitPriceFlag == 'N' (Chưa có giá hợp đồng)
-        LEC->>PUR: Gửi thông tin kỹ thuật yêu cầu RFQ
-        PUR-->>LEC: Đàm phán nhà cung cấp, phản hồi báo giá
-        LEC->>SYS: Cập nhật đơn giá sơ bộ & tiến độ RFQ
+    %% Phase 3: RFQ Coordination with Purchase
+    alt unitPriceFlag == 'N' (No contract price available)
+        LEC->>PUR: Send technical specs requesting RFQ
+        PUR-->>LEC: Negotiate with vendor, return quotation
+        LEC->>SYS: Update preliminary unit price & RFQ progress
     end
 
-    %% Giai đoạn 4: Thẩm định ĐẦU THÁNG & Luồng 3 bên
-    Note over LEC,CST: ĐẦU THÁNG (TỪ NGÀY 01 ĐẾN NGÀY 05): THẨM ĐỊNH CHI PHÍ
-    LEC->>SYS: Đóng hồ sơ thẩm định đầu tháng (Chỉ gom các mã ĐÃ CÓ QCODE)
-    LEC->>CST: Thẩm định chi phí offline (Rà soát ngân sách SG No-Rollover & danh sách Over)
-    opt Reviewer Cost Management cần thêm thông tin
-        CST->>SYS: Nhập yêu cầu cần làm rõ trên giao diện Thẩm Định
-        SYS-->>LEC: Thông báo yêu cầu làm rõ từ Reviewer
-        LEC->>SYS: Giao việc & điều phối cho Kỹ sư phụ trách máy
-        SYS-->>REQ: Nhận câu hỏi làm rõ trên Tab 4
-        REQ->>SYS: Cập nhật bằng chứng kỹ thuật (ảnh, biên bản sự cố)
-        SYS-->>LEC: Kỹ sư đã phản hồi
-        LEC->>SYS: Tổng hợp tài liệu & Gửi lại cho Reviewer Cost Management
-        CST->>SYS: Reviewer xác nhận hoàn tất thẩm định offline
+    %% Phase 4: Beginning-of-Month Audit & 3-Party Clarification Loop
+    Note over LEC,CST: BEGINNING OF MONTH (DAYS 01-05): COST MANAGEMENT AUDIT
+    LEC->>SYS: Close beginning-of-month audit dossier (Consolidate ONLY items with OFFICIAL QCODE)
+    LEC->>CST: Offline cost audit review (Review SG budget No-Rollover & Over list)
+    opt Cost Management Reviewer requires clarification
+        CST->>SYS: Enter clarification request on Audit interface
+        SYS-->>LEC: Notify clarification request from Reviewer
+        LEC->>SYS: Assign & coordinate task to machine-responsible Engineer
+        SYS-->>REQ: Receive clarification query on Tab 4
+        REQ->>SYS: Update technical evidence (photos, incident reports)
+        SYS-->>LEC: Engineer responded
+        LEC->>SYS: Consolidate documentation & Resubmit to Cost Management Reviewer
+        CST->>SYS: Reviewer confirms offline audit completion
     end
 
-    %% Giai đoạn 5: Phê duyệt chính thức & Phát hành PO trên EMS
-    LEC->>EMS: Tạo PRV No trên hệ thống EMS (Kèm biên bản thẩm định)
-    Note over EMS: Cost Management (Reviewer - 1 người) phê duyệt ký tắt chính thức TRÊN EMS
-    LEC->>SYS: Nhập mã PRV No vào hệ thống để bắt đầu đồng bộ tiến độ
-    EMS-->>SYS: Đồng bộ trạng thái PO No đã phát hành
+    %% Phase 5: Official Approval & PO Issuance on EMS
+    LEC->>EMS: Create PRV No on EMS (Attach audit minutes)
+    Note over EMS: Cost Management (Reviewer - 1 single person) signs off official approval ON EMS
+    LEC->>SYS: Enter PRV No into system to begin progress synchronization
+    EMS-->>SYS: Synchronize issued PO No status
 
-    %% Giai đoạn 6: Theo dõi tiến độ nhập hàng & Xuất kho
-    LEC->>SYS: Nhập thủ công tiến độ: Vendor Confirm ngày giao, ETA về xưởng, Phân bổ chi phí
-    EMS-->>SYS: Đọc dữ liệu nhập kho thực tế (Goods Receipt hoàn tất trên EMS)
-    REQ->>EMS: Kỹ sư làm thủ tục xuất kho trên EMS để lấy phụ tùng lắp máy
-    EMS-->>SYS: Tự động đồng bộ số liệu xuất kho (Issue Expense) & Ghi nhận chi phí thực tế
+    %% Phase 6: Delivery Tracking & Warehouse Issuance
+    LEC->>SYS: Manually enter tracking milestones: Vendor Confirm delivery date, Factory ETA, Expense allocation plan
+    EMS-->>SYS: Read actual goods receipt data (Goods Receipt completed on EMS)
+    REQ->>EMS: Engineer completes warehouse issuance procedure on EMS to draw parts for machine installation
+    EMS-->>SYS: Automatically synchronize warehouse issuance data (Issue Expense) & Record actual costs
 ```
 
 ---
 
-## 2. Các Mốc Trạng Thái Vòng Đời Của Yêu Cầu (Requisition State Machine)
+## 2. Requisition Lifecycle State Machine
 
-Hệ thống quản lý tiến độ qua 8 trạng thái minh bạch:
+The system tracks progress across 8 transparent states:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT_DATA_PREPARATION: Kỹ sư nộp folder CAD/Doc/ảnh (Mã tạm TMP-HW-xxxx)
-    DRAFT_DATA_PREPARATION --> QCODE_REGISTERED: LEC đã đăng ký QCode chính thức trên ERP/EMS
+    [*] --> DRAFT_DATA_PREPARATION: Engineer submits CAD/Doc/Image folder (Temporary code TMP-HW-xxxx)
+    DRAFT_DATA_PREPARATION --> QCODE_REGISTERED: LEC registers official QCode on ERP/EMS
     
-    QCODE_REGISTERED --> INTERLOCK_SCANNING: Quét Interlock, kiểm tra cờ agingInterlock & unitPrice
+    QCODE_REGISTERED --> INTERLOCK_SCANNING: Run Interlock scan, evaluate agingInterlock & unitPrice flags
     
     state INTERLOCK_SCANNING {
         [*] --> HAS_OTHER_TEAM_STOCK: agingInterlockFlag = Y
-        HAS_OTHER_TEAM_STOCK --> PERSISTENT_TASK_BORROW: Mở Task bắt buộc mượn tồn kho (Treo đến khi EMS='N')
-        PERSISTENT_TASK_BORROW --> READY_FOR_AUDIT: EMS cập nhật 'N'
+        HAS_OTHER_TEAM_STOCK --> PERSISTENT_TASK_BORROW: Open mandatory stock borrow task (Blocked until EMS = 'N')
+        PERSISTENT_TASK_BORROW --> READY_FOR_AUDIT: EMS updates to 'N'
         [*] --> READY_FOR_AUDIT: agingInterlockFlag = N
     }
     
-    READY_FOR_AUDIT --> MONTHLY_AUDIT_PENDING: LEC gom danh sách & tự phân loại Target/Over
-    MONTHLY_AUDIT_PENDING --> THREE_WAY_CLARIFICATION: Reviewer Cost Management yêu cầu làm rõ
-    THREE_WAY_CLARIFICATION --> MONTHLY_AUDIT_PENDING: Kỹ sư phản hồi qua LEC
+    READY_FOR_AUDIT --> MONTHLY_AUDIT_PENDING: LEC consolidates list & manually classifies Target/Over
+    MONTHLY_AUDIT_PENDING --> THREE_WAY_CLARIFICATION: Cost Management Reviewer requests clarification
+    THREE_WAY_CLARIFICATION --> MONTHLY_AUDIT_PENDING: Engineer responds via LEC
     
-    MONTHLY_AUDIT_PENDING --> EMS_PRV_PROCESSING: Thẩm định đầu tháng hoàn tất -> LEC tạo PRV trên EMS
-    EMS_PRV_PROCESSING --> PO_TRACKING_PROGRESS: PRV/PO duyệt trên EMS -> LEC nhập Vendor Confirm & ETA
-    PO_TRACKING_PROGRESS --> RECEIVED_IN_EMS: Hàng về (Đồng bộ từ EMS)
-    RECEIVED_IN_EMS --> ISSUED_FROM_EMS: Kỹ sư xuất kho lắp máy (Đồng bộ Issue từ EMS)
+    MONTHLY_AUDIT_PENDING --> EMS_PRV_PROCESSING: Beginning-of-month audit completed -> LEC creates PRV on EMS
+    EMS_PRV_PROCESSING --> PO_TRACKING_PROGRESS: PRV/PO approved on EMS -> LEC enters Vendor Confirm & ETA
+    PO_TRACKING_PROGRESS --> RECEIVED_IN_EMS: Goods received (Synced from EMS)
+    RECEIVED_IN_EMS --> ISSUED_FROM_EMS: Engineer issues parts from warehouse (Issue synced from EMS)
     ISSUED_FROM_EMS --> [*]
 ```
 
 ---
 
-## 3. Các Nguyên Tắc Vận Hành Bất Biến
+## 3. Immutable Operational Principles
 
-1. **Tuyệt Đối Không Phê Duyệt Trên Hệ Thống Mới**:
-   - Hệ thống mới đóng vai trò là "Bảng điều khiển kiểm soát tiến độ & dữ liệu kỹ thuật". Mọi phê duyệt có giá trị pháp lý và tài chính bắt buộc phải thực hiện trên **LG Display Nexacro EMS**.
-2. **Loại Bỏ Hoàn Toàn Cổng Thủ Kho**:
-   - Nhân viên kho không sử dụng ứng dụng này. Số liệu xuất kho, nhập kho và tồn kho vật lý được đọc tự động qua các API tích hợp của EMS.
-3. **Điều Kiện Đủ Để Thẩm Định Chi Phí**:
-   - Bắt buộc phải có **Mã QCode chính thức**. Mọi phụ tùng mới còn mang mã tạm `TMP-HW-xxxx` chỉ dừng ở giai đoạn chuẩn bị dữ liệu, không được đưa vào đợt thẩm định đầu tháng.
-4. **Cảnh Báo Tồn Kho Khác Team Là Task Bắt Buộc**:
-   - Kỹ sư không phải giải trình lý do chưa xuất, nhưng bắt buộc phải ưu tiên liên hệ mượn/xuất kho của Team bạn. Task này không thể bấm đóng thủ công; chỉ khi hệ thống đọc lại EMS thấy cờ chuyển `'N'`, Task mới tự động hoàn tất.
+1. **Strictly No Approvals on the New System**:
+   - The new system serves solely as a "Progress Tracking & Technical Data Control Dashboard". All legal, administrative, and financial approvals must take place on **LG Display Nexacro EMS**.
+2. **Complete Elimination of Warehouse Portal**:
+   - Warehouse personnel do not use this application. Inventory movements, physical receipts, and material issuance are read automatically through EMS integration APIs.
+3. **Mandatory Prerequisite for Cost Audit**:
+   - Requisitions strictly require an **Official QCode**. Any new spare parts retaining temporary codes (`TMP-HW-xxxx`) remain in the data preparation stage and are strictly excluded from the beginning-of-month audit.
+4. **Cross-Team Aging Stock Warning is a Mandatory Task**:
+   - While engineers do not need to submit delayed issuance justifications, they are mandated to prioritize borrowing and utilizing stock available in peer teams. This task cannot be closed manually; it automatically resolves only when the system re-syncs with EMS and confirms the flag is `'N'`.

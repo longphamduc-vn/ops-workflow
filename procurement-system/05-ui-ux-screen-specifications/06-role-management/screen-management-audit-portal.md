@@ -1,70 +1,70 @@
-# Giao Diện Dành Riêng Cho Vai Trò: Cost Management (Bộ Phận Quản Lý Chi Phí)
-> **Mã Giao Diện: UI-ROLE-06 — Cost Management Audit Portal**  
-> *Dành riêng cho: Bộ Phận Quản Lý Chi Phí — Reviewer & Assistant LÀ 1 NGƯỜI DUY NHẤT (Chuyên viên thẩm định chi phí / Cost Controller, KHÔNG PHẢI Ban Giám Đốc hay Ban Lãnh Đạo)*
+# Role-Specific Interface: Cost Management
+> **Screen Code: UI-ROLE-06 — Cost Management Audit Portal**  
+> *Dedicated to: Cost Management Department — Reviewer & Assistant IS 1 SINGLE PERSON (Cost Audit Specialist / Cost Controller, NOT the Board of Directors or Executive Leadership)*
 
 ---
 
-## 1. Tổng Quan Không Gian Làm Việc Của Cost Management (Workspace Anatomy)
+## 1. Cost Management Workspace Anatomy
 
-Theo nguyên tắc vận hành chuẩn hóa:
-> *"Cost Management là bộ phận chuyên trách quản lý chi phí, kiểm soát ngân sách SG và giải trình tồn kho. Đầu mỗi tháng, Reviewer (Cost Management) họp thẩm định offline với các LEC để thẩm tra chi tiết về tồn kho chưa dùng và các khoản chi Over. Sau khi thẩm định offline, nếu cần thêm thông tin, Reviewer nhập yêu cầu gửi LEC; LEC gửi Kỹ sư phản hồi rồi chuyển lại cho Reviewer. Khi hoàn tất xác nhận chi phí, việc phê duyệt chính thức diễn ra trên hệ thống EMS."*
+According to standardized operating principles:
+> *"Cost Management is the dedicated department responsible for cost control, SG budget monitoring, and inventory aging audits. At the beginning of each month, the Reviewer (Cost Management) conducts offline audit meetings with LECs to scrutinize unconsumed aging stock and unbudgeted Over expenditures. Following the offline audit, if additional clarification is needed, the Reviewer inputs inquiries into the system to forward to the LEC; the LEC dispatches them to the responsible Engineer for feedback, and routes the responses back to the Reviewer. Upon completion of cost clearance, official approval takes place on the EMS system."*
 
-Giao diện **Cost Management Audit Portal** đóng vai trò là **Công cụ kiểm soát chi phí & Cầu nối thông tin số hóa**:
-- Thẩm định chi phí và kiểm thảo giải trình tồn kho vào **ĐẦU MỖI THÁNG**.
-- Rà soát danh mục 100% các dòng phát sinh **Over Ngoài Kế Hoạch** (tách riêng Over do Mua Hàng vs Over do Xuất Kho từ EMS).
-- Rà soát các **Task Giải Trình Tồn Kho Chưa Dùng (>30 ngày)** của các kỹ sư hiện trường để kiểm soát hiện tượng găm hàng.
-- **Nhập yêu cầu cần thêm thông tin** gửi cho LEC điều phối kỹ sư làm rõ.
-- Tra cứu đối soát trước khi thao tác duyệt chính thức trên hệ thống EMS.
+The **Cost Management Audit Portal** interface functions as a **Cost Control & Digitalized Clarification Bridge**:
+- Cost audits and inventory aging reviews conducted at the **BEGINNING OF EACH MONTH**.
+- Scrutinize 100% of line items incurred as **Unbudgeted Over** (distinguishing Over from Procurement vs. Over from Warehouse Issuance synced from EMS).
+- Review **Unconsumed Inventory Justification Tasks (>30 days)** assigned to field engineers to prevent spare part hoarding.
+- **Input requests for additional information** to dispatch to the LEC for engineering clarification.
+- Cross-check and verify records prior to executing official approval on the external EMS system.
 
-Cấu trúc giao diện gồm **3 Chế Độ Xem Chuyên Biệt**:
-1.  **View 1: 📑 Bảng Thẩm Định Chi Phí & Tồn Kho Đầu Tháng**: So sánh hạn mức SG tháng (nhập thủ công, No-Rollover) với cam kết Trong Target và danh sách Over (`OVR-01..06`).
-2.  **View 2: 💬 Quản Lý Yêu Cầu Làm Rõ Thông Tin**: Nhập các câu hỏi / yêu cầu giải trình gửi cho LEC để kỹ sư trả lời.
-3.  **View 3: 📂 Kho Lưu Trữ Biên Bản & Đối Soát EMS**: Lưu trữ bản scan biên bản thẩm định và tra cứu mã PRV/PO đã đối soát từ EMS.
+The interface architecture comprises **3 Specialized Views**:
+1.  **View 1: 📑 Beginning-of-Month Cost & Inventory Audit Dossier**: Compares monthly SG budget ceilings (manually entered, No-Rollover) against Within-Target commitments and unbudgeted Over lists (`OVR-01..06`).
+2.  **View 2: 💬 Clarification Request Management**: Input inquiries and justification demands to dispatch to the LEC for engineer response.
+3.  **View 3: 📂 Minutes Archive & EMS Cross-Check**: Stores digitized scans of audit meeting minutes and cross-references PRV/PO tracking codes verified from EMS.
 
 ---
 
-## 2. Bản Vẽ Giao Diện Chi Tiết (ASCII UI Wireframe)
+## 2. Detailed UI Wireframe (ASCII)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ [LOGO OPS]  CỔNG THẨM ĐỊNH CHI PHÍ — COST MANAGEMENT (FACTORY HW)                [🔔 2 Cần Làm Rõ] [👤 Reviewer (Cost Control)]   │
-│ Phạm vi: Toàn bộ Nhà máy HW (Display Module Plant 1)                             Kỳ thẩm định: ĐẦU THÁNG 11/2026                   │
+│ [OPS LOGO]  COST MANAGEMENT AUDIT PORTAL — FACTORY HW                           [🔔 2 Clarifications Pending] [👤 Reviewer (Cost)]│
+│ Scope: Factory HW Entire Facility (Display Module Plant 1)                      Audit Period: BEGINNING OF MONTH 11/2026         │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ CÁC CHẾ ĐỘ XEM CỦA COST MANAGEMENT:                                                                                              │
-│ [📑 VIEW 1: THẨM ĐỊNH CHI PHÍ ĐẦU THÁNG]   [💬 VIEW 2: YÊU CẦU LÀM RÕ (GỬI LEC)]   [📂 VIEW 3: KHO BIÊN BẢN & ĐỐI SOÁT EMS]      │
+│ COST MANAGEMENT AUDIT VIEWS:                                                                                                     │
+│ [📑 VIEW 1: BEG-OF-MONTH COST AUDIT]   [💬 VIEW 2: CLARIFICATION REQUESTS (TO LEC)]   [📂 VIEW 3: MINUTES ARCHIVE & EMS CROSS-CHECK]│
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 📌 ĐANG XEM: VIEW 1 — HỒ SƠ THẨM ĐỊNH CHI PHÍ & TỒN KHO ĐẦU THÁNG 11/2026                                                        │
+│ 📌 ACTIVE VIEW: VIEW 1 — COST & INVENTORY AUDIT DOSSIER (NOVEMBER 2026)                                                          │
 │                                                                                                                                  │
-│ 1.1. BẢNG CÂN ĐỐI NGÂN SÁCH MUA SẮM SG THÁNG 11 (TUYỆT ĐỐI KHÔNG ROLLOVER):                                                      │
+│ 1.1. NOVEMBER SG PROCUREMENT BUDGET BALANCE (STRICT NO-ROLLOVER):                                                                │
 │ ┌────────────────────────────────────────┬───────────────────────────────────────┬─────────────────────────────────────────────┐ │
-│ │ Hạn Mức SG Tháng 11 (LEC Nhập Thủ Công)│ Tổng Cam Kết Đề Xuất Trong Target     │ Tổng Phát Sinh Mua Ngoài Kế Hoạch (Over)    │ │
-│ │              $150,000 USD              │      $122,000 USD (81.3% ngân sách)   │         $28,000 USD (18.7% ngân sách)       │ │
+│ │ November SG Cap (Manually Entered)     │ Total Committed Proposed Within-Target│ Total Unbudgeted Over Purchases Incurred    │ │
+│ │              $150,000 USD              │      $122,000 USD (81.3% of budget)   │         $28,000 USD (18.7% of budget)       │ │
 │ └────────────────────────────────────────┴───────────────────────────────────────┴─────────────────────────────────────────────┘ │
-│ • Tình trạng ngân sách tháng: 🟢 Tổng chi tiêu đề xuất ($150,000 USD) vừa khít trần ngân sách phân bổ tháng 11.                   │
+│ • Monthly Budget Status: 🟢 Total proposed expenditure ($150,000 USD) exactly matches the allocated November budget ceiling.      │
 │                                                                                                                                  │
-│ 1.2. DANH MỤC CÁC HẠNG MỤC PHÁT SINH OVER CẦN THẨM TRA (OVR-01 ĐẾN OVR-06):                                                      │
+│ 1.2. AUDIT LINE ITEMS: UNBUDGETED OVER REQUISITIONS REQUIRING SCRUTINY (OVR-01 TO OVR-06):                                      │
 │ ┌──┬────────────┬─────────────────────────────┬───────────┬─────────────┬─────────────┬──────────┬──────────────┬──────────────────┐ │
-│ │ST│ Mã QCode   │ Tên Phụ Tùng & Maker        │ Vị Trí    │ Số Lượng Mua│ Thành Tiền  │ Mã Lý Do │ Mã Lệnh Máy  │ Thao Tác Của     │ │
-│ │T │ / Mã Tạm   │                             │ Máy & Line│             │ Dự Kiến     │ Over     │ (Work Order) │ Reviewer         │ │
+│ │No│ QCode /    │ Spare Part Name & Maker     │ Machine & │ Order       │ Estimated   │ Over     │ Work Order   │ Reviewer Action  │ │
+│ │. │ Temp Code  │                             │ Line Loc  │ Qty         │ Total Amount│ Code     │ (WO Number)  │                  │ │
 │ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼──────────────────┤ │
-│ │1 │ QDAD12236  │ Board nguồn CPX V4 Trumpf   │ DB-01/#201│ 1 EA        │ $3,150.00   │ OVR-01   │ WO-248926091 │[❓ Yêu Cầu Làm Rõ│ │
-│ │  │            │ ↳ Lý do kỹ sư: Cháy board do xung sét ca đêm, dừng máy DB-01                         │   Gửi Cho LEC]   │ │
+│ │1 │ QDAD12236  │ CPX V4 Trumpf Power Board   │ DB-01/#201│ 1 EA        │ $3,150.00   │ OVR-01   │ WO-248926091 │[❓ Request Info  │ │
+│ │  │            │ ↳ Engineer reason: Board burned from night shift lightning surge, line down DB-01   │   Send to LEC]   │ │
 │ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼──────────────────┤ │
-│ │2 │ QCAD38190  │ Xylanh trượt kép SMC MXQ16  │ TAB-02/#20│ 2 EA        │ $440.00     │ OVR-03   │ WO-248926098 │[✅ Đồng Ý Duyệt] │ │
-│ │  │            │ ↳ Lý do kỹ sư: LGD Korea chưa transfer kịp, mua gấp tránh dừng chuyền                │                  │ │
+│ │2 │ QCAD38190  │ Dual Slide Cylinder MXQ16   │ TAB-02/#20│ 2 EA        │ $440.00     │ OVR-03   │ WO-248926098 │[✅ Endorse Line] │ │
+│ │  │            │ ↳ Engineer reason: LGD Korea transfer delayed; urgent purchase to prevent stoppage  │                  │ │
 │ └──┴────────────┴─────────────────────────────┴───────────┴─────────────┴─────────────┴──────────┴──────────────┴──────────────────┘ │
 │                                                                                                                                  │
-│  [📥 XUẤT BÁO CÁO EXCEL FORM CỐ ĐỊNH]      [✍️ KÝ BIÊN BẢN XÁC NHẬN CHI PHÍ (COST CLEARANCE)]     [↗️ CHUYỂN SANG DUYỆT TRÊN EMS] │
+│  [📥 EXPORT FIXED-FORMAT EXCEL REPORT]      [✍️ SIGN COST CLEARANCE MINUTES]     [↗️ PROCEED TO OFFICIAL APPROVAL ON EMS]        │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. View 2 Chi Tiết: Gửi Yêu Cầu Cần Thêm Thông Tin Cho LEC
+## 3. View 2 Detail: Sending Requests for Additional Information to LEC
 
-Khi Reviewer phát hiện một dòng chi phí chưa đủ bằng chứng hoặc nghi ngờ tính xác thực:
-1. Reviewer bấm **`[❓ Yêu Cầu Làm Rõ Gửi Cho LEC]`**.
-2. Form popup mở ra:
-   - Reviewer nhập nội dung câu hỏi (ví dụ: *"Cần bổ sung biên bản giám định hỏng hóc và giải trình tại sao không xuất dùng tồn kho của Team 1?"*).
-3. Hệ thống chuyển nội dung này trực tiếp đến tab `Cầu Nối Reviewer` trên Bàn làm việc của LEC.
-4. Sau khi Kỹ sư phản hồi và LEC gửi lại, Reviewer nhận được thông báo để xem xét phê duyệt.
+When the Reviewer detects an expenditure line lacking adequate evidence or requiring scrutiny:
+1. The Reviewer clicks **`[❓ Request Info Send to LEC]`**.
+2. A modal dialog opens:
+   - The Reviewer enters the inquiry (e.g., *"Provide damaged component inspection report and clarify why Team 1 spare stock was not borrowed/transferred?"*).
+3. The system dispatches this inquiry directly to the `Reviewer Clarification Bridge` tab on the LEC Master Workbench.
+4. Once the Engineer responds and the LEC consolidates and resubmits, the Reviewer receives a notification to finalize verification.

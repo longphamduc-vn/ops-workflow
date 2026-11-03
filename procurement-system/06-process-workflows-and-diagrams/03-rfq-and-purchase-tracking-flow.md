@@ -1,60 +1,60 @@
-# 03. Sơ Đồ Quy Trình: Theo Dõi Báo Giá (RFQ), Xử Lý Bất Thường & Kiểm Soát Tiến Độ Nhập Hàng
-> *Ranh Giới Nghiệp Vụ Chuẩn Hóa: Purchase Làm Giá Với Nhà Cung Cấp, LEC Theo Dõi Tiến Độ RFQ, Xử Lý Bất Thường Từ Email, và Nhập Thủ Công Các Mốc Tiến Độ Nhập Hàng (Vendor Confirm, ETA, Phân Bổ Chi Phí Hàng Tháng; Hàng Về Kiểm Tra Trên EMS)*
+# 03. Process Workflow: RFQ Tracking, Exception Handling & Goods Receipt Progress Monitoring
+> *Standardized Operational Boundaries: Purchase Negotiates Pricing with Suppliers, LEC Tracks RFQ Progress, Handles Email Exceptions, and Manually Enters Inbound Progress Milestones (Vendor Confirm Date, ETA, Monthly Expense Allocation Plan; Physical Goods Receipt Checked on EMS)*
 
 ---
 
-## 1. Lưu Đồ Chi Tiết Vòng Đời Báo Giá & Kiểm Soát Tiến Độ Nhập Hàng
+## 1. Detailed Flowchart: Quotation Lifecycle & Inbound Progress Monitoring
 
 ```mermaid
 flowchart TD
-    subgraph S1["1. Khởi Tạo Yêu Cầu & Kiểm Tra Cờ Giá (unitPriceFlag)"]
-        Req["Kỹ sư hiện trường tạo yêu cầu mua (Bắt buộc có QCode)"] --> PriceCheck{"Cờ Giá unitPriceFlag (Y/N)?"}
-        PriceCheck -->|"Y (Đã có đơn giá hợp đồng)"| DonePrice["Đã có giá ServeOne / Hợp đồng\n➔ Sẵn sàng cho LEC phân loại Target/Over"]
-        PriceCheck -->|"N (Chưa có giá hợp đồng)"| RFQ_Init["Hệ thống chuyển trạng thái: ⏳ CHỜ BÁO GIÁ RFQ"]
+    subgraph S1["1. Requisition Initiation & Price Flag Check (unitPriceFlag)"]
+        Req["Field engineer creates purchase requisition (Official QCode mandatory)"] --> PriceCheck{"Price Flag unitPriceFlag (Y/N)?"}
+        PriceCheck -->|"Y (Contract unit price exists)"| DonePrice["ServeOne / Contract price available\n➔ Ready for LEC Target/Over classification"]
+        PriceCheck -->|"N (No contract price)"| RFQ_Init["System updates status: ⏳ AWAITING RFQ QUOTATION"]
     end
 
-    subgraph S2["2. Giai Đoạn Đàm Phán Thương Mại (Purchase Phụ Trách)"]
-        RFQ_Init --> PurAction["Chuyên viên Purchase gửi RFQ sang Nhà Cung Cấp ngoài\n(ServeOne, SMC, Keyence, Trumpf...)"]
-        PurAction --> VenResponse{"Nhà Cung Cấp Phản Hồi"}
+    subgraph S2["2. Commercial Negotiation Phase (Purchase Department)"]
+        RFQ_Init --> PurAction["Purchase specialist sends RFQ to external vendor\n(ServeOne, SMC, Keyence, Trumpf...)"]
+        PurAction --> VenResponse{"Vendor Response"}
     end
 
-    subgraph S3["3. Phân Nhánh: Báo Giá Chuẩn vs Bất Thường Nhận Qua Email"]
-        VenResponse -->|"Báo giá bình thường"| NormalFlow["Purchase cập nhật đơn giá thỏa thuận vào EMS"]
+    subgraph S3["3. Branching: Standard Quotation vs. Email-Reported Exception"]
+        VenResponse -->|"Standard quotation"| NormalFlow["Purchase updates agreed unit price into EMS"]
         NormalFlow --> DonePrice
         
-        VenResponse -->|"Có BẤT THƯỜNG\n(EOL / Tăng giá đột biến / Leadtime >120 ngày)"| ExMail["Purchase gửi Email cảnh báo bất thường cho LEC"]
+        VenResponse -->|"EXCEPTION DETECTED\n(EOL / Price surge / Lead time > 120 days)"| ExMail["Purchase sends exception alert email to LEC"]
     end
 
-    subgraph S4["4. Xử Lý Bất Thường Kỹ Thuật (LEC Thực Hiện)"]
-        ExMail --> LEC_Input["LEC mở Form 'Xử Lý Bất Thường RFQ' trên hệ thống:\n• Trích dẫn nội dung Email từ Purchase\n• Đính kèm tệp email / báo giá\n• Chọn hướng xử lý: Đổi mã thay thế / Sửa chữa SPR"]
-        LEC_Input --> SysAlert["Hệ thống chuyển trạng thái: ⚠️ RFQ_EXCEPTION\nBắn thông báo làm rõ cho Kỹ sư"]
-        SysAlert --> ReqAction{"Kỹ sư phản hồi"}
-        ReqAction -->|"Đồng ý mã thay thế"| UpdateOrder["Cập nhật mã linh kiện mới"]
-        ReqAction -->|"Giữ nguyên & Giải trình kỹ thuật"| ReExplain["Gửi lại ý kiến kỹ thuật cho LEC & Purchase"]
+    subgraph S4["4. Technical Exception Handling (Executed by LEC)"]
+        ExMail --> LEC_Input["LEC opens 'RFQ Exception Handling' form on system:\n• Quotes email content from Purchase\n• Attaches email / quotation file\n• Selects resolution: Substitute part code / SPR repair"]
+        LEC_Input --> SysAlert["System transitions status: ⚠️ RFQ_EXCEPTION\nDispatches clarification prompt to Engineer"]
+        SysAlert --> ReqAction{"Engineer Response"}
+        ReqAction -->|"Accept substitute code"| UpdateOrder["Update to new spare part code"]
+        ReqAction -->|"Retain original & provide technical justification"| ReExplain["Resubmit technical rationale to LEC & Purchase"]
         UpdateOrder --> DonePrice
     end
 
-    subgraph S5["5. Thẩm Định Đầu Tháng & Theo Dõi Tiến Độ Nhập Hàng Thủ Công"]
-        DonePrice --> AuditMonth["Họp Thẩm Định Chi Phí ĐẦU THÁNG với Cost Management (1 người)\n(LEC tự tay phân loại [TARGET] hoặc [OVER PHÁT SINH])"]
-        AuditMonth --> EMS_PO["LEC tạo PRV trên EMS ➔ Lãnh đạo ký duyệt ➔ EMS phát hành PO"]
+    subgraph S5["5. Beginning-of-Month Audit & Manual Inbound Progress Tracking"]
+        DonePrice --> AuditMonth["BEGINNING-OF-MONTH Cost Audit Meeting with Cost Management (1 person)\n(LEC manually classifies [TARGET] or [OVER UNPLANNED])"]
+        AuditMonth --> EMS_PO["LEC creates PRV on EMS ➔ Approvers sign off ➔ EMS issues PO"]
         
-        EMS_PO --> ManualTracking["LEC NHẬP TIẾN ĐỘ THỦ CÔNG TRÊN HỆ THỐNG:\n1. 📅 Vendor Confirm Ngày Giao Hàng Dự Kiến\n2. 🚚 Ngày Hàng Về Cảng / Xưởng (ETA)\n3. 📊 Sắp Xếp Phân Bổ Sử Dụng Hàng Tháng (Phân bổ chi phí)"]
+        EMS_PO --> ManualTracking["LEC MANUALLY ENTERS PROGRESS MILESTONES ON SYSTEM:\n1. 📅 Vendor Confirm Estimated Dispatch Date\n2. 🚚 Estimated Time of Arrival (ETA) at factory\n3. 📊 Monthly Expense Allocation Plan (Expense distribution)"]
         
-        ManualTracking --> EMS_Receipt["KIỂM TRA THÔNG TIN HÀNG VỀ TRÊN EMS:\n(Goods Receipt hoàn tất trên EMS ➔ Đọc tự động vào hệ thống)"]
+        ManualTracking --> EMS_Receipt["CHECK PHYSICAL GOODS RECEIPT ON EMS:\n(Goods Receipt completed on EMS ➔ Synced automatically into system)"]
     end
 ```
 
 ---
 
-## 2. Đặc Tả Nghiệp Vụ Xử Lý & Kiểm Soát Tiến Độ
+## 2. Business Specifications & Progress Monitoring
 
-1.  **Ranh Giới Rõ Ràng Về Báo Giá**:
-    - LEC không làm thay công việc thương mại của Purchase. Mọi thủ tục đàm phán, chiết khấu thuộc trách nhiệm của bộ phận Mua hàng. LEC chỉ theo dõi trạng thái cờ `unitPriceFlag` trên hệ thống.
-2.  **Minh Bạch Sự Cố Qua Email**:
-    - Khi có chậm trễ ngoài mong muốn (hãng ngừng sản xuất EOL, thời gian giao hàng kéo dài), LEC đưa nguyên văn email từ Purchase lên hệ thống để kỹ sư nắm rõ, loại bỏ hoàn toàn việc nghi ngờ chậm trễ thủ tục.
-3.  **Kiểm Soát Tiến Độ Nhập Hàng Thủ Công**:
-    - **Thông tin hàng về cuối cùng**: Chỉ cần kiểm tra và đọc tự động từ hệ thống Core EMS khi kho hoàn tất thủ tục nhập kho.
-    - **Các mốc trước khi hàng về**: Do EMS không quản lý chi tiết các mốc trung gian của nhà sản xuất, LEC sẽ **nhập thủ công trên hệ thống này**:
-      * **Vendor Confirm Ngày Nhận**: Ngày nhà cung cấp chính thức xác nhận xuất xưởng.
-      * **ETA (Estimated Time of Arrival)**: Ngày dự kiến hàng cập cảng hoặc về đến nhà máy HW.
-      * **Sắp Xếp Phân Bổ Sử Dụng Hàng Tháng**: Kế hoạch chia nhỏ số lượng sử dụng theo từng tháng để cân đối phân bổ chi phí ngân sách SG, tránh dồn cục chi phí làm vượt trần ngân sách tháng.
+1.  **Clear Boundary on Quotations**:
+    - The LEC does not handle commercial pricing duties in place of Purchase. All supplier negotiations, quotations, and volume discounts are the sole responsibility of the Purchasing department. The LEC only monitors the `unitPriceFlag` status in the system.
+2.  **Transparency for Email-Reported Exceptions**:
+    - When unexpected delays or roadblocks occur (manufacturer End-of-Life [EOL], abnormal lead times), the LEC quotes the verbatim email received from Purchase into the system so engineers have immediate visibility, eliminating misunderstandings or suspicion of administrative delays.
+3.  **Manual Inbound Progress Monitoring**:
+    - **Final Goods Receipt Verification**: Inspected and verified directly on Core EMS; once the warehouse completes physical goods receipt, the status is automatically synchronized into the system.
+    - **Intermediate Milestones Prior to Arrival**: Because EMS does not record upstream manufacturer milestones, the LEC **manually enters them in this system**:
+      * **Vendor Confirm Estimated Dispatch Date**: The date the vendor officially confirms outbound shipment from their manufacturing facility.
+      * **Estimated Time of Arrival (ETA)**: Projected arrival date at port or delivery at the HW factory floor.
+      * **Monthly Expense Allocation Plan**: Schedule dividing projected material usage across calendar months to balance SG budget expense allocations and prevent single-month budget cap overruns.

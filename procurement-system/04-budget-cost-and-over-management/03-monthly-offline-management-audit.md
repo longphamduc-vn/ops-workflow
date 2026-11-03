@@ -1,61 +1,62 @@
-# 03. Quy Trình Thẩm Định Đầu Tháng & Kiểm Thảo Giải Trình Tồn Kho (Cost Management Audit)
-> *Thẩm Định Chi Phí & Kiểm Thảo Tồn Kho Chưa Dùng Vào ĐẦU THÁNG, Cơ Chế Làm Rõ Thông Tin 3 Bên (Reviewer <-> LEC <-> Kỹ Sư), Ngân Sách Không Rollover & Phê Duyệt Trên EMS*
+# 03. Beginning-of-Month Cost Audit & Aging Review Process (Cost Management Audit)
+> *Beginning-of-Month Cost Governance & Unconsumed Stock Review (Days 01–05), Three-Party Clarification Loop (Reviewer ↔ LEC ↔ Engineer), Strict No-Rollover Budget & Approvals on EMS*
 
 ---
 
-## 1. Cơ Chế Thẩm Định & Kiểm Thảo Đầu Mỗi Tháng (Beginning-of-Month Cost Governance)
+## 1. Beginning-of-Month Governance & Review Architecture
 
-Quy trình thẩm định được vận hành thực tế và tinh gọn vào **đầu mỗi tháng** giữa **Nhóm LEC trong Team** và **Reviewer (Bộ phận Cost Management - Reviewer & Assistant là 1 người)**:
+The cost audit workflow operates practically and concisely at the **beginning of each month (Days 01–05)** between the **LEC Group in the Team** and the **Reviewer (Cost Management — 1 single person acting as Reviewer & Assistant)**:
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor LEC as Nhóm LEC Trong Team
-    participant SYS as Hệ Thống Mua Bán Mới
+    actor LEC as LEC Group in Team
+    participant SYS as New Procurement System
     actor REV as Reviewer (Cost Management)
-    actor ENG as Kỹ Sư Hiện Trường
-    participant EMS as Hệ Thống EMS Nexacro
+    actor ENG as Field Engineer
+    participant EMS as EMS Nexacro System
 
-    Note over LEC,SYS: ĐẦU MỖI THÁNG: Chốt kỳ & Xuất Hồ sơ Kiểm thảo
-    LEC->>SYS: Bấm "Chốt kỳ & Xuất Báo Cáo Kiểm Thảo Tháng [YYYY-MM]"
-    SYS-->>LEC: Xuất file Excel Form Cố Định (Giải trình tồn kho, Trong Target vs Over)
+    Note over LEC,SYS: BEGINNING OF MONTH: Period Close & Audit Dossier Export (Days 01-05)
+    LEC->>SYS: Click "Close Period & Export Audit Dossier [YYYY-MM]"
+    SYS-->>LEC: Export Standard Fixed-Template Excel (Stock Aging Justification, In-Target vs Over)
     
-    Note over LEC,REV: Họp Thẩm Định Offline Đầu Tháng (Reviewer & LEC)
-    LEC->>REV: Trình giải trình chi phí Over (OVR-01..06) và tồn kho chưa xuất dùng
+    Note over LEC,REV: Beginning-of-Month Offline Audit Meeting (Reviewer & LEC)
+    LEC->>REV: Present Over spend justifications (OVR-01..06) and unconsumed aging stock
     
-    alt Reviewer CẦN THÊM THÔNG TIN / GIẢI TRÌNH BỔ SUNG
-        REV->>LEC: Nêu yêu cầu làm rõ các dòng nghi vấn
-        LEC->>SYS: Nhập yêu cầu làm rõ vào đơn trên hệ thống
-        SYS->>ENG: Bắn thông báo & Task phản hồi cho Kỹ Sư
-        ENG->>SYS: Kỹ sư nhập giải trình, đính kèm tài liệu/ảnh
-        SYS->>LEC: Thông báo Kỹ sư đã phản hồi
-        LEC->>SYS: LEC kiểm tra và bấm [Gửi Lại Cho Reviewer]
-        SYS-->>REV: Reviewer xem phản hồi hoàn thiện
+    alt Reviewer REQUESTS ADDITIONAL INFORMATION / CLARIFICATION
+        REV->>LEC: Highlight queried line items requiring clarification
+        LEC->>SYS: Input inquiry into line items on the system
+        SYS->>ENG: Dispatch notification & clarification task to Requestor Engineer
+        ENG->>SYS: Engineer inputs justification, attaches documents/photos
+        SYS->>LEC: Notify LEC of engineer response
+        LEC->>SYS: LEC validates submission and clicks [Resubmit to Reviewer]
+        SYS-->>REV: Reviewer inspects consolidated clarification
     end
 
-    REV-->>LEC: Thống nhất xác nhận chi phí (Cost Clearance)
+    REV-->>LEC: Concur on Cost Clearance
     
-    Note over REV,EMS: PHÊ DUYỆT CHÍNH THỨC TRÊN EMS
-    REV->>EMS: Thao tác duyệt chính thức trên hệ thống EMS
-    LEC->>EMS: Lên PRV / PO trên EMS theo quy trình tập đoàn
-    LEC->>SYS: Nhập mã PRV No / PO No đối soát vào hệ thống để theo dõi tiến độ
+    Note over REV,EMS: OFFICIAL APPROVAL ON EMS (No approval buttons on new system)
+    REV->>EMS: Execute official approvals within EMS
+    LEC->>EMS: Create PRV / PO on EMS per corporate workflow
+    LEC->>SYS: Input matching PRV No / PO No into system to track delivery milestones
 ```
 
 ---
 
-## 2. Cấu Trúc Báo Cáo Excel Form Cố Định (Standard Fixed Template)
+## 2. Standard Fixed-Template Excel Report Architecture
 
-Báo cáo xuất ra phục vụ phiên thẩm định đầu tháng gồm 4 Sheet tiêu chuẩn:
-1. **Sheet 1: Giải Trình Biến Động Tồn Kho & Tuổi Thọ Tồn (Inventory Aging & Variance)**:
-   - Tồn kho đầu kỳ, lượng nhập kho, lượng xuất kho lắp máy trong tháng (từ EMS), tồn kho cuối kỳ.
-   - Đối soát tồn an toàn (Target Stock) vs Tồn thực tế On-hand tại kho HW.
-   - Danh sách tồn kho >30 ngày kèm nội dung Task giải trình của Kỹ sư.
-2. **Sheet 2: Bảng Cân Đối Ngân Sách SG Tháng (TUYỆT ĐỐI KHÔNG ROLLOVER)**:
-   - Hạn mức ngân sách SG tháng mới do LEC nhập thủ công (độc lập từng Team).
-   - **Tuyệt đối KHÔNG cộng dồn số dư từ tháng trước sang tháng sau**.
-   - Tổng cam kết mua Trong Target vs Tổng phát sinh Mua Ngoài Kế Hoạch (Over).
-3. **Sheet 3: Danh Mục Chi Tiết Các Hạng Mục Over Ngoài Kế Hoạch**:
-   - Bảng kê từng chi tiết Over kèm 6 mã nguyên nhân (**OVR-01 đến OVR-06**), mã lệnh máy `Work Order`, đơn giá và kỹ sư yêu cầu.
-4. **Sheet 4: Báo Cáo Hiệu Quả Xử Lý Interlock & Tồn Kho Team Bạn**:
-   - Tổng hợp các hạng mục đã xuất sử dụng từ tồn kho nhàn rỗi của Team bạn trong nhà máy HW (theo cảnh báo `agingInterlockFlag`), giúp tiết kiệm chi phí mua mới.
-   - Danh sách các mã điều chuyển liên pháp nhân thành công.
+The audit workbook generated for the Beginning-of-Month Audit comprises 4 standardized sheets:
+
+1. **Sheet 1: Inventory Aging & Variance Justification (Inventory Aging & Variance)**:
+   - Beginning inventory, receipts, warehouse issuances to machines during the month (automatically read from EMS), and ending inventory.
+   - Reconciliation of Target Stock vs. actual On-hand inventory in the HW warehouse.
+   - Detailed ledger of stagnant stock aging >30 days, incorporating justification text submitted by requestor engineers.
+2. **Sheet 2: Monthly SG Budget Balance Sheet (STRICT NO-ROLLOVER POLICY)**:
+   - Monthly SG budget quota manually input by the LEC (managed independently per Team).
+   - **Strictly NO rollover of unspent balances from prior months into the new cycle**.
+   - Total procurement commitments In-Target vs. Total Unplanned Over spend.
+3. **Sheet 3: Itemized Ledger of Unplanned Over-Budget Purchases**:
+   - Comprehensive breakdown of each Over item tagged with its respective root-cause code (**OVR-01 through OVR-06**), equipment maintenance `Work Order` codes, unit prices, and requesting engineers.
+4. **Sheet 4: Interlock Efficiency & Cross-Team Stock Utilization Report**:
+   - Summary of spare parts borrowed and consumed from idle stock held by peer teams within the HW factory (prompted by `agingInterlockFlag`), demonstrating direct procurement cost avoidance.
+   - Ledger of successfully executed inter-entity inventory transfers across corporate subsidiaries.

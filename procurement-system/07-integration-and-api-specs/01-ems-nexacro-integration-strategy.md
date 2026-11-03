@@ -1,51 +1,50 @@
-# 01. Chiến Lược Tích Hợp Song Song Với EMS (Nexacro Protocol)
+# 01. Parallel Integration Strategy with EMS (Nexacro Protocol)
 
-## 1. Nguyên Tắc Tích Hợp & Bảo Vệ Hệ Thống Cốt Lõi
+## 1. Integration Principles & Core System Protection
 
-Hệ thống EMS (LG Display Nexacro Platform) được xem là "Nguồn chân lý" (System of Record) về tài chính và kho vận. Hệ thống Mua Bán Mới đóng vai trò là "Lớp vận hành linh hoạt" (System of Engagement).
+The EMS system (LG Display Nexacro Platform) serves as the "System of Record" for financial and warehouse inventory transactions. The New Procurement Progress System operates as the agile "System of Engagement".
 
-### Các nguyên tắc kỹ thuật bất biến:
-1.  **Không truy cập trực tiếp Database của EMS**: Mọi giao tiếp bắt buộc đi qua tầng Gateway của `ops-workflow` (thực hiện mã hóa/giải mã XML Nexacro wire protocol).
-2.  **Bảo vệ máy chủ EMS**: Luôn áp dụng giới hạn `max_concurrent: 3`, `min_interval: 100ms`, và chỉ cho phép gọi các endpoint nằm trong danh sách trắng `allowed_services`.
-3.  **Tự động tái đăng nhập phiên (Session Auto-Relogin)**: Giữ phiên làm việc liên tục của tài khoản `658359 (Pham Duc Long)`.
+### Immutable Technical Principles:
+1.  **Strictly No Direct Database Access to EMS**: All communications must route through the `ops-workflow` Gateway layer (which handles encoding/decoding of the Nexacro XML wire protocol).
+2.  **Protection of EMS Servers**: Always enforce `max_concurrent: 3`, `min_interval: 100ms`, and only allow calls to whitelisted endpoints configured in `allowed_services`.
+3.  **Session Auto-Relogin**: Maintain continuous authenticated session persistence for user account `658359 (Pham Duc Long)`.
 
 ---
 
-## 2. Bảng Xử Lý Chi Tiết Các API Trọng Yếu Đã Cập Nhật
+## 2. Detailed Mapping Table of Critical Updated APIs
 
-| Đường Dẫn API EMS | Dataset Trao Đổi | Nghiệp Vụ Tại Hệ Thống Mới |
+| EMS API Endpoint | Exchanged Datasets | Business Logic in New System |
 | :--- | :--- | :--- |
-| `/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn` | `ds_StockInfomation` | **Xử lý đặc biệt CheckDisuse**: Trích xuất trường `holdReasonContent` làm nguyên văn lý do khóa mua phụ tùng. |
-| `/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn` | `ds_search`, `ds_item` | **Điều chuyển liên pháp nhân**: Gửi yêu cầu sang pháp nhân bạn, đặt trạng thái `PENDING_OTHER_ENTITY_CONFIRMATION`. |
-| `/emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn` | `ds_list` | Đánh giá tồn kho tại các site của pháp nhân liên kết theo định dạng cờ Y/N. |
-| `/emscom/popupNav/retrieveItemPoStatusList.lgdn` | `ds_Rtn` | Trả về toàn bộ các cờ Interlock nhị phân: `stopPoFlag`, `transferFlag`, `waitRepairFlag`, `disuseInventoryFlag`. **Đặc biệt quan trọng**: trường **`agingInterlockFlag`** (`'Y'`/`'N'`) — khi `'Y'` kích hoạt Task bắt buộc dùng tồn kho Team khác trước khi mua; và trường **`unitPriceStatusCode`** (`UP001` = đã có giá, `UP004: None Price` = chưa có giá) quyết định lộ trình RFQ. Task `agingInterlockFlag` chỉ tự đóng khi API đồng bộ lại và cờ chuyển thành `'N'`. |
-| `/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn` | `ds_param` | **Đẩy hồ sơ PRV sang EMS**: Áp dụng trong Phase 2 khi mở rộng tự động sinh đơn trực tiếp. |
-| `/emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn` | `ds_Item`, `ds_Inv` | Lấy đường dẫn bản vẽ CAD (`fdmUrl`) và mức tiêu hao lịch sử phục vụ hiển thị trên cây EBOM. |
-| `/emsspareparts/sp105/sp180Nav/EmergencyPoList.lgdn` | `ds_result` | Quản lý các đơn mua khẩn cấp (`orderTypeDesc: tức sử dụng`) cho sự cố máy hỏng. |
-| `/emsspareparts/sp130/sp130Nav/retrieveBuyMainList.lgdn` | `ds_search`, `ds_list` | **Phase 1 - Đồng bộ đối soát**: Tra cứu chi tiết PRV No/PO No do LEC nhập để đồng bộ trạng thái từ EMS. |
+| `/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn` | `ds_StockInfomation` | **Special CheckDisuse Handling**: Extracts the `holdReasonContent` field as the verbatim lock reason blocking spare part procurement. |
+| `/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn` | `ds_search`, `ds_item` | **Inter-Entity Transfer**: Dispatches requests to sister entities, transitions status to `PENDING_OTHER_ENTITY_CONFIRMATION`. |
+| `/emsspareparts/sp40/sp405Nav/retOtherSitePoRevReqList.lgdn` | `ds_list` | Evaluates stock availability across affiliated entity sites based on binary Y/N flags. |
+| `/emscom/popupNav/retrieveItemPoStatusList.lgdn` | `ds_Rtn` | Returns all binary Interlock flags: `stopPoFlag`, `transferFlag`, `waitRepairFlag`, `disuseInventoryFlag`. **Critically important**: the **`agingInterlockFlag`** (`'Y'`/`'N'`) field — when `'Y'`, triggers a mandatory task to borrow/use peer team stock prior to purchasing; and the **`unitPriceStatusCode`** field (`UP001` = contract price exists, `UP004: None Price` = price missing) determining the RFQ path. The `agingInterlockFlag` task automatically resolves only when the API re-syncs and the flag transitions to `'N'`. |
+| `/emsspareparts/sp102/sp130Nav/save130PrvData.lgdn` | `ds_param` | **Push PRV Requisition Payload to EMS**: Applied in Phase 2 for automated direct requisition generation. |
+| `/emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn` | `ds_Item`, `ds_Inv` | Retrieves CAD drawing file paths (`fdmUrl`) and historical consumption patterns for EBOM tree visualization. |
+| `/emsspareparts/sp105/sp180Nav/EmergencyPoList.lgdn` | `ds_result` | Manages emergency purchase orders (`orderTypeDesc: immediate use`) for critical breakdown recovery. |
+| `/emsspareparts/sp130/sp130Nav/retrieveBuyMainList.lgdn` | `ds_search`, `ds_list` | **Phase 1 - Reconciliation Synchronization**: Queries PRV No / PO No details entered by the LEC to synchronize status progression from EMS. |
 
 ---
 
-## 3. Lộ Trình Tích Hợp Mở Rộng Dần (Phased Pragmatic Rollout)
+## 3. Phased Pragmatic Rollout Roadmap
 
-Hệ thống được thiết kế theo lộ trình 2 giai đoạn thực tiễn, tránh rủi ro văng lỗi khi phụ thuộc quá sớm vào API ghi của EMS:
+The system is designed with a 2-stage pragmatic implementation roadmap to eliminate failure risks associated with premature reliance on EMS write APIs:
 
 ```mermaid
 flowchart LR
-    subgraph Phase1["GIAI ĐOẠN 1 (HIỆN TẠI): ĐỒNG BỘ ĐỐI SOÁT QUA MÃ PRV"]
-        P1_LEC["LEC tạo PRV/PO trực tiếp\ntrên giao diện Nexacro EMS"] --> P1_INPUT["LEC quay lại nhập mã PRV No\nvào hệ thống mới"]
-        P1_INPUT --> P1_FETCH["Hệ thống gọi API retrieveBuyMainList\ntra cứu chi tiết & đồng bộ trạng thái"]
+    subgraph Phase1["PHASE 1 (CURRENT): RECONCILIATION SYNCHRONIZATION VIA PRV NO"]
+        P1_LEC["LEC creates PRV/PO directly\non Nexacro EMS UI"] --> P1_INPUT["LEC returns and enters PRV No\ninto new system"]
+        P1_INPUT --> P1_FETCH["System invokes retrieveBuyMainList API\nto query details & sync status"]
     end
 
-    subgraph Phase2["GIAI ĐOẠN 2 (TƯƠNG LAI): TỰ ĐỘNG HÓA GỌI API SINH ĐƠN"]
-        P2_AUTO["Hệ thống mới đóng gói dataset ds_param\ngọi trực tiếp API save130PrvData.lgdn"] --> P2_RES["EMS phản hồi kết quả cấp mã PRV tự động"]
+    subgraph Phase2["PHASE 2 (FUTURE): AUTOMATED DIRECT API REQUISITION GENERATION"]
+        P2_AUTO["New system packages ds_param dataset\nand calls save130PrvData.lgdn directly"] --> P2_RES["EMS returns automated PRV allocation response"]
     end
 
-    Phase1 -.->|"Khi hệ thống ổn định & chuẩn hóa 100% QCode"| Phase2
+    Phase1 -.->|"Once system is fully stabilized & 100% QCode standardized"| Phase2
 ```
 
-### Lợi thế vượt trội của giải pháp Giai đoạn 1:
-1. **Tuyệt đối an toàn**: Không sợ lỗi rớt mạng hoặc văng exception do thiếu trường dữ liệu trong dataset `ds_param` của EMS cũ.
-2. **Linh hoạt tối đa**: LEC kiểm soát hoàn toàn việc tạo đơn trên EMS, hệ thống mới đóng vai trò chuẩn hóa quy trình nội bộ, giải trình tồn kho, kiểm tra Interlock và theo dõi trạng thái.
-3. **Sẵn sàng mở rộng**: Khi các quy tắc mã QCode và API ổn định, hệ thống chỉ cần kích hoạt pipeline Giai đoạn 2 mà không phải đập đi xây lại kiến trúc.
-
+### Outstanding Advantages of Phase 1 Strategy:
+1. **Absolute Safety**: Eliminates risks of connection drops or fatal exceptions caused by missing schema fields in legacy EMS `ds_param` datasets.
+2. **Maximum Operational Flexibility**: The LEC retains full control over PRV creation on EMS, while the new system standardizes internal workflows, aging justifications, Interlock verification, and status tracking.
+3. **Extensible Architecture**: Once QCode conventions and API mappings are completely solidified, the system seamlessly enables the Phase 2 pipeline without requiring architectural rewrites.

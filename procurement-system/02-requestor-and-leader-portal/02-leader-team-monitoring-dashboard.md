@@ -1,88 +1,88 @@
-# 02. Bàn Điều Khiển Leader: Giám Sát Tiến Độ Mua Sắm Nội Bộ Team (Team => Part => Kỹ Sư)
+# 02. Leader Team Monitoring Dashboard: Intra-Team Procurement Progress Tracking (Team => Part => Engineers)
 
-> *Tài liệu đặc tả nghiệp vụ Bàn Điều Khiển Leader (Team / Part Leader)*  
-> *Nguyên tắc cốt lõi: Không chia công đoạn (kỹ sư ngang hàng trong Part), Bỏ qua quy trình duyệt trên hệ thống (duyệt chính thức trên EMS - hệ thống này CHỈ KIỂM SOÁT TIẾN ĐỘ), giám sát tiến độ giải trình tồn kho và phân bổ chi phí.*
+> *Business Specification for Leader Dashboard (Team / Part Leader)*  
+> *Core Principles: No process/stage division (peer engineers within Part), Bypassed in-app approval workflow (official approval on EMS — this system is STRICTLY FOR PROGRESS TRACKING), monitoring idle inventory justification progress and expense allocation.*
 
 ---
 
-## 1. Mục Đích & Phạm Vi Giám Sát Của Leader (Team & Part Scope)
+## 1. Purpose & Monitoring Scope of Leaders (Team & Part Scope)
 
-Theo định hướng vận hành thực tế tại nhà máy Smart Watch (Factory HW):
-1. **Kỹ sư ngang hàng (Peer Engineers)**: Trong mỗi Part/Team, toàn bộ kỹ sư đều bình đẳng, không phân chia cấp bậc Công đoạn (Process: POL, TAB, DIP...) và không có vai trò "Process Leader".
-2. **Không phê duyệt trên hệ thống mới**: Mọi quy trình phê duyệt ký tá ngân sách, PRV, PO chính thức đều thực hiện trên hệ thống **LG Display Nexacro EMS**. Hệ thống nội bộ này **hoàn toàn loại bỏ các nút bấm phê duyệt/duyệt đơn (Endorse / Approve / Reject)**; chức năng duy nhất là **kiểm soát tiến độ toàn diện (Progress Tracking)**.
-3. **Phạm vi hiển thị (Visibility Scope)**:
-   - **Part Leader**: Theo dõi tiến độ mua sắm và tiến độ giải trình tồn kho của toàn bộ kỹ sư thuộc Part mình phụ trách.
-   - **Team Leader**: Giám sát toàn cảnh tiến độ của tất cả các Part trong Team, tiến độ xử lý của LEC, tỷ trọng Target vs Over do LEC phân loại, và tình trạng phân bổ chi phí hàng tháng.
+According to operational reality at the Smart Watch manufacturing plant (Factory HW):
+1. **Peer Engineers**: Within each Part/Team, all engineers operate as peers without hierarchical Process tiers (POL, TAB, DIP...) and without "Process Leader" roles.
+2. **No In-App Approval in New System**: All official budget endorsement, PRV, and PO approvals are executed on **LG Display Nexacro EMS**. This internal system **completely omits in-app endorsement / approval / rejection buttons (Endorse / Approve / Reject)**; its exclusive role is **end-to-end progress tracking**.
+3. **Visibility Scope**:
+   - **Part Leader**: Tracks procurement progress and idle inventory justification progress for all engineers within their assigned Part.
+   - **Team Leader**: Oversees panoramic progress across all Parts in the Team, LEC processing throughput, Target vs Over proportion classified by LEC, and monthly expense allocation status.
 
 ```mermaid
 graph TD
-    subgraph TeamLevel["1. Team Leader (Trưởng Team - vd: PO Module Tech Team 2)"]
-        TL_View["Toàn cảnh mua sắm & tiến độ toàn Team\n(Giám sát các Part, nhóm LEC và tổng ngân sách SG không bảo lưu)"]
+    subgraph TeamLevel["1. Team Leader (e.g., PO Module Tech Team 2)"]
+        TL_View["Team-wide procurement overview & progress\n(Monitors Parts, LEC group, and non-rollover SG budget total)"]
     end
 
-    subgraph PartLevel["2. Part Leader (Trưởng Part - vd: CP/SG Part 1)"]
-        PL_View["Giám sát tiến độ kỹ sư & đôn đốc giải trình tồn kho thuộc Part"]
+    subgraph PartLevel["2. Part Leader (e.g., CP/SG Part 1)"]
+        PL_View["Monitors engineer progress & expedites Part idle inventory justifications"]
     end
 
-    subgraph PeerEngineers["3. Kỹ Sư Hiện Trường (Ngang hàng nhau - Không chia công đoạn)"]
-        Eng1["Kỹ sư A (Line #201)"]
-        Eng2["Kỹ sư B (Line #202)"]
-        Eng3["Kỹ sư C (Line #203)"]
+    subgraph PeerEngineers["3. Field Engineers (Peers - No process division)"]
+        Eng1["Engineer A (Line #201)"]
+        Eng2["Engineer B (Line #202)"]
+        Eng3["Engineer C (Line #203)"]
     end
 
-    subgraph LECLevel["4. LEC Quản Lý Phụ Tùng Trong Team (Pham Duc Long - 658359)"]
-        LEC_View["Gom đơn, Interlock, phân loại Target/Over, quy định hạn Deadline,\nnhập tiến độ Vendor Confirm/ETA, cầu nối Cost Management"]
+    subgraph LECLevel["4. Team Spare Parts LEC (Pham Duc Long - 658359)"]
+        LEC_View["Aggregates orders, Interlock, classifies Target/Over, configures deadlines,\ninputs Vendor Confirm/ETA, bridges Cost Management"]
     end
 
     TeamLevel --> PartLevel
     TeamLevel --> LECLevel
     PartLevel --> PeerEngineers
-    PeerEngineers -.->|"Kiểm soát tiến độ kỹ thuật & gom đơn"| LECLevel
+    PeerEngineers -.->|"Technical progress tracking & order aggregation"| LECLevel
 ```
 
 ---
 
-## 2. Các Chức Năng Chính Trên Màn Hình Leader
+## 2. Key Capabilities on the Leader Dashboard
 
-### 2.1. Thẻ Chỉ Số Tiến Độ Thời Gian Thực (Team Real-time KPI Cards)
-- **Tổng số hạng mục đang xử lý**: Phân tách rõ theo các mốc tiến độ (Chuẩn bị data QCode $\rightarrow$ Gom đơn $\rightarrow$ Chờ thẩm định đầu tháng $\rightarrow$ Đang RFQ $\rightarrow$ Đã lên EMS $\rightarrow$ Chờ hàng về).
-- **Tỷ trọng Trong Target vs Over (Do LEC phân loại)**:
-  * Tỷ lệ xanh (Trong Target): Hạng mục phụ tùng thay thế định kỳ nằm trong ngân sách.
-  * Tỷ lệ đỏ (Over phát sinh): Cảnh báo hạng mục ngoài kế hoạch cần chuẩn bị tài liệu kỹ thuật để giải trình trong đợt thẩm định đầu tháng với Cost Management.
-- **Tiến độ giải trình tồn kho (Task Monitoring)**:
-  * Theo dõi số lượng Task giải trình tồn kho chưa sử dụng của các kỹ sư trong Part.
-  * Theo dõi các Task cảnh báo tồn kho của Team khác (`agingInterlockFlag`) chưa hoàn tất thủ tục mượn/xuất kho.
-- **Tổng ngân sách SG dự toán tháng**: Đối chiếu tiến độ cam kết chi phí với hạn mức tháng của Team (Nguyên tắc nghiêm ngặt: **Không bảo lưu ngân sách - No Rollover** giữa các tháng).
+### 2.1. Real-Time Team Progress KPI Cards
+- **Total Pipeline Items**: Broken down by progress milestone (QCode Data Prep $\rightarrow$ Order Aggregation $\rightarrow$ Pending Beginning-of-Month Audit $\rightarrow$ RFQ in Progress $\rightarrow$ Logged on EMS $\rightarrow$ Awaiting Delivery).
+- **Target vs Over Breakdown (Classified by LEC)**:
+  * Green Ratio (Within Target): Routine replacement items accommodated within budget quota.
+  * Red Ratio (Over Budget / Unplanned): Non-routine items requiring technical documentation for beginning-of-month audit with Cost Management.
+- **Idle Inventory Justification Monitoring (Task Monitoring)**:
+  * Tracks pending idle inventory justification tasks assigned to Part engineers.
+  * Tracks peer team idle stock warning tasks (`agingInterlockFlag`) pending warehouse borrowing/issuing procedures.
+- **Monthly Committed SG Budget Total**: Compares committed expenditure against the Team's monthly allowance (Strict Rule: **No Budget Rollover** across months).
 
-### 2.2. Bảng Theo Dõi Tiến Độ Chi Tiết (Team Procurement Progress Table)
-Bảng hiển thị trực quan toàn bộ các yêu cầu mua sắm của các kỹ sư trong Part/Team với các cột dữ liệu:
-* **Kỹ sư yêu cầu (Requestor Name & ID)**: Tên kỹ sư tạo đơn trong Part.
-* **Định vị máy**: Tên máy thân thiện (vd: *Die Bonder DB-01, Line #201, Tầng 2*).
-* **Thông tin phụ tùng**: Tên chi tiết, Mã QCode chính thức (hoặc mã tạm `TMP-HW-xxxx` đang chuẩn bị data), Số lượng yêu cầu.
-* **Cờ cảnh báo tồn kho (`agingInterlockFlag`)**:
-  - `Y`: Cảnh báo có tồn kho khả dụng (của nội bộ hoặc của **Team khác**). Hiển thị trạng thái kỹ sư đã làm thủ tục mượn/xuất kho hay chưa. Task này được duy trì liên tục cho đến khi EMS cập nhật chuyển sang `'N'`.
-* **Phân loại của LEC**: Huy hiệu `[TARGET]` hoặc `[OVER PHÁT SINH]` (do LEC đánh giá thủ công, không tự động).
-* **Mốc tiến độ mua sắm (Tracking Funnel)**:
-  1. *Đang chuẩn bị data QCode*: Kỹ sư đã nộp folder CAD/Doc/ảnh, LEC đang đăng ký QCode trên ERP/EMS.
-  2. *Chờ thẩm định đầu tháng*: Đã có QCode chính thức, LEC đưa vào danh sách thẩm định chi phí với Cost Management.
-  3. *Đang RFQ báo giá*: Chuyên viên Purchase đang đàm phán giá với nhà cung cấp.
-  4. *Đã tạo PRV / PO trên EMS*: Đang trong quy trình phê duyệt ký tá chính thức trên hệ thống EMS.
-  5. *Vendor Confirm ngày nhận*: Nhà cung cấp đã xác nhận ngày giao hàng dự kiến.
-  6. *ETA về cảng / nội địa*: Ngày hàng dự kiến về nhà máy HW.
-  7. *Hoàn tất nhập kho (EMS Sync)*: Trạng thái hàng về đã được ghi nhận trên hệ thống EMS.
+### 2.2. Detailed Team Procurement Progress Table
+A visual grid displaying all requisitions initiated by engineers within the Part/Team with data columns:
+* **Requestor Name & ID**: Name of the requisition creator within the Part.
+* **Machine Location**: Friendly machine name (e.g., *Die Bonder DB-01, Line #201, Floor 2*).
+* **Spare Part Information**: Part name, Official QCode (or temporary code `TMP-HW-xxxx` during data preparation), Requested quantity.
+* **Inventory Warning Flag (`agingInterlockFlag`)**:
+  - `Y`: Alert indicating available inventory (internal or belonging to a **peer team**). Indicates whether the engineer has executed borrowing/issuing procedures. This task remains active until EMS re-sync confirms the flag has turned to `'N'`.
+* **LEC Classification**: Badge `[TARGET]` or `[OVER BUDGET]` (manually evaluated by LEC, strictly non-automated).
+* **Procurement Milestones (Tracking Funnel)**:
+  1. *QCode Data Preparation*: Engineer uploaded CAD/Doc/photo folder; LEC registering QCode on ERP/EMS.
+  2. *Pending Beginning-of-Month Audit*: Official QCode issued; LEC included item in cost audit package with Cost Management.
+  3. *RFQ Quoting*: Purchasing specialist actively negotiating pricing with suppliers.
+  4. *PRV / PO Created on EMS*: Currently undergoing official review and electronic signatures on EMS.
+  5. *Vendor Confirmed Delivery Date*: Supplier confirmed expected shipment/delivery date.
+  6. *Port / Domestic ETA*: Anticipated arrival date at Factory HW.
+  7. *Goods Receipt Complete (EMS Sync)*: Physical goods receipt confirmed and synced from EMS.
 
 ---
 
-## 3. Vai Trò Giám Sát Của Leader Trong Các Hoạt Động Trọng Yếu
+## 3. Leader Monitoring Responsibilities in Critical Operations
 
-### 3.1. Đôn Đốc Kỹ Sư Thực Hiện Task Giải Trình & Mượn Tồn Kho
-- Leader không can thiệp duyệt hay chặn đơn trên hệ thống, nhưng có trách nhiệm:
-  1. Đôn đốc kỹ sư hoàn thành các Task giải trình tồn kho trước **Deadline do LEC thiết lập**.
-  2. Yêu cầu kỹ sư ưu tiên làm thủ tục liên hệ mượn/xuất dùng tồn kho của Team khác trước khi tiếp tục đẩy yêu cầu mua mới.
-  3. Rà soát trước các lý do kỹ thuật nếu phụ tùng rơi vào diện `OVER` để hỗ trợ kỹ sư và LEC chuẩn bị nội dung thẩm định với Cost Management vào đầu tháng.
+### 3.1. Expediting Engineer Justification Tasks & Peer Stock Borrowing
+- Leaders do not intervene to approve or block orders in the system, but hold operational responsibility to:
+  1. Expedite engineers to resolve idle inventory justification tasks before the **Deadline configured by the LEC**.
+  2. Instruct engineers to prioritize borrowing and issuing available stock from peer teams before pushing new purchase requisitions.
+  3. Pre-review technical justifications if items fall under `OVER` to assist engineers and the LEC in preparing audit materials for the beginning-of-month session with Cost Management.
 
-### 3.2. Theo Dõi Kế Hoạch Phân Bổ Chi Phí Hàng Tháng
-- Leader theo dõi tiến độ phân bổ chi phí phụ tùng theo từng tháng sử dụng (do LEC phối hợp cùng kỹ sư sắp xếp) nhằm đảm bảo chi phí phát sinh đồng đều, không làm biến động vượt trần ngân sách SG tháng của Team.
+### 3.2. Tracking Monthly Expense Allocation Plan
+- Leaders monitor spare part cost allocation plans across usage months (arranged by the LEC in coordination with engineers) to ensure balanced expenditure without exceeding the monthly Team SG budget ceiling.
 
-### 3.3. Hoàn Toàn Không Duyệt Trên Ứng Dụng Này
-- Mọi thao tác phê duyệt chính thức diễn ra trên **LG Display Nexacro EMS**. Bàn điều khiển Leader chỉ là công cụ hỗ trợ trực quan hóa dữ liệu và quản trị vận hành nội bộ theo thời gian thực.
+### 3.3. Strictly No In-App Approvals
+- All official approvals take place on **LG Display Nexacro EMS**. The Leader Dashboard functions strictly as a data visualization and intra-team operational progress tracking instrument.

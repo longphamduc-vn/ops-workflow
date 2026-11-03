@@ -1,82 +1,82 @@
-# 03. Công Cụ Gom & Xử Lý Hàng Loạt Của LEC Theo Trạng Thái (Batch Interlock Resolver)
-> *Gom Hạng Mục Từ Các Kỹ Sư Ngang Hàng Trong Team, Quét Interlock, Thiết Lập Hạn Deadline, Lọc Mã Đủ Điều Kiện (Bắt Buộc Có QCode) Đưa Vào Thẩm Định Đầu Tháng & LEC Đánh Dấu Target/Over Thủ Công*
+# 03. LEC Status-Based Batch Aggregation & Interlock Resolution Tool (Batch Interlock Resolver)
+> *Consolidating Items from Peer Engineers across the Team, Interlock Scanning, Configuring Deadlines, Filtering Eligible Codes (MANDATORY Official QCode) for Beginning-of-Month Audit & Manual Target/Over Tagging by LEC*
 
 ---
 
-## 1. Nhu Cầu & Kiến Trúc Gom Nhóm Đồng Loại Của LEC
+## 1. Operational Requirements & Batch Aggregation Architecture
 
-Mỗi kỳ mua sắm tại phân xưởng Smart Watch (Factory HW), LEC trong Team (Pham Duc Long - 658359) phải tiếp nhận và xử lý hàng trăm yêu cầu từ các kỹ sư hiện trường trong Team (các kỹ sư ngang hàng, không phân chia cấp bậc công đoạn).
+During each procurement cycle at the Smart Watch production facility (Factory HW), the Line Equipment Controller (LEC) within the Team (Pham Duc Long - 658359) handles hundreds of spare part demands raised by field shop-floor engineers across the Team (peer engineers operating without hierarchical process-leader boundaries).
 
-Hệ thống cung cấp **Module Gom & Xử Lý Đồng Loạt (Status-based Batch Aggregator & Resolver)** với các nguyên tắc cốt lõi:
-1.  **Gom Tất Cả Hạng Mục Đăng Ký Trong Team**: Tập trung toàn bộ danh sách phụ tùng kỹ sư tạo về một hàng đợi duy nhất của Team.
-2.  **Tự Động Phân Nhóm Cùng Trạng Thái (Status Grouping)**:
-    - *Nhóm 1: Mới đăng ký (Cần quét Interlock 4 bước)*.
-    - *Nhóm 2: Cảnh báo tồn kho (`agingInterlockFlag` == 'Y')*: Cảnh báo tồn kho lâu ngày (có thể là tồn kho của Team khác). Kỹ sư phải làm thủ tục mượn/xuất dùng; task duy trì liên tục cho đến khi EMS đồng bộ `'N'`.
-    - *Nhóm 3: Kiểm tra cờ giá (`unitPriceFlag`)*: Phân tách rõ mã đã có giá hợp đồng (`Y`) vs mã chưa có giá (`N` - cần Purchase RFQ).
-    - *Nhóm 4: Đủ điều kiện thẩm định đầu tháng (Purchasable)* $\rightarrow$ Bắt buộc **phải có Mã QCode chính thức** (mã tạm `TMP-HW-xxxx` bị giữ lại hàng đợi chuẩn bị dữ liệu).
-    - *Nhóm 5: Chờ Xác Nhận Liên Pháp Nhân* (Điều chuyển kho hoặc Mua giá thấp nhất tại LGD HQ/Guangzhou).
-    - *Nhóm 6: Bất Thường / Ngừng Sản Xuất (EOL)* $\rightarrow$ LEC thẩm tra kỹ thuật và phản hồi kỹ sư.
-3.  **Quy Định Thời Hạn (Deadlines Do LEC Cấu Hình)**:
-    - Hạn chót kỹ sư nộp giải trình tồn kho đầu tháng.
-    - Hạn chót đóng danh sách chốt hồ sơ thẩm định đầu tháng.
-4.  **Thẩm Quyền Đánh Dấu Kế Hoạch Của LEC (Không Tự Động)**:
-    - LEC trực tiếp rà soát và **thủ công đánh dấu `[TRONG TARGET]` hay `[OVER PHÁT SINH]`**. Hệ thống tuyệt đối không tự động phân loại.
+The system provides a **Status-Based Batch Aggregator & Resolver Module** built upon key operational principles:
+1. **Aggregating All Demands Across the Team**: Centralizes all spare parts requested by peer engineers into a unified queue for the Team.
+2. **Automated Status-Based Grouping**:
+   - *Group 1: Newly Registered (Requires 4-step Interlock scan)*.
+   - *Group 2: Aging Stock Alert (`agingInterlockFlag == 'Y'`)*: Stagnant inventory alert (potentially idle stock held by another peer team). The engineer must borrow or consume this stock prior to purchasing; this mandatory task persists continuously and auto-closes only when an EMS sync confirms `'N'`.
+   - *Group 3: Price Verification (`unitPriceFlag`)*: Segregates items with active contract pricing (`Y`) from unpriced items (`N` — awaiting RFQ quotation by the Purchase Department).
+   - *Group 4: Eligible for Beginning-of-Month Audit (Purchasable)* $\rightarrow$ **MANDATORY to possess an official registered QCode** (temporary codes like `TMP-HW-xxxx` are strictly held in the technical data preparation queue; folder uploads represent engineering data prep for QCode registration, not audit admission).
+   - *Group 5: Awaiting Inter-Entity Confirmation*: Intra-group stock transfer or lowest-cost purchase via LGD Headquarters (Korea) or Guangzhou.
+   - *Group 6: Anomalies / Discontinued (EOL)* $\rightarrow$ LEC reviews technical feasibility, assigns substitute codes, and provides engineering feedback.
+3. **LEC-Configured Operational Deadlines**:
+   - Deadline for engineers to complete beginning-of-month aging stock justification tasks.
+   - Deadline for closing dossiers for the Beginning-of-Month Audit.
+4. **LEC Manual Classification Authority (Strictly NO Auto-Classification)**:
+   - The LEC personally examines each demand and **manually tags `[IN TARGET]` or `[UNPLANNED OVER]`**. The system strictly refrains from automated classification.
 
 ---
 
-## 2. Giao Diện Bàn Làm Việc Gom Nhóm & Xử Lý Hàng Loạt Của LEC
+## 2. Multi-LEC Batch Processing Console Interface
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  BÀN LÀM VIỆC GOM VÀ XỬ LÝ HẠNG MỤC THEO TRẠNG THÁI (MULTI-LEC WORKBENCH)       [Team: HW Smart Watch 1]   [⚡ QUÉT INTERLOCK]   │
+│  MULTI-LEC WORKBENCH: STATUS-BASED BATCH PROCESSING & RESOLUTION                  [Team: HW Smart Watch 1]   [⚡ SCAN INTERLOCK]   │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  CẤU HÌNH THỜI HẠN (DEADLINE DO LEC QUY ĐỊNH):                                                                                  │
-│  📅 Hạn Chót Kỹ Sư Giải Trình Tồn Kho: [ 03 hàng tháng - 17:00 ]   📅 Hạn Đóng Hồ Sơ Thẩm Định Đầu Tháng: [ 05 hàng tháng - 12:00 ]│
+│  OPERATIONAL DEADLINE CONFIGURATION (CONFIGURED BY LEC):                                                                         │
+│  📅 Engineer Stock Justification Deadline: [ 03rd Monthly - 17:00 ]   📅 Audit Dossier Closure Deadline: [ 05th Monthly - 12:00 ]│
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  TAB PHÂN NHÓM TRẠNG THÁI:                                                                                                       │
-│  [🔘 Tất Cả (184)] [⏳ Mới Đăng Ký (42)] [⚠️ Cảnh Báo Tồn Kho (18)] [🟢 Đủ ĐK Thẩm Định (85)] [🌐 Liên Pháp Nhân (23)] [🏷️ EOL (16)]│
+│  STATUS GROUP TABS:                                                                                                              │
+│  [🔘 All (184)] [⏳ New (42)] [⚠️ Aging Alert (18)] [🟢 Audit Ready (85)] [🌐 Inter-Entity (23)] [🏷️ EOL (16)]                 │
 ├────┬────────────┬─────────────────────────────┬───────────┬──────────────┬─────────────┬──────────────┬─────────────┬──────────────┤
-│STT │Mã Hạng Mục │Tên Phụ Tùng & Maker         │Định Vị Máy│Trạng Thái    │Interlock &  │Phân Loại LEC │Lộ Trình Xử  │Hành Động     │
-│    │/ QCode     │(Kỹ sư hiện trường tạo)      │Line / VịTrí│Hệ Thống     │Tồn / Giá    │(Thủ Công)    │Lý Tiếp Theo │Của LEC       │
+│No. │Item Code   │Part Description & Maker     │Equipment  │System Status │Interlock &  │LEC Classify  │Next Route   │LEC Batch     │
+│    │/ QCode     │(Created by Field Engineer)  │Line / Pos │              │Stock/Price  │(Manual)      │             │Action        │
 ├────┼────────────┼─────────────────────────────┼───────────┼──────────────┼─────────────┼──────────────┼─────────────┼──────────────┤
-│ 1  │PR-2611-001 │Cảm biến quang vuông         │Line #201  │🟢 ĐỦ ĐK      │agingFlag: N │[🔘 TRONG     │Đưa vào Thẩm │[✅ Gom Vào   │
-│    │QDAB03583   │Maker: Panasonic / Model: CN │Die Bonder │   THẨM ĐỊNH  │unitPrice: Y │ TARGET]      │định ĐẦU     │ Thẩm Định]   │
-│    │(QCode Chuẩn│Kỹ sư: Nguyễn Văn Thắng      │           │(Có QCode)    │(Đã có giá)  │              │ THÁNG       │              │
+│ 1  │PR-2611-001 │Square photoelectric sensor  │Line #201  │🟢 AUDIT READY│agingFlag: N │[🔘 IN        │Submit to    │[✅ Add to     │
+│    │QDAB03583   │Maker: Panasonic / Model: CN │Die Bonder │(Official     │unitPrice: Y │ TARGET]      │BEGINNING-OF-│ Audit Batch] │
+│    │(Valid QCode│Engineer: Nguyen Van Thang   │           │ QCode)       │(Priced)     │              │MONTH Audit  │              │
 ├────┼────────────┼─────────────────────────────┼───────────┼──────────────┼─────────────┼──────────────┼─────────────┼──────────────┤
-│ 2  │PR-2611-002 │Board nguồn CPX V4 Controls  │Line #202  │🟢 ĐỦ ĐK      │agingFlag: N │[🔘 OVER      │Đưa vào Thẩm │[✅ Gom Vào   │
-│    │QDAD12236   │Maker: Trumpf / Model: 291214│Laser Cut  │   THẨM ĐỊNH  │unitPrice: Y │ PHÁT SINH]   │định ĐẦU     │ Thẩm Định]   │
-│    │(QCode Chuẩn│Kỹ sư: Trần Đức Minh         │           │(Có QCode)    │(Đã có giá)  │Lý do: OVR-01 │ THÁNG       │              │
-│    │            │↳ Kỹ sư ghi chú: Cháy nổ do xung điện lưới (WO-248926091)   ➔ LEC gắn cờ OVER vì ngoài định mức hao mòn định kỳ │
+│ 2  │PR-2611-002 │CPX V4 Power Control Board   │Line #202  │🟢 AUDIT READY│agingFlag: N │[🔘 UNPLANNED │Submit to    │[✅ Add to     │
+│    │QDAD12236   │Maker: Trumpf / Model: 291214│Laser Cut  │(Official     │unitPrice: Y │ OVER]        │BEGINNING-OF-│ Audit Batch] │
+│    │(Valid QCode│Engineer: Tran Duc Minh      │           │ QCode)       │(Priced)     │Reason: OVR-01│MONTH Audit  │              │
+│    │            │↳ Engineer note: Blown by grid voltage surge (WO-248926091) ➔ LEC tags OVER due to exceeding wear baseline    │
 ├────┼────────────┼─────────────────────────────┼───────────┼──────────────┼─────────────┼──────────────┼─────────────┼──────────────┤
-│ 3  │PR-2611-003 │Xylanh kẹp SMC khí nén       │Line #201  │⚠️ CẢNH BÁO   │agingFlag: Y │—             │Kỹ sư phải   │[🔔 Nhắc Kỹ Sư│
-│    │QCAD38190   │Maker: SMC / Model: MHZ2-16D │Tester     │   TỒN KHO    │(Tồn Team 2) │(Chưa xét     │làm thủ tục  │ Mượn Tồn]    │
-│    │(QCode Chuẩn│Kỹ sư: Lê Hoàng Quân         │           │(Team khác)   │unitPrice: Y │ Target/Over) │mượn xuất kho│              │
+│ 3  │PR-2611-003 │SMC Pneumatic Gripper        │Line #201  │⚠️ AGING STOCK│agingFlag: Y │—             │Engineer must│[🔔 Remind    │
+│    │QCAD38190   │Maker: SMC / Model: MHZ2-16D │Tester     │   ALERT      │(Team 2 Stock│(Pending LEC  │borrow peer  │ Peer Stock   │
+│    │(Valid QCode│Engineer: Le Hoang Quan      │           │(Peer Team)   │unitPrice: Y │ Target/Over) │team stock   │ Borrow]      │
 ├────┼────────────┼─────────────────────────────┼───────────┼──────────────┼─────────────┼──────────────┼─────────────┼──────────────┤
-│ 4  │PR-2611-004 │Bộ điều tốc Driver Motor     │Line #203  │⏳ CHỜ QCODE  │agingFlag: N │—             │LEC nộp dữ   │[📤 Đăng Ký   │
-│    │TMP-HW-0105 │Maker: Omron / Model: R88D   │Bonding    │(Mã Tạm)      │unitPrice: N │(Chưa xét     │liệu kỹ thuật│ QCode ERP]   │
-│    │(MÃ TẠM)    │Kỹ sư: Vũ Quốc Huy (Nộp CAD) │           │CHƯA THẨM ĐỊNH│(Chờ RFQ)    │ Target/Over) │lên ERP/EMS  │              │
+│ 4  │PR-2611-004 │Motor Driver Speed Controller│Line #203  │⏳ AWAITING   │agingFlag: N │—             │LEC submits  │[📤 Register  │
+│    │TMP-HW-0105 │Maker: Omron / Model: R88D   │Bonding    │   QCODE      │unitPrice: N │(Pending LEC  │tech dossier │ ERP QCode]   │
+│    │(TEMP CODE) │Engineer: Vu Quoc Huy (CAD)  │           │AUDIT BLOCKED │(Pending RFQ)│ Target/Over) │to ERP/EMS   │              │
 └────┴────────────┴─────────────────────────────┴───────────┴──────────────┴─────────────┴──────────────┴─────────────┴──────────────┘
-  ➔ Thao tác hàng loạt theo nhóm đang chọn: 
-  [📦 GOM TOÀN BỘ 85 MÃ ĐỦ ĐK CHUYỂN THẨM ĐỊNH ĐẦU THÁNG]   [⚡ ĐÁNH DẤU TRONG TARGET]   [🔔 GỬI CẢNH BÁO TASK TỒN KHO]
+  ➔ Batch operations on selected records:
+  [📦 BATCH CONSOLIDATE ALL 85 ELIGIBLE CODES TO BEGINNING-OF-MONTH AUDIT]  [⚡ TAG IN TARGET]  [🔔 DISPATCH AGING STOCK TASK]
 ```
 
 ---
 
-## 3. Quy Trình 3 Bước Xử Lý Đồng Loạt Cho Nhóm "Đủ Điều Kiện Thẩm Định"
+## 3. Three-Step Batch Workflow for "Audit-Ready" Items
 
-1.  **Bước 1: Quét Lọc Trạng Thái & Điều Kiện Tiên Quyết**:
-    - LEC bấm chọn tab `[🟢 Đủ ĐK Thẩm Định Đầu Tháng]`.
-    - **Điều kiện bất di bất dịch**: Hạng mục **bắt buộc phải có Mã QCode chính thức** trên hệ thống ERP/EMS. Nếu chỉ có mã tạm `TMP-HW-xxxx`, hệ thống lập tức loại khỏi danh sách thẩm định và chuyển vào hàng đợi đăng ký QCode.
-    - Mã không bị cờ Interlock chặn (`stopPoFlag == 'N'`).
-    - Nếu có cờ tồn kho (`agingInterlockFlag == 'Y'`), kỹ sư phải hoàn thành mượn/xuất kho trước, EMS cập nhật sang `'N'` mới được mua bổ sung.
+1. **Step 1: Status Filtering & Strict Prerequisites**:
+   - The LEC selects the `[🟢 Audit Ready]` tab.
+   - **Non-Negotiable Rule**: Items **MUST possess an official registered QCode** in the ERP/EMS master. Any item bearing a temporary code (`TMP-HW-xxxx`) is strictly blocked from the audit list and held in the technical preparation queue for QCode creation.
+   - The item must not be blocked by procurement interlocks (`stopPoFlag == 'N'`).
+   - If an aging stock alert exists (`agingInterlockFlag == 'Y'`), the engineer must first borrow/consume the existing peer team stock; only after EMS re-syncs the flag to `'N'` can new purchase authorization proceed.
 
-2.  **Bước 2: Đối Soát Ngân Sách & Đánh Dấu Kế Hoạch Thủ Công (LEC Phân Loại)**:
-    - LEC xem xét từng hạng mục:
-      * Với phụ tùng tiêu hao định kỳ nằm trong kế hoạch chi phí: LEC đánh dấu `[TRONG TARGET]`.
-      * Với phụ tùng hư hỏng đột xuất, sự cố bất thường hoặc vượt hạn mức ngân sách: LEC đánh dấu `[OVER PHÁT SINH]` và chỉ định mã nguyên nhân (`OVR-01` đến `OVR-06`).
-    - LEC kiểm tra cờ `unitPriceFlag`: Nếu `'N'` (chưa có giá hợp đồng), LEC ghi chú cần Purchase đàm phán RFQ song song.
+2. **Step 2: Budget Reconciliation & Manual Tagging by LEC**:
+   - The LEC inspects each spare part individually:
+     * Regular wear-and-tear consumables planned within normal maintenance quotas: The LEC marks `[IN TARGET]`.
+     * Unscheduled machine breakdowns, sudden demand increases, or items breaching budget thresholds: The LEC marks `[UNPLANNED OVER]` and assigns an appropriate root-cause code (`OVR-01` through `OVR-06`).
+   - The LEC inspects `unitPriceFlag`: If `'N'` (unpriced), the LEC notes that a parallel RFQ quotation from Purchase is required.
 
-3.  **Bước 3: Đóng Gói Hồ Sơ Trình Thẩm Định Đầu Tháng (Cost Management Review)**:
-    - Đúng thời hạn Deadline do LEC thiết lập (Đầu tháng), LEC bấm `[📦 GOM TOÀN BỘ VÀO BÁO CÁO THẨM ĐỊNH ĐẦU THÁNG]`.
-    - Hệ thống đóng băng dữ liệu của nhóm này, khóa chỉnh sửa tạm thời và tự động kết xuất hồ sơ thẩm định gửi sang **Bàn Thẩm Định Của Bộ Phận Quản Lý Chi Phí (Cost Management Portal - Reviewer & Assistant là 1 người)**.
-    - Nếu Reviewer yêu cầu làm rõ, LEC sẽ nhập yêu cầu lên hệ thống gửi cho kỹ sư, nhận phản hồi từ kỹ sư, rồi tổng hợp phản hồi lại cho Reviewer trước khi tiến hành tạo PRV/PO trên EMS.
+3. **Step 3: Packaging Dossier for Beginning-of-Month Audit (Cost Management Review)**:
+   - At the LEC-configured deadline (Days 01–05 of each month), the LEC clicks `[📦 BATCH CONSOLIDATE INTO BEGINNING-OF-MONTH AUDIT]`.
+   - The system freezes the dataset for this batch, locks temporary edits, and exports the audit package to the **Cost Management Portal (where Reviewer & Assistant is 1 single person)**.
+   - If the Reviewer requests clarification, the 3-party clarification loop is engaged: Reviewer $\rightarrow$ LEC $\rightarrow$ Requestor Engineer $\rightarrow$ LEC $\rightarrow$ Reviewer. Upon final cost clearance, formal PRV/PO creation proceeds on EMS (no approval buttons on the new system).

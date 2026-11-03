@@ -1,138 +1,141 @@
-# Giao Diện Dành Riêng Cho Vai Trò: Requestor (Kỹ Sư Hiện Trường)
-> **Mã Giao Diện: UI-ROLE-01 — Requestor Unified Engineering Portal**  
-> *Dành riêng cho: Kỹ Sư Hiện Trường trực tiếp phụ trách máy móc trên các dây chuyền sản xuất Smart Watch tại Factory HW (Kỹ sư ngang hàng trong Part/Team, không phân chia cấp bậc công đoạn).*
+# Role-Specific Workspace: Requestor (Field Engineer)
+> **Screen ID: UI-ROLE-01 — Requestor Unified Engineering Portal**  
+> *Dedicated to: Field Engineers directly responsible for machinery across Smart Watch production lines at Factory HW (Peer engineers within Part/Team, no process hierarchy).*
 
 ---
 
-## 1. Tổng Quan Không Gian Làm Việc Của Kỹ Sư (Workspace Anatomy)
+## 1. Engineer Workspace Anatomy
 
-Giao diện Requestor Portal là không gian làm việc chuyên biệt, hỗ trợ tối đa cho Kỹ sư Hiện Trường:
-- **Nguyên tắc tên thân thiện**: Kỹ sư làm việc 100% bằng tên máy, tên chuyền, tên vị trí thân thiện (`Line #201`, `Máy Die Bonder DB-01`, `Cụm Đầu Gắp Bonding Head`), không bị áp lực phải nhớ chuỗi mã kỹ thuật 14 ký tự `EM No` (`HWBMTL21EC0101`).
-- **Cảnh báo tức thời tồn kho của Team khác (`agingInterlockFlag`)**: Ngay khi kỹ sư chọn mã phụ tùng mà hệ thống phát hiện có tồn kho lâu ngày (kể cả tồn kho thuộc quyền sở hữu của Team khác), hệ thống **lập tức bắn Banner cảnh báo màu vàng cam ngay trên form tạo đơn** và **tự động sinh một Task Bắt Buộc**. Kỹ sư phải làm thủ tục liên hệ mượn/xuất dùng tồn kho này trước khi mua mới. Task này **luôn luôn duy trì trên màn hình**, không thể đóng thủ công cho đến khi EMS đồng bộ lại trạng thái cờ chuyển sang `'N'`.
-- **Upload cả Thư mục để chuẩn bị dữ liệu QCode**: Kéo thả nguyên thư mục chứa CAD, catalog PDF, datasheet và ảnh $\rightarrow$ hệ thống tự động sinh bảng lưới để kỹ sư điền thông số ban đầu rồi nộp dữ liệu kỹ thuật cho LEC đăng ký QCode trên ERP/EMS (đây là bước chuẩn bị dữ liệu, **không phải thẩm định chi phí**).
-- **Lý do & Hiện trạng**: Kỹ sư cung cấp hiện trạng hỏng hóc và lý do (Work Order sự cố, mã đề xuất OVR); **LEC sẽ là người thẩm định và chính thức đánh dấu thủ công `[TRONG TARGET]` hay `[OVER PHÁT SINH]`**.
-- **Cầu nối phản hồi 3 bên**: Tiếp nhận yêu cầu bổ sung thông tin từ Reviewer Cost Management (thông qua LEC), phản hồi trực tiếp kèm bằng chứng kỹ thuật.
+The Requestor Portal is a dedicated workspace designed to provide maximum support for Field Engineers:
+- **Friendly Name Principle**: Engineers work 100% with friendly machine names, line names, and mechanism unit names (`Line #201`, `Die Bonder DB-01`, `Bonding Head Unit`), without the burden of memorizing 14-character technical equipment identifiers (`EM No`: `HWBMTL21EC0101`).
+- **Instant Cross-Team Stock Warning (`agingInterlockFlag`)**: As soon as an engineer selects a part code for which the system detects aging inventory (even stock owned by another team), the system **immediately displays an orange-yellow alert banner directly on the requisition form** and **automatically generates a Mandatory Task**. The engineer must contact and borrow/issue this existing stock before purchasing new items. This task **persists continuously on the screen** and cannot be manually closed until an EMS sync confirms the flag has turned to `'N'`.
+- **Full Folder Upload for QCode Data Preparation**: Drag and drop an entire folder containing CAD files, PDF catalogs, datasheets, and photos $\rightarrow$ the system auto-generates a grid table for the engineer to fill preliminary specifications and submit technical data to LEC for QCode registration on ERP/EMS (this is data preparation, **not cost appraisal**).
+- **Justification & Current Status**: The engineer provides breakdown status and justification (Incident Work Order, proposed OVR code); **LEC will evaluate and officially mark `[WITHIN TARGET]` or `[INCIDENTAL OVER]` manually**.
+- **3-Party Clarification Bridge**: Receive clarification requests from the Cost Management Reviewer (routed via LEC) and reply directly with technical evidence.
 
-Cấu trúc giao diện gồm **4 Tab chức năng**:
-1.  **Tab 1: 📝 Đăng Ký Yêu Cầu Mua Phụ Tùng (Requisition Registration)**: Chọn máy bằng tên thân thiện, đối soát tồn kho tức thời 50ms, hiển thị cảnh báo tồn kho Team khác ngay lập tức, nhập hiện trạng sự cố và gửi LEC.
-2.  **Tab 2: 📁 Chuẩn Bị Dữ Liệu Đăng Ký QCode (Folder & Excel Onboarding)**: Kéo thả nguyên thư mục CAD/Doc/Ảnh hoặc dán bảng Excel, tự động bóc tách tài liệu và chuyển giao LEC cấp mã QCode trên ERP/EMS.
-3.  **Tab 3: 🌳 Bàn Kéo - Thả EBOM Trực Quan (Drag-and-Drop EBOM Slot Mapper)**: Kéo linh kiện thả vào slot cơ cấu máy, hoàn thiện các cơ cấu "Khai báo sau".
-4.  **Tab 4: 📋 Danh Sách Của Tôi, Phản Hồi 3 Bên & Task Tồn Kho**: Theo dõi tiến độ đơn, phản hồi làm rõ thông tin với LEC, thực hiện Task mượn tồn kho Team khác (treo đến khi EMS='N') và Task giải trình tồn kho đầu tháng trước Deadline của LEC.
+The interface consists of **4 Functional Tabs**:
+1.  **Tab 1: 📝 Part Requisition Registration**: Select machine by friendly name, 50ms instant stock lookup, immediate cross-team stock warning, input breakdown status, and submit to LEC.
+2.  **Tab 2: 📁 QCode Registration Data Preparation (Folder & Excel Onboarding)**: Drag and drop an entire CAD/Doc/Photo folder or paste an Excel table, auto-extract documentation, and transfer to LEC for QCode issuance on ERP/EMS.
+3.  **Tab 3: 🌳 Visual Drag-and-Drop EBOM Slot Mapper**: Drag parts and drop them into machine mechanism slots; complete "Post-Declaration" mechanisms.
+4.  **Tab 4: 📋 My Requisitions, 3-Party Clarification & Inventory Tasks**: Track requisition progress, respond to LEC clarification inquiries, execute cross-team stock borrowing tasks (persisting until EMS='N'), and complete Beginning-of-Month inventory aging justification tasks before LEC deadlines.
 
 ---
 
-## 2. Bản Vẽ Giao Diện Chi Tiết (ASCII UI Wireframe)
+## 2. Detailed ASCII UI Wireframe
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ [LOGO OPS]  CỔNG KỸ SƯ HIỆN TRƯỜNG — FACTORY HW (SMART WATCH)                    [🔔 1 Cảnh Báo Tồn] [👤 Nguyen Van A (Kỹ Sư)]  │
-│ Ngữ cảnh: Factory HW (Smart Watch) > Line #201 (2F) > Part: CP/SG Part 1         Vai trò: Requestor (Kỹ Sư Ngang Hàng)         │
+│ [LOGO OPS]  FIELD ENGINEER PORTAL — FACTORY HW (SMART WATCH)                    [🔔 1 Stock Alert] [👤 Nguyen Van A (Engineer)]  │
+│ Context: Factory HW (Smart Watch) > Line #201 (2F) > Part: CP/SG Part 1         Role: Requestor (Peer Engineer)                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ CÁC TAB CHỨC NĂNG CỦA KỸ SƯ:                                                                                                     │
-│ [🔵 TAB 1: TẠO YÊU CẦU MUA PHỤ TÙNG] [📁 TAB 2: CHUẨN BỊ DATA QCODE] [🌳 TAB 3: KÉO-THẢ EBOM] [💬 TAB 4: THEO DÕI & TASKS (2)]  │
+│ FUNCTIONAL TABS:                                                                                                                 │
+│ [🔵 TAB 1: CREATE PART REQUISITION] [📁 TAB 2: PREPARE QCODE DATA] [🌳 TAB 3: DRAG-DROP EBOM] [💬 TAB 4: TRACKING & TASKS (2)]  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 📌 ĐANG HIỂN THỊ: TAB 1 — TẠO YÊU CẦU MUA PHỤ TÙNG (THEO TÊN MÁY THÂN THIỆN)                                                    │
+│ 📌 ACTIVE TAB: TAB 1 — CREATE PART REQUISITION (BY FRIENDLY MACHINE NAME)                                                        │
 │                                                                                                                                  │
-│ 1.1. CHỌN VỊ TRÍ LẮP ĐẶT BẰNG TÊN THÂN THIỆN (FRIENDLY MECHANISM SELECTOR):                                                      │
-│  Dây Chuyền (Line): [ Line #201 (Smart Watch Line 1 - 2F)    ▼ ]   Máy (Machine): [ Máy Die Bonder 01 (DB-01)                 ▼ ] │
-│  Chi Tiết Cơ Cấu Lắp:                                                                                                            │
-│  (🔘) Chọn Cơ Cấu Đã Có Trong EBOM: [ 02. Bonding Head > Mech 01: Xylanh gắp phôi (Đã gắn EM No: HWBMTL21EC0101)             ▼ ] │
-│  ( ) Cơ Cấu Chưa Có Trong EBOM (Khai Báo Sau): [ Gõ tên mô tả cơ cấu phát sinh ngoài hiện trường...                          ]   │
-│      ↳ 💡 Thông báo: Hệ thống KHÔNG CHẶN đơn mua! Cờ EBOM_PENDING_MAPPING sẽ được bật để bổ sung trong 7 ngày.                   │
+│ 1.1. FRIENDLY MECHANISM SELECTOR:                                                                                                │
+│  Line: [ Line #201 (Smart Watch Line 1 - 2F)    ▼ ]   Machine: [ Die Bonder 01 (DB-01)                 ▼ ]                       │
+│  Installation Mechanism Details:                                                                                                 │
+│  (🔘) Select Existing EBOM Mechanism: [ 02. Bonding Head > Mech 01: Workpiece Gripper Cylinder (Linked EM No: HWBMTL21EC0101)  ▼ ] │
+│  ( ) Mechanism Not Yet in EBOM (Post-Declaration): [ Enter descriptive name of ad-hoc field mechanism...                       ] │
+│      ↳ 💡 System Notice: Requisitions are NOT BLOCKED! Flag EBOM_PENDING_MAPPING will be raised to allow mapping within 7 days.   │
 │                                                                                                                                  │
-│ 1.2. THÔNG TIN PHỤ TÙNG & ĐỐI SOÁT TỒN KHO TỨC THỜI:                                                                             │
-│  Mã Phụ Tùng: [ QCAD38190                 ▼ ]  [ Hoặc chọn mã tạm: TMP-HW-xxxx ]  [📂 Chọn từ Cây EBOM Máy]                     │
-│  Tên Chi Tiết: Xylanh kẹp SMC khí nén                       Nhà Sản Xuất: SMC (Nhật Bản)       Model: MHZ2-16D                    │
-│  Số Lượng Cần Mua: [ 2 ] EA               Đơn Giá Hợp Đồng: $45.00 USD (unitPriceFlag: Y)    Thành Tiền Dự Kiến: $90.00 USD      │
+│ 1.2. PART INFORMATION & INSTANT INVENTORY RECONCILIATION:                                                                        │
+│  Part Code: [ QCAD38190                 ▼ ]  [ Or select temp code: TMP-HW-xxxx ]  [📂 Select from Machine EBOM Tree]            │
+│  Part Description: Pneumatic Gripper Cylinder SMC      Manufacturer: SMC (Japan)       Model: MHZ2-16D                           │
+│  Order Quantity: [ 2 ] EA               Contract Unit Price: $45.00 USD (unitPriceFlag: Y)   Est Total: $90.00 USD               │
 │  ┌──────────────────────┬──────────────────────┬──────────────────────┬────────────────────┬──────────────────────────────────┐  │
-│  │  Tồn Kho Khả Dụng HW │  PO Remained Đang Về │  PO Standby Chờ Duyệt│  Target Stock Chuẩn│  Số Lượng Đặt Hàng Tối Thiểu     │  │
-│  │        0 EA          │         0 EA         │         0 EA         │        2 EA        │  MOQ: 1 EA  |  Pack Size: 1 EA   │  │
+│  │ Available HW Stock   │ Incoming PO Remained │ Standby PO Awaiting  │ Standard Target    │ Minimum Order Quantity           │  │
+│  │                      │                      │ Approval             │ Stock              │                                  │  │
+│  │        0 EA          │         0 EA         │         0 EA         │        2 EA        │ MOQ: 1 EA  |  Pack Size: 1 EA    │  │
 │  └──────────────────────┴──────────────────────┴──────────────────────┴────────────────────┴──────────────────────────────────┘  │
 │                                                                                                                                  │
-│  ⚠️ CẢNH BÁO TỨC THỜI — PHÁT HIỆN TỒN KHO CỦA TEAM KHÁC (agingInterlockFlag = Y):                                                │
+│  ⚠️ INSTANT WARNING — CROSS-TEAM AGING STOCK DETECTED (agingInterlockFlag = Y):                                                  │
 │  ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ 🔔 HỆ THỐNG CẢNH BÁO: Phụ tùng này đang có TỒN KHO LÂU NGÀY tại [PO Module Tech Team 1 - Kho HW2] (Số lượng: 4 EA).        │  │
-│  │ ↳ QUY ĐỊNH BẮT BUỘC: Bạn PHẢI LIÊN HỆ MƯỢN / XUẤT SỬ DỤNG TỒN KHO NÀY TRƯỚC KHI YÊU CẦU MUA MỚI!                             │  │
-│  │ ↳ Hệ thống đã tự động tạo một [Task Mượn Tồn Kho Team Khác]. Task này sẽ LUÔN LUÔN DUY TRÌ cho đến khi hệ thống đồng bộ lại│  │
-│  │   dữ liệu từ Nexacro EMS xác nhận cờ đã chuyển sang 'N'. (Không yêu cầu giải trình lý do).                                │  │
+│  │ 🔔 SYSTEM ALERT: This spare part has AGING STOCK at [PO Module Tech Team 1 - Warehouse HW2] (Quantity: 4 EA).             │  │
+│  │ ↳ MANDATORY REQUIREMENT: You MUST CONTACT AND BORROW / ISSUE THIS EXISTING STOCK BEFORE REQUESTING A NEW PURCHASE!        │  │
+│  │ ↳ The system has automatically generated a [Cross-Team Stock Borrowing Task]. This task will PERSIST CONTINUOUSLY until  │  │
+│  │   data re-synced from Nexacro EMS confirms the flag has turned to 'N'. (No written justification required).               │  │
 │  └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                                                                  │
-│ 1.3. CUNG CẤP HIỆN TRẠNG MÁY & ĐỀ XUẤT LÝ DO (LEC SẼ CHÍNH THỨC ĐÁNH DẤU TARGET / OVER):                                        │
-│  Chế độ đặt hàng:      ( ) Bổ sung định kỳ / Bù tồn an toàn       (•) DÙNG NGAY DO SỰ CỐ MÁY (Breakdown Repair)                  │
-│  Mã Lệnh Sự Cố (Work Order): [ WO-248926091                ]  Đề Xuất Mã Lý Do: [ OVR-01: Sự cố máy hỏng bất thường (Breakdown)▼ ]│
-│  Hiện Trạng Máy & Vấn Đề Gặp Phải:                                                                                               │
-│  [ Xylanh kẹp bị rò khí gioăng, hành trình kẹp không khít gây lỗi gắp phôi. Cần thay mới phục hồi máy.                         ]│
-│  Hình ảnh hiện trường: [ 🖼️ xylanh_ro_khi.jpg (1.8MB) ❌ ] [ ➕ Kéo thả thêm ảnh sự cố... ]                                      │
+│ 1.3. MACHINE STATUS & PROPOSED REASON (LEC OFFICIALLY MARKS TARGET / OVER):                                                      │
+│  Order Mode:         ( ) Periodic Replenishment / Safety Stock Buffer   (•) IMMEDIATE BREAKDOWN REPAIR                           │
+│  Incident Work Order: [ WO-248926091                ]  Proposed Reason: [ OVR-01: Machine breakdown / failure (Breakdown) ▼ ]    │
+│  Machine Status & Encountered Problem:                                                                                           │
+│  [ Gripper cylinder has leaking piston seal; clamping stroke is loose, dropping workpieces. Immediate replacement needed.        ]│
+│  Field Photos: [ 🖼️ cylinder_air_leak.jpg (1.8MB) ❌ ] [ ➕ Drag & drop additional incident photos... ]                            │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  [💾 Lưu Bản Nháp]                     [👁️ Xem Lại Hồ Sơ]                     [🚀 GỬI YÊU CẦU CHO LEC RÀ SOÁT (Ctrl+Enter)]       │
+│  [💾 Save Draft]                     [👁️ Review Dossier]                     [🚀 SUBMIT REQUISITION TO LEC (Ctrl+Enter)]       │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Tab 2 Chi Tiết: Chuẩn Bị Dữ Liệu Đăng Ký QCode (Upload Folder Kỹ Thuật)
+## 3. Tab 2 Details: QCode Registration Data Preparation (Technical Folder Upload)
 
-Khi kỹ sư cần đăng ký mã phụ tùng mới từ tài liệu chế tạo của Vendor hoặc phòng R&D:
-> *Lưu ý quan trọng: Đây là bước chuẩn bị hồ sơ kỹ thuật để LEC đăng ký QCode trên ERP/EMS. Hạng mục ở bước này mang mã tạm `TMP-HW-xxxx` và **chưa đủ điều kiện tham gia thẩm định chi phí đầu tháng**.*
+When engineers need to onboard new spare parts from Vendor fabrication packages or R&D documents:
+> *Important Note: This step prepares the technical dossier for LEC to register the QCode on ERP/EMS. Items at this stage carry temporary codes `TMP-HW-xxxx` and are **strictly ineligible for the Beginning-of-Month cost appraisal**.*
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 📁 TAB 2: CHUẨN BỊ DỮ LIỆU ĐĂNG KÝ QCODE BẰNG UPLOAD THƯ MỤC KỸ THUẬT                                                            │
+│ 📁 TAB 2: PREPARE QCODE REGISTRATION DATA VIA TECHNICAL FOLDER UPLOAD                                                            │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ KHUNG THẢ FOLDER CAD / TÀI LIỆU:                                                                                                 │
+│ CAD / TECHNICAL DOCUMENTATION DROP ZONE:                                                                                         │
 │ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│ │                 📁 KÉO THẢ NGUYÊN FOLDER VÀO ĐÂY HOẶC [ BẤM ĐỂ CHỌN THƯ MỤC TỪ MÁY TÍNH ]                                  │  │
-│ │           (Hỗ trợ tự động quét đệ quy: Bản vẽ CAD .dwg/.step, Catalog PDF, Datasheet, Ảnh hiện trường)                     │  │
+│ │                 📁 DRAG & DROP ENTIRE FOLDER HERE OR [ CLICK TO BROWSE FOLDER FROM PC ]                                    │  │
+│ │           (Supports automatic recursive scanning: CAD drawings .dwg/.step, Catalog PDF, Datasheets, Field photos)          │  │
 │ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
-│ ↳ ĐÃ QUÉT ĐƯỢC: Folder 'Setup_DB01_Jig' (Gồm 8 tệp: 2 bản vẽ CAD, 2 catalog PDF, 4 ảnh chi tiết)                                 │
+│ ↳ SCANNED: Folder 'Setup_DB01_Jig' (Contains 8 files: 2 CAD drawings, 2 PDF catalogs, 4 detail photos)                           │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ BẢNG LƯỚI THÔNG SỐ TỰ ĐỘNG SINH RA (KỸ SƯ ĐIỀN THÔNG SỐ SƠ BỘ):                                                                  │
+│ AUTO-GENERATED SPECIFICATION GRID (ENGINEER ENTERS PRELIMINARY DATA):                                                            │
 │ ┌────┬─────────────┬──────────────────────────┬──────────────┬─────────────┬───────────┬─────────────┬─────────────────┬─────────┐ │
-│ │STT │Mã Tạm Sinh  │Tên Phụ Tùng              │Maker         │Model        │Vị Trí Máy │Số Lượng Dùng│Tệp Đã Khớp Nối  │Hồ Sơ    │ │
+│ │No. │Gen Temp Code│Part Description          │Maker         │Model        │Machine Loc│Usage Qty    │Linked Files     │Status   │ │
 │ ├────┼─────────────┼──────────────────────────┼──────────────┼─────────────┼───────────┼─────────────┼─────────────────┼─────────┤ │
-│ │ 1  │TMP-HW-0101  │Xylanh trượt thanh ray    │SMC           │MXQ16-100B   │DB-01      │2 EA         │📄 Catalog_SMC   │🟢 Đủ file│ │
-│ │    │             │                          │              │             │           │             │🖼️ Anh_01.jpg    │         │ │
-│ │ 2  │TMP-HW-0102  │Cụm đồ gá gia công cơ khí │NỘI BỘ        │MECH-FIX-V1  │DB-01      │1 EA         │📐 CAD_Fix_01.dwg│🟢 Đủ CAD │ │
+│ │ 1  │TMP-HW-0101  │Slide rail cylinder       │SMC           │MXQ16-100B   │DB-01      │2 EA         │📄 Catalog_SMC   │🟢 Files │ │
+│ │    │             │                          │              │             │           │             │🖼️ Photo_01.jpg  │   Ready │ │
+│ │ 2  │TMP-HW-0102  │Machined fixture jig      │INTERNAL      │MECH-FIX-V1  │DB-01      │1 EA         │📐 CAD_Fix_01.dwg│🟢 CAD   │ │
+│ │    │             │                          │              │             │           │             │                 │   Ready │ │
 │ └────┴─────────────┴──────────────────────────┴──────────────┴─────────────┴───────────┴─────────────┴─────────────────┴─────────┘ │
 │                                                                                                                                  │
-│  ➔ HÀNH ĐỘNG:  [➕ Thêm Dòng]  [📋 Paste Từ Excel]  [🚀 NỘP DỮ LIỆU ĐỂ LEC ĐĂNG KÝ QCODE TRÊN ERP/EMS]                             │
+│  ➔ ACTIONS:  [➕ Add Row]  [📋 Paste from Excel]  [🚀 SUBMIT DATA FOR LEC QCODE ERP/EMS REGISTRATION]                             │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. Tab 4 Chi Tiết: Theo Dõi Đơn, Phản Hồi 3 Bên & Quản Lý Task Tồn Kho
+## 4. Tab 4 Details: Order Tracking, 3-Party Clarification & Mandatory Inventory Tasks
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 💬 TAB 4: THEO DÕI ĐƠN HÀNG, PHẢN HỒI LÀM RÕ & DANH SÁCH TASKS BẮT BUỘC                                                          │
+│ 💬 TAB 4: REQUISITION TRACKING, 3-PARTY CLARIFICATION & MANDATORY INVENTORY TASKS                                                │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 1. KHUNG TASKS BẮT BUỘC ĐANG MỞ (PERSISTENT REQUIRED TASKS):                                                                     │
+│ 1. PERSISTENT MANDATORY OPEN TASKS:                                                                                              │
 │                                                                                                                                  │
 │ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│ │ 📌 TASK 1 (BẮT BUỘC - KHÔNG THỂ ĐÓNG): MƯỢN / XUẤT DÙNG TỒN KHO CỦA TEAM KHÁC (QCode: QCAD38190)                          │  │
-│ │ • Hạng mục: Xylanh kẹp SMC khí nén (Mã yêu cầu: REQ-2611-008).                                                             │  │
-│ │ • Hiện trạng: Có 4 EA tồn kho lâu ngày tại Team 1 (Kho HW2).                                                               │  │
-│ │ • Chỉ dẫn: Liên hệ Kỹ sư Nguyễn Văn B (Team 1 - Ext: 2210) để làm thủ tục mượn/xuất kho trên EMS.                          │  │
-│ │ • 🔒 Trạng thái Task: ĐANG MỞ (Luôn duy trì cho đến khi hệ thống đọc dữ liệu EMS xác nhận cờ agingInterlock chuyển sang 'N')│  │
+│ │ 📌 TASK 1 (MANDATORY - CANNOT CLOSE): BORROW / USE PEER TEAM AGING STOCK (QCode: QCAD38190)                                │  │
+│ │ • Item: Pneumatic Gripper Cylinder SMC (Requisition ID: REQ-2611-008).                                                     │  │
+│ │ • Current Status: 4 EA aging in stock at Team 1 (Warehouse HW2).                                                           │  │
+│ │ • Instructions: Contact Engineer Nguyen Van B (Team 1 - Ext: 2210) to complete loan/issuance procedures on EMS.            │  │
+│ │ • 🔒 Task Status: OPEN (Persists continuously until system reads EMS data confirming agingInterlock flag turns to 'N')     │  │
 │ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                                                                  │
 │ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│ │ 📅 TASK 2: GIẢI TRÌNH TỒN KHO CHƯA SỬ DỤNG ĐẦU THÁNG (Hạn Chót Do LEC Cấu Hình: 03/11 - 17:00)                              │  │
-│ │ • Hạng mục: Cảm biến quang Panasomic QDAB03583 (Đã về kho 32 ngày trước nhưng chưa xuất lắp máy).                           │  │
-│ │ • Lý do chưa dùng: [ Đã dời lịch bảo dưỡng PM sang tuần 2 do chuyền tăng ca sản xuất Smart Watch Model D111              ]│  │
-│ │ • Cam kết ngày xuất: [ 10/11/2026 ]   [ Gửi Giải Trình Cho LEC ]                                                            │  │
+│ │ 📅 TASK 2: BEGINNING-OF-MONTH UNUSED INVENTORY AGING JUSTIFICATION (LEC-Configured Deadline: 03/11 - 17:00)                │  │
+│ │ • Item: Optical Sensor Panasonic QDAB03583 (Received at warehouse 32 days ago; not yet issued for assembly).               │  │
+│ │ • Unused Reason: [ PM maintenance postponed to Week 2 due to overtime production on Smart Watch Model D111                ]│  │
+│ │ • Committed Issuance Date: [ 10/11/2026 ]   [ Submit Justification to LEC ]                                                │  │
 │ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 2. CẦU NỐI PHẢN HỒI 3 BÊN — LÀM RÕ THÔNG TIN VỚI REVIEWER (COST MANAGEMENT) QUA LEC:                                            │
+│ 2. 3-PARTY CLARIFICATION BRIDGE — CLARIFY INFORMATION WITH REVIEWER (COST MANAGEMENT) VIA LEC:                                   │
 │                                                                                                                                  │
-│ [💬 HỘP THOẠI YÊU CẦU BỔ SUNG THÔNG TIN TỪ LEC]:                                                                                 │
-│ ↳ 👤 Pham Duc Long (LEC) [10:15]: "Reviewer Cost Management yêu cầu làm rõ lý do mua mới Board nguồn CPX V4 (QDAD12236)         │
-│   vì mã này được đánh dấu OVER (OVR-01). Bạn vui lòng bổ sung báo cáo sự cố điện lưới và xác nhận đã kiểm tra sửa chữa board cũ."│
+│ [💬 CLARIFICATION REQUEST DIALOG FROM LEC]:                                                                                      │
+│ ↳ 👤 Pham Duc Long (LEC) [10:15]: "The Cost Management Reviewer requests clarification on the reason for purchasing a new CPX  │
+│   V4 Power Supply Board (QDAD12236) since this item is flagged as OVER (OVR-01). Please provide the power surge incident report  │
+│   and confirm whether repairs on the old board were attempted."                                                                  │
 │                                                                                                                                  │
-│ ↳ ✍️ Kỹ sư trả lời LEC:                                                                                                          │
-│   [ Đã gửi kèm biên bản kiểm tra của bảo trì ca đêm: Board bị nổ tụ nguồn chính và nứt mạch in nhiều lớp, hãng TRUMPF xác nhận   │
-│     không thể phục hồi tại chỗ. Đính kèm biên bản: BB_su_co_2489.pdf (1.2MB).                                                 ]  │
-│   [📎 Đính kèm tệp]   [🚀 Gửi Phản Hồi Cho LEC Để Nộp Reviewer]                                                                  │
+│ ↳ ✍️ Engineer reply to LEC:                                                                                                      │
+│   [ Attached night-shift maintenance inspection report: The board experienced an exploded primary capacitor and multilayer PCB   │
+│     cracking; TRUMPF confirmed it cannot be repaired on-site. Attached report: Incident_Report_2489.pdf (1.2MB).                 ]│
+│   [📎 Attach File]   [🚀 Send Response to LEC for Reviewer Submission]                                                           │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```

@@ -1,87 +1,87 @@
-# 02. Quản Lý Danh Sách Mua Ngoài Kế Hoạch (Unplanned Over-Budget Tracking)
-> *Phân Tách Rõ Thẩm Quyền Đánh Dấu Thủ Công Của LEC (Không Tự Động), Điều Kiện Bắt Buộc Có QCode, Đối Chiếu 2 Trục Over (Mua Hàng vs Xuất Kho Đọc Từ EMS), 6 Mã Chuẩn Hóa Giải Trình Lý Do & Vòng Phản Hồi 3 Bên Đầu Tháng*
+# 02. Unplanned Over-Budget Tracking & Classification
+> *Distinguishing LEC Manual Tagging Authority (Strictly NO Auto-Classification), Mandatory Official QCode Prerequisite, Reconciling Two Over Axes (PO Commit vs. EMS Issuance Ingestion), 6 Standardized Justification Codes & 3-Party Clarification Loop*
 
 ---
 
-## 1. Định Nghĩa Chuẩn Xác & Thẩm Quyền Đánh Dấu Của LEC
+## 1. Operational Definition & LEC Tagging Authority
 
-Theo yêu cầu nghiệp vụ thực tế của nhà máy Smart Watch (Factory HW):
-> **"Trường hợp có thể thẩm định phải có Qcode, không tự động LEC tự phân loại. Thẩm định và giải trình do LEC quy định hạn. Trong Over hoặc ngoài over, LEC sẽ là người trực tiếp đánh dấu thủ công dựa trên lý do kỹ sư cung cấp."**
+According to shop-floor operational governance requirements at the Smart Watch production facility (Factory HW):
+> **"Items eligible for audit must possess an official QCode; the system does not auto-classify, the LEC classifies manually. The audit and justification deadlines are configured by the LEC. Whether an item is categorized as In-Target or Over, the LEC personally performs manual tagging based on the justification provided by the engineer."**
 
 ```mermaid
 flowchart LR
-    subgraph REQ["1. Kỹ Sư Hiện Trường (Peer Engineers)"]
-        A["Nhập Nhu Cầu Mua\n• Cung cấp hiện trạng máy\n• Đính kèm mã Work Order sự cố\n• Nộp folder CAD chuẩn bị QCode"]
+    subgraph REQ["1. Field Engineers (Peer Engineers)"]
+        A["Submit Purchase Demands\n• Provide machine status\n• Attach incident Work Order code\n• Upload CAD folder for QCode preparation"]
     end
 
-    subgraph LEC["2. Kỹ Sư Quản Trị Phụ Tùng (LEC)"]
-        B["Rà Soát Kỹ Thuật & Ngân Sách\n• Đăng ký QCode chính thức (Bắt buộc)\n• Thiết lập hạn Deadline giải trình\n• ĐÁNH DẤU THỦ CÔNG (Không Tự Động):\n  [🟢 TRONG TARGET] hoặc [🔴 OVER PHÁT SINH]"]
+    subgraph LEC["2. Line Equipment Controller (LEC)"]
+        B["Technical & Budget Reconciliation\n• Register official QCode (Mandatory)\n• Configure justification deadlines\n• MANUAL TAGGING (No Auto-Classification):\n  [🟢 IN TARGET] or [🔴 UNPLANNED OVER]"]
     end
 
-    subgraph MGMT["3. Cost Management (Đầu Tháng)"]
-        C["Thẩm Định Chi Phí Đầu Tháng\n(Reviewer & Assistant là 1 người)\n• Rà soát danh sách Over OVR-01..06\n• Luồng làm rõ 3 bên (Reviewer ↔ LEC ↔ Kỹ Sư)"]
+    subgraph MGMT["3. Cost Management (Beginning of Month)"]
+        C["Beginning-of-Month Cost Audit\n(Reviewer & Assistant is 1 Single Person)\n• Review Over items OVR-01..06\n• 3-Party Clarification Loop (Reviewer ↔ LEC ↔ Engineer)"]
     end
 
     A --> B --> C
 ```
 
-*   **Điều Kiện Tiên Quyết Để Thẩm Định**: Phụ tùng **bắt buộc phải có Mã QCode chính thức**. Các mã tạm `TMP-HW-xxxx` chỉ là dữ liệu chuẩn bị kỹ thuật, tuyệt đối không được đưa vào danh sách thẩm định chi phí.
-*   **Hạng Mục Trong Target (In-Target / Planned)**:
-    - Là các đơn mua hoặc xuất kho nằm trong kế hoạch định mức ban đầu: Bù tồn kho an toàn (Target Stock Replenishment), mua theo định mức tiêu hao sản lượng (BOM Norm), hoặc bảo dưỡng định kỳ (PM).
-*   **Hạng Mục Over (Out-of-Plan / Unplanned Over)**:
-    - Là các phát sinh **ngoài kế hoạch**: Hỏng hóc đột xuất (Breakdown), sản lượng tăng đột biến, hư hại khi thao tác lắp ráp, hoặc biến động giá/vướng mắc điều chuyển.
-    - **LEC là người duy nhất trực tiếp đánh dấu phân loại này** sau khi đối chiếu ngân sách tháng của Team. **Hệ thống không tự động phân loại**.
-*   **Thời Hạn (Deadline)**: Thời hạn nộp giải trình và thời hạn chốt danh sách thẩm định do **LEC thiết lập và cấu hình**.
+*   **Mandatory Prerequisite for Audit**: Spare parts **must possess an official registered QCode**. Temporary codes (`TMP-HW-xxxx`) represent engineering technical preparation data only (folder uploads serve as data prep for QCode creation, not audit admission); they are strictly blocked from cost audit submission.
+*   **In-Target Items (Planned Allocation)**:
+    - Procurement or issuance lines falling within baseline planned quotas: Target Stock Replenishment, bill-of-materials consumption norms (BOM Norm), or scheduled preventive maintenance (PM).
+*   **Over Items (Out-of-Plan / Unplanned Over)**:
+    - Items arising from **unplanned operational requirements**: Unscheduled machine breakdowns, abrupt production volume surges, assembly handling damage, or unexpected vendor price escalations and transfer delays.
+    - **The LEC serves as the sole authority to manually classify these items** following reconciliation against the Team's monthly budget. **The system strictly does NOT auto-classify**.
+*   **Deadlines**: Deadlines for submitting aging stock justifications and closing audit dossiers are **configured and controlled by the LEC**.
 
 ---
 
-## 2. Phân Tách Hai Trục Over: Over Mua Hàng (PO Commit) vs Over Xuất Kho (Issue Expense Đọc Từ EMS)
+## 2. Reconciling Two Over Axes: PO Commit Over vs. Issuance Expense Over (Read from EMS)
 
-Hệ thống bóc tách danh sách gây Over thành 2 trục độc lập:
+The system segregates over-budget drivers across two independent financial axes:
 
-1.  **Over Do Mua Hàng (PO Commit Over)**:
-    - Phát sinh khi tổng giá trị cam kết mua hàng (PRV/PO) trong tháng vượt quá ngân sách mua của tháng đó.
-    - Danh sách chỉ rõ: *Nhà cung cấp nào, số PRV, số PO, và mã lý do tại sao phải mua gấp (`OVR-01` đến `OVR-06`)*.
-2.  **Over Do Xuất Kho (Issue Expense Over - Đồng Bộ Từ EMS)**:
-    - Bỏ qua Cổng thủ kho nhà máy HW (thủ kho không sử dụng ứng dụng này).
-    - Tình trạng xuất kho thực tế được hệ thống **đọc tự động từ dữ liệu xuất kho trên LG Display Nexacro EMS**.
-    - Khi tổng giá trị phụ tùng kỹ sư xuất dùng vượt trần định mức chi phí vận hành của Part/Team, hệ thống tự động nhận diện và đưa vào danh mục Over xuất kho: *Chỉ rõ kỹ sư nào xuất, xuất vào máy nào (Machine Name / EM No), phục vụ sự cố nào*.
+1.  **Procurement Over (PO Commit Over)**:
+    - Incurred when the total committed purchase value (PRV/PO) in a given month exceeds the approved monthly procurement budget ceiling.
+    - Line-item tracking details: *Vendor, PRV No, PO No, and root-cause justification code (`OVR-01` through `OVR-06`)*.
+2.  **Issuance Over (Issue Expense Over — Ingested from EMS)**:
+    - Bypasses any HW warehouse portal (warehouse keepers do not use this application).
+    - Actual physical spare part issuance is **automatically ingested from LG Display Nexacro EMS (`ds_Inv`)**.
+    - When the total value of parts issued by engineers exceeds the operating expense allocation for the Part/Team, the system automatically detects and flags it within the Issuance Over ledger: *Detailing the requesting engineer, target equipment (Friendly Machine Name / EM No), and specific breakdown Work Order*.
 
 ---
 
-## 3. Danh Mục 6 Mã Chuẩn Hóa Giải Trình Lý Do Over
+## 3. Standard Catalog of 6 Root-Cause Codes for Over Budget
 
-Mọi dòng mua sắm được LEC đánh dấu `OVER PHÁT SINH` bắt buộc phải được gắn 1 trong 6 mã nguyên nhân:
+Every procurement line manually tagged by the LEC as `UNPLANNED OVER` must be assigned one of the 6 standardized root-cause codes:
 
 ```mermaid
-pie title "Phân Bố Nguyên Nhân Mua Ngoài Kế Hoạch (Over Unplanned)"
-    "OVR-01: Sự cố máy bất thường (Machine Breakdown)" : 40
-    "OVR-02: Sản lượng Smart Watch tăng đột xuất" : 20
-    "OVR-03: Pháp nhân khác chậm/vướng điều chuyển" : 15
-    "OVR-04: Setup Model mới (NPI / ECO)" : 10
-    "OVR-05: Biến động giá từ Nhà cung cấp" : 10
-    "OVR-06: Hư hại thao tác khi lắp đặt" : 5
+pie title "Root Cause Distribution of Unplanned Over-Budget Purchases"
+    "OVR-01: Machine Breakdown" : 40
+    "OVR-02: Smart Watch Production Spike" : 20
+    "OVR-03: Inter-Entity Transfer Delay/Block" : 15
+    "OVR-04: New Model Setup (NPI / ECO)" : 10
+    "OVR-05: Vendor Price Increase" : 10
+    "OVR-06: Assembly / Handling Damage" : 5
 ```
 
-| Mã lý do | Tên nguyên nhân | Dữ liệu đính kèm trên hệ thống | Căn cứ thẩm định đầu tháng |
+| Reason Code | Root Cause Description | System Supporting Artifacts | Beginning-of-Month Audit Basis |
 | :---: | :--- | :--- | :--- |
-| **OVR-01** | **Sự cố máy bất thường (Breakdown)** | Mã Work Order (`WO-xxxx`), hình ảnh hỏng hóc, báo cáo dừng máy | Biên bản sự cố kỹ thuật của kỹ sư máy |
-| **OVR-02** | **Tăng sản lượng đột xuất** | Quyết định điều chỉnh sản lượng từ phòng Kế hoạch (PP) | Kế hoạch tăng công suất chuyền Smart Watch |
-| **OVR-03** | **Pháp nhân khác vướng điều chuyển** | Mã yêu cầu Transfer trên API `retPartsTransferReqList` | Thông báo vướng mắc thủ tục hải quan / xuất khẩu |
-| **OVR-04** | **Setup Model mới (ECO / NPI)** | Mã lệnh thay đổi kỹ thuật (ECO / NPI) | Kế hoạch gá đặt thiết bị model mới |
-| **OVR-05** | **Biến động giá từ Nhà cung cấp** | Báo giá so sánh giữa kỳ trước và kỳ này từ Purchase | Xác nhận đơn giá tăng từ Purchase Dept |
-| **OVR-06** | **Hư hại thao tác lắp máy** | Báo cáo kiểm điểm sự cố và đề xuất đào tạo lại thao tác | Báo cáo giải trình nội bộ Part |
+| **OVR-01** | **Machine Breakdown** | Work Order code (`WO-xxxx`), failure photos, downtime log | Machine breakdown incident report from field engineer |
+| **OVR-02** | **Production Throughput Spike** | Production adjustment directive from Production Planning (PP) | Throughput ramp plan for Smart Watch lines |
+| **OVR-03** | **Inter-Entity Transfer Blockage** | Transfer request ID via API `retPartsTransferReqList` | Customs or cross-border logistics delay notice |
+| **OVR-04** | **New Model Setup (ECO / NPI)** | Engineering Change Order (ECO / NPI) authorization | Tooling and fixture setup schedule for new model |
+| **OVR-05** | **Vendor Price Increase** | Quotation comparison between prior and current cycles from Purchase | Formal price increase confirmation from Purchase Dept |
+| **OVR-06** | **Assembly / Installation Damage** | Post-incident review report and operator re-training plan | Internal Part corrective action report |
 
 ---
 
-## 4. Quy Trình Phản Hồi 3 Bên Làm Rõ Thông Tin Thẩm Định Đầu Tháng
+## 4. Three-Party Clarification Loop During Beginning-of-Month Audit
 
-Sau phiên thẩm định chi phí offline vào đầu tháng giữa LEC và Reviewer (Bộ phận Quản lý chi phí - Cost Management):
-1. **Reviewer Yêu Cầu Bổ Sung Thông Tin**:
-   - Nếu một số hạng mục Over chưa đủ chứng cứ hoặc cần làm rõ tính cấp thiết, Reviewer nhập yêu cầu cần thêm thông tin trực tiếp trên phân hệ Thẩm Định.
-2. **LEC Điều Phối & Gửi Cho Kỹ Sư**:
-   - LEC kiểm tra câu hỏi của Reviewer, bổ sung ghi chú nghiệp vụ và chuyển giao nhiệm vụ làm rõ cho đúng Kỹ sư phụ trách máy.
-3. **Kỹ Sư Phản Hồi Cho LEC**:
-   - Kỹ sư cập nhật thêm thông số kỹ thuật, hình ảnh hiện trường, nhật ký hỏng hóc và gửi lại cho LEC trước thời hạn quy định.
-4. **LEC Tổng Hợp & Phản Hồi Lại Reviewer**:
-   - LEC rà soát câu trả lời của kỹ sư, tổng hợp thành tài liệu hoàn chỉnh và bấm gửi lại cho Reviewer Cost Management để hoàn tất thẩm định trước khi đưa lên tạo PRV/PO chính thức trên EMS.
+Following the offline cost audit session conducted at the beginning of each month between the LEC and the Reviewer (Cost Management — a single individual acting as Reviewer & Assistant):
+1. **Reviewer Requests Additional Information**:
+   - If specific Over items lack sufficient engineering documentation or urgent necessity justification, the Reviewer logs inquiry items directly within the Audit module.
+2. **LEC Coordinates & Delegates to Engineer**:
+   - The LEC reviews the Reviewer's inquiry, provides operational guidance, and assigns the clarification task to the responsible equipment engineer.
+3. **Engineer Responds to LEC**:
+   - The engineer submits technical parameters, shop-floor photos, and maintenance logs back to the LEC prior to the established deadline.
+4. **LEC Consolidates & Resubmits to Reviewer**:
+   - The LEC validates the engineer's submission, compiles a complete response package, and submits it back to the Cost Management Reviewer to finalize audit clearance prior to formal PRV/PO creation on EMS (formal approvals take place exclusively on EMS; no approval buttons exist on the new system).

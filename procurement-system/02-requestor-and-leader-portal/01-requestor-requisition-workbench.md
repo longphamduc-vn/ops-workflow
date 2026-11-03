@@ -1,74 +1,74 @@
-# 01. Bàn Làm Việc Kỹ Sư: Khởi Tạo Nhu Cầu, Cảnh Báo Tồn Kho Team Bạn & Task Bắt Buộc
-> *Hiển Thị Cảnh Báo Tồn Kho Team Bạn Ngay Khi Tạo Đơn, Duy Trì Task Bắt Buộc Đến Khi EMS Đổi Sang 'N', Điều Kiện Thẩm Định Bắt Buộc Có QCode & LEC Tự Tay Phân Loại Target/Over*
+# 01. Requestor Requisition Workbench: Need Creation, Peer Team Stock Warning & Persistent Mandatory Task
+> *Peer Team Stock Warning Triggered at Requisition Creation, Persistent Mandatory Task Maintained Until EMS Flag Shifts to 'N', Mandatory Official QCode for Audit & Manual LEC Classification of Target vs Over*
 
 ---
 
-## 1. Cơ Chế Cảnh Báo Tồn Kho Team Bạn & Duy Trì Task Bắt Buộc (Persistent Interlock Task)
+## 1. Peer Team Stock Warning Mechanism & Persistent Mandatory Task
 
-Theo quy định thực tế tại xưởng:
-> **"Thủ tục mượn/xuất dùng tồn kho của Team khác: Sẽ hiển thị cảnh báo cho Requestor ngay khi tạo. Luôn luôn duy trì task phải làm cho đến khi hệ thống load lại thông tin EMS đã chuyển sang 'N'."**
+According to shop-floor operational rules:
+> **"Procedure for borrowing/issuing idle stock from peer teams: A warning alert is displayed to the Requestor immediately upon requisition creation. A mandatory task is persistently maintained until the system reloads EMS information confirming the flag has transitioned to 'N'."**
 
 ```mermaid
 flowchart TD
-    ReqCreate["Kỹ sư chọn linh kiện / phụ tùng"] --> ScanStock{"Kiểm tra tồn kho toàn xưởng HW\n(agingInterlockFlag == 'Y' hoặc Tồn Team bạn > 0)"}
+    ReqCreate["Engineer selects component / spare part"] --> ScanStock{"Check plant-wide inventory in Factory HW\n(agingInterlockFlag == 'Y' or Peer Team Stock > 0)"}
     
-    ScanStock -->|"Phát hiện có tồn kho Team khác"| AlertUI["⚠️ BẬT CẢNH BÁO ĐỎ/VÀNG NGAY TRÊN GIAO DIỆN:\n'Phụ tùng này đang có sẵn X chiếc tại kho của Team bạn!'"]
+    ScanStock -->|"Peer team stock detected"| AlertUI["⚠️ TRIGGER RED/YELLOW WARNING ON UI:\n'This spare part has X units in stock at a peer team warehouse!'"]
     
-    AlertUI --> GenTask["TỰ ĐỘNG SINH TASK BẮT BUỘC TRÊN WORKSPACE KỸ SƯ & LEC:\n'Xuất mượn sử dụng tồn kho của Team bạn trước khi mua mới'"]
+    AlertUI --> GenTask["AUTOMATICALLY GENERATE MANDATORY TASK IN ENGINEER & LEC WORKSPACE:\n'Borrow/issue peer team stock before purchasing new'"]
     
-    GenTask --> Persist["🔄 LUÔN LUÔN DUY TRÌ TASK TRÊN HỆ THỐNG\n(Không cho phép Kỹ sư hay LEC tự tay bấm hoàn thành/đóng Task!)"]
+    GenTask --> Persist["🔄 PERSISTENTLY MAINTAIN TASK IN SYSTEM\n(Neither Engineer nor LEC can manually complete/close this Task!)"]
     
-    Persist --> PollEMS{"Hệ thống chạy Workflow đồng bộ từ EMS"}
+    Persist --> PollEMS{"System runs periodic EMS sync workflow"}
     
-    PollEMS -->|"EMS vẫn báo cờ 'Y'\n(Chưa làm thủ tục xuất kho)"| Persist
-    PollEMS -->|"EMS đã ghi nhận phiếu xuất kho\n-> Cờ chuyển sang 'N'"| AutoClose["✅ HỆ THỐNG TỰ ĐỘNG ĐÓNG TASK & MỞ KHÓA HOÀN TOÀN"]
+    PollEMS -->|"EMS still reports flag 'Y'\n(Warehouse issuance not yet executed)"| Persist
+    PollEMS -->|"EMS records warehouse issuance\n-> Flag transitions to 'N'"| AutoClose["✅ SYSTEM AUTOMATICALLY CLOSES TASK & FULLY UNLOCKS REQUISITION"]
     
-    ScanStock -->|"Toàn xưởng HW không còn tồn"| NormalProc["Tiếp tục luồng mua sắm bình thường"]
+    ScanStock -->|"Zero stock across entire Factory HW"| NormalProc["Proceed with standard procurement workflow"]
 ```
 
-### Đặc tả quy tắc hiển thị và vận hành:
-1. **Cảnh báo tức thời (Instant Warning Banner)**:
-   - Ngay khi Kỹ sư gõ mã QCode hoặc chọn từ cây EBOM, nếu linh kiện có tồn kho tại Team khác, form tạo đơn lập tức hiển thị khung cảnh báo nổi bật:
-     > ⚠️ **CẢNH BÁO TỒN KHO NHÀN RỖI**: Mã `QDAB03583` hiện đang có tồn **6 EA** tại kho của **PO Module Tech Team 1**. Hãy liên hệ LEC để mượn xuất dùng trước khi đề xuất mua mới!
-2. **Task bắt buộc duy trì liên tục (Persistent Mandatory Task)**:
-   - Hệ thống tự động tạo 1 Task mang mã `TASK-INTER-STOCK-[QCode]`.
-   - Task này **không có nút bấm "Hoàn tất thủ công"**.
-   - Điều kiện duy nhất để Task được giải phóng là: **Khi phiếu xuất kho/điều chuyển được thực hiện trên hệ thống EMS, và workflow đồng bộ định kỳ đọc được cờ `agingInterlockFlag` đã chuyển thành `'N'`**.
+### Detailed Operational & Display Rules:
+1. **Instant Warning Banner**:
+   - As soon as the Engineer types a QCode or selects an item from the EBOM tree, if the spare part has idle inventory in another Team, the requisition form immediately surfaces a prominent alert banner:
+     > ⚠️ **IDLE STOCK WARNING**: Part code `QDAB03583` currently has **6 EA** in stock at **PO Module Tech Team 1**. Please contact your LEC to borrow/issue this stock prior to proposing a new purchase!
+2. **Persistent Mandatory Task**:
+   - The system automatically generates a task tagged `TASK-INTER-STOCK-[QCode]`.
+   - This task **has no manual "Complete" button**.
+   - The sole condition for task resolution is: **When the warehouse issuance / transfer slip is executed in the EMS system, and the recurring sync workflow reads that `agingInterlockFlag` has transitioned to `'N'`**.
 
 ---
 
-## 2. Điều Kiện Đưa Vào Thẩm Định Đầu Tháng & Phân Loại Target vs Over
+## 2. Conditions for Beginning-of-Month Audit Inclusion & Target vs Over Classification
 
-### 2.1. Bắt Buộc Phải Có Mã QCode Mới Được Thẩm Định
-* **Quy tắc cứng**: **Trường hợp có thể thẩm định BẮT BUỘC PHẢI CÓ MÃ QCODE**.
-* Các linh kiện mới chỉ có mã tạm thời `TMP-HW-xxxx` (kỹ sư mới nộp folder CAD/Doc) **không được đưa vào phiên thẩm định chi phí đầu tháng**.
-* Kỹ sư phải chuẩn bị đủ hồ sơ tài liệu từ sớm để LEC hoàn tất việc cấp mã QCode trên ERP/EMS trước khi kỳ thẩm định diễn ra.
+### 2.1. Mandatory Official QCode for Audit Eligibility
+* **Strict Operational Rule**: **Requisitions eligible for audit MUST POSSESS AN OFFICIAL QCODE**.
+* Spare parts carrying only temporary codes `TMP-HW-xxxx` (where engineers have only uploaded CAD/Doc documentation folders) **are strictly barred from the beginning-of-month cost review/audit session**.
+* Engineers must submit documentation packages early so that the LEC can finalize official QCode registration on ERP/EMS prior to the audit review cycle.
 
-### 2.2. LEC Tự Tay Phân Loại — Tuyệt Đối Không Tự Động
-* Hệ thống **tuyệt đối không tự động gán nhãn** `Trong Target` hay `Over`.
-* Kỹ sư chỉ có nhiệm vụ:
-  - Cung cấp hiện trạng máy móc, mô tả vấn đề hỏng hóc.
-  - Đính kèm mã lệnh bảo trì sửa chữa máy (`Work Order: WO-xxxx`).
-  - Đính kèm hình ảnh hiện trường linh kiện cháy hỏng.
-  - Đề xuất sơ bộ lý do (`OVR-01` đến `OVR-06`).
-* **LEC là người tự tay xem xét và bấm chọn phân loại chính thức** trên Bàn làm việc LEC.
+### 2.2. Manual LEC Classification — Strictly No Automation
+* The system **strictly DOES NOT automatically classify** items as `Within Target` or `Over Target`.
+* The Engineer's responsibility is solely to:
+  - Provide machine operating conditions and describe failure symptoms.
+  - Attach the maintenance repair work order (`Work Order: WO-xxxx`).
+  - Attach shop-floor photographs of damaged components.
+  - Propose a preliminary rationale code (`OVR-01` to `OVR-06`).
+* **The LEC manually evaluates and selects the official classification** on the LEC Workbench.
 
-### 2.3. Hạn Thẩm Định & Giải Trình Do LEC Quy Định
-* Thời hạn chốt nộp **Task Giải Trình Tồn Kho Chưa Dùng** và chốt hồ sơ thẩm định chi phí đầu tháng **hoàn toàn do LEC quy định hạn (Deadline)** theo lịch làm việc thực tế của Team, không áp đặt ngày cố định.
+### 2.3. Review Deadlines & Aging Justifications Configured by LEC
+* Submission deadlines for **Idle Inventory Justification Tasks** and the cutoff for beginning-of-month cost audit packages **are fully configured by the LEC (Deadlines)** based on the Team's operational schedule, rather than rigid system dates.
 
 ---
 
-## 3. Các Phương Thức Tạo Yêu Cầu Của Kỹ Sư
+## 3. Requisition Creation Methods for Engineers
 
-### 3.1. Đăng ký theo Cây EBOM Tên Thân Thiện
-- Kỹ sư chọn: `Dây chuyền Line #201` $\rightarrow$ `Máy Die Bonder DB-01` $\rightarrow$ `Cụm Đầu Gắp Bonding Head` $\rightarrow$ Tích chọn phụ tùng.
-- Nếu cơ cấu chưa có trong EBOM: Chọn `[+] Cơ cấu chưa có trong EBOM (Khai báo sau)` để không bị chặn mua.
+### 3.1. Requisition via EBOM Friendly Names
+- Engineer selects: `Line #201` $\rightarrow$ `Die Bonder DB-01` $\rightarrow$ `Bonding Head Unit` $\rightarrow$ checks spare part.
+- If the mechanism is not yet in EBOM: Select `[+] Mechanism not in EBOM (Late Declaration)` to avoid blocking procurement.
 
-### 3.2. Đăng ký cho sự cố máy đột xuất (Emergency Breakdown)
-- Chọn loại nhu cầu: `Dùng ngay do sự cố máy (Breakdown)`.
-- Nhập mã lệnh sửa máy `Work Order` (ví dụ `WO-248926091`).
-- Tải ảnh hiện trường linh kiện hỏng và màn hình log alarm máy.
+### 3.2. Requisition for Emergency Machine Breakdown
+- Select demand type: `Immediate breakdown replacement`.
+- Enter maintenance repair work order (e.g., `WO-248926091`).
+- Upload photographs of damaged components and machine alarm logs.
 
-### 3.3. Đăng ký qua Bảng Nhập Lưới (Grid Entry)
-- Copy-paste hàng chục dòng từ Excel kiểm kê ca vào bảng lưới.
-- Kiểm tra các dòng bị cảnh báo tồn kho Team bạn để ưu tiên xuất dùng trước.
+### 3.3. Bulk Grid Entry
+- Copy-paste dozens of rows from shift inspection spreadsheets into the grid table.
+- Identify rows flagged with peer team stock warnings to prioritize borrowing before purchasing.

@@ -1,60 +1,60 @@
-# 01. Quản Lý Ngân Sách SG & Kế Toán Chi Phí Mua vs Xuất
-> *Cơ Chế Nhập Ngân Sách Thủ Công Hàng Tháng Của LEC, Tuyệt Đối Không Cộng Dồn Số Dư (Strict No Rollover), Xuất Kho Tự Động Đọc Từ EMS & Đối Chiếu Các Trục Tài Chính*
+# 01. SG Budget Management & Purchase vs. Issuance Cost Accounting
+> *Manual Monthly Budget Input by LEC, Strict No-Rollover Policy, Automated Issuance Ingestion from EMS & Financial Axis Reconciliation*
 
 ---
 
-## 1. Bản Chất Hai Dòng Tiền: Mua Hàng (PO Commit) vs Xuất Kho (Issue Expense Đọc Từ EMS)
+## 1. Nature of the Two Cash Flows: Purchase (PO Commit) vs. Issuance (Issue Expense Read from EMS)
 
-Để kiểm soát chặt chẽ tài chính tại nhà máy HW (Smart Watch) cũng như các nhà máy khác trong tập đoàn, hệ thống tách bạch tuyệt đối giữa hai khái niệm:
+To enforce strict financial governance at Factory HW (Smart Watch) as well as across other plants within the enterprise, the system maintains a clear separation between two distinct accounting concepts:
 
 ```mermaid
 flowchart LR
-    A["Ngân Sách SG Tháng Do LEC Nhập\n(Monthly Budget Allocation)\n(Nhập thủ công đầu mỗi tháng)"]
-    B["Chi Phí Mua (Purchase / PO Commit)\n(Giữ chỗ trần ngân sách khi ký PO)"]
-    C["Chi Phí Xuất Kho (Issue Expense)\n(Đọc tự động từ dữ liệu xuất kho EMS)"]
+    A["Monthly SG Budget Input by LEC\n(Monthly Budget Allocation)\n(Manually entered at start of each month)"]
+    B["Purchase Spend (PO Commit)\n(Holds ceiling when PO is released)"]
+    C["Issuance Expense (Issue Expense)\n(Automatically read from EMS issuance data)"]
 
-    A -->|Kiểm soát trần cam kết chi| B
-    A -->|Kiểm soát trần chi phí vận hành| C
+    A -->|Controls committed cash ceiling| B
+    A -->|Controls operating expense ceiling| C
 ```
 
-### So sánh chi tiết:
-*   **Chi Phí Mua (Purchase / PO Commit Spend)**:
-    - Phát sinh ngay khi đơn đặt hàng (PO) được ký phát hành cho nhà cung cấp (ServeOne, SMC, Trumpf...).
-    - Mục đích: **Kiểm soát dòng tiền ra (Cash-out commitment)**, đảm bảo tổng giá trị cam kết mua hàng trong tháng không vượt trần ngân sách tháng đó.
-    - Hàng về nhập kho được ghi nhận là: **Tài sản tồn kho (Inventory Asset)**.
-*   **Chi Phí Xuất (Issue / Operational Expense)**:
-    - **CHỈ PHÁT SINH KHI KỸ SƯ XUẤT KHO LẮP VÀO MÁY TRÊN DÂY CHUYỀN**.
-    - **Nguồn dữ liệu**: Bỏ qua Cổng thủ kho nhà máy HW (thủ kho không dùng ứng dụng này); hệ thống **đọc tự động từ thông tin xuất kho trên hệ thống Core EMS**.
-    - Mục đích: **Tính giá thành sản phẩm và chi phí vận hành thực tế của từng Part/Team**, gắn trực tiếp theo Tên Máy thân thiện và mã lệnh sửa chữa `Work Order`.
+### Detailed Comparison:
+*   **Purchase Spend (Purchase / PO Commit Spend)**:
+    - Incurred immediately when a Purchase Order (PO) is officially signed and released to external vendors (ServeOne, SMC, Trumpf, etc.).
+    - Purpose: **Controls cash-out commitment**, ensuring the total value of procurement commitments during the month does not breach the authorized monthly budget ceiling.
+    - Physical goods receipt at the warehouse is booked as: **Inventory Asset**.
+*   **Issuance Expense (Issue / Operational Expense)**:
+    - **INCURRED ONLY WHEN AN ENGINEER WITHDRAWS SPARE PARTS FROM THE WAREHOUSE AND INSTALLS THEM ONTO FACTORY EQUIPMENT**.
+    - **Data Source**: Bypasses any HW warehouse portal (warehouse keepers do not use this application); the system **automatically ingests issuance transactions directly from core EMS (`ds_Inv`)**.
+    - Purpose: **Calculates actual manufacturing unit cost and operational expenses for each Part/Team**, mapped directly to friendly Machine Names and maintenance `Work Order` records.
 
 ---
 
-## 2. Quy Tắc Ngân Sách Hàng Tháng: Nhập Thủ Công & TUYỆT ĐỐI KHÔNG CỘNG DỒN SỐ DƯ (Strict No Rollover)
+## 2. Monthly Budget Rules: Manual Input & STRICT NO-ROLLOVER POLICY
 
-### 2.1. Nhập Ngân Sách Thủ Công Hàng Tháng (Manual Monthly Budget Input)
-- **Người chịu trách nhiệm**: **LEC** của từng Team.
-- **Thời điểm**: Trước ngày 01 của mỗi tháng tài chính (hoặc ngay sau khi hạn mức tháng được thông qua).
-- **Thao tác**: LEC truy cập màn hình Cấu Hình Ngân Sách, nhập trực tiếp hạn mức SG Budget cho tháng (USD / VND).
+### 2.1. Manual Monthly Budget Entry
+- **Responsible Person**: The **LEC** of each respective Team.
+- **Timing**: Prior to the 01st day of each financial month (or immediately following corporate authorization of the monthly quota).
+- **Operation**: The LEC accesses the Budget Configuration panel and directly inputs the authorized SG Budget quota for the month (USD / VND).
 
-### 2.2. Nguyên Tắc Cốt Lõi: TUYỆT ĐỐI KHÔNG CỘNG DỒN SỐ DƯ (Strict No Rollover)
-Trái với cơ chế dồn tích quý trong các doanh nghiệp dịch vụ, tại môi trường sản xuất công nghệ cao của nhà máy:
-> ⚠️ **NGUYÊN TẮC VÀNG TÀI CHÍNH**:  
-> **Ngân sách tháng nào khóa sổ trọn vẹn tháng đó. Hạn mức chưa dùng hết trong tháng sẽ tự động HỦY BỎ (Expire) vào 23:59:59 của ngày cuối tháng. TUYỆT ĐỐI KHÔNG CỘNG DỒN SỐ DƯ (STRICT NO ROLLOVER) sang tháng tiếp theo.**
+### 2.2. Core Financial Principle: STRICT NO-ROLLOVER POLICY
+Unlike quarterly accrual or rollover mechanisms common in commercial or service enterprises, high-tech manufacturing facility operations adhere to the following:
+> ⚠️ **GOLDEN FINANCIAL RULE**:  
+> **Each month's budget closes completely within that month. Any uncommitted balance remaining at month-end automatically EXPIRES at 23:59:59 on the final day of the month. STRICTLY NO ROLLOVER of unspent funds into subsequent months.**
 
-$$\text{Hạn Mức Khả Dụng Tháng } (M) = \text{Budget Nhập Mới Cho Tháng } (M) \quad (\text{Không cộng thêm số dư Tháng } M-1)$$
+$$\text{Available Budget Limit for Month } (M) = \text{Newly Input Budget for Month } (M) \quad (\text{No carryover from Month } M-1)$$
 
-- **Lý do quản trị**:
-  1. Ngăn chặn hiện tượng "dồn toa" ngân sách: Tránh tình trạng các Team tiết kiệm giả tạo trong tháng đầu để dồn tiền mua ồ ạt trong tháng sau gây sốc dòng tiền.
-  2. Bắt buộc Kỹ sư và LEC phải lập kế hoạch mua sắm chính xác theo nhu cầu vận hành thực tế của từng tháng.
-  3. Đảm bảo số liệu đối soát với Bộ phận Quản lý Chi phí (Cost Management) trong phiên Thẩm định Offline ĐẦU THÁNG phản ánh đúng thực trạng chi tiêu của kỳ đó.
+- **Governance Rationale**:
+  1. Prevents budget hoarding: Eliminates artificial spending suppression in earlier months intended to stockpile budget for massive procurement spikes later, preventing operational cash-flow volatility.
+  2. Enforces demand-driven accuracy: Mandates that engineers and LECs formulate procurement plans strictly aligned with the actual operational maintenance needs of that specific monthly cycle.
+  3. Ensures audit integrity: Reconciliation data presented to Cost Management (a single individual serving as Reviewer & Assistant) during the Beginning-of-Month Audit reflects the authentic financial posture of the operating cycle.
 
 ---
 
-## 3. Khả Năng Áp Dụng Dễ Dàng Cho Nhà Máy / Phân Xưởng Khác (Multi-Plant Applicability)
+## 3. Multi-Plant Applicability
 
-Bảng phân bổ ngân sách được thiết kế cấu hình động (Config-driven) theo các thuộc tính Master Data:
-- Mã Nhà máy (`factory_code`: `HW`, `TV`, `AU`...).
-- Mã Phòng ban Kế toán (`cost_center`: `87321` cho SW, `87410` cho TV...).
-- Mã Tài khoản Tổng hợp (`gl_account`: `NY PO M Technology CP/SG Part 1`...).
+The budget allocation schema is built on a configuration-driven architecture leveraging core Master Data attributes:
+- Factory Code (`factory_code`: `HW`, `TV`, `AU`, etc.).
+- Cost Center Code (`cost_center`: `87321` for SW, `87410` for TV, etc.).
+- General Ledger Account (`gl_account`: `NY PO M Technology CP/SG Part 1`, etc.).
 
-Khi triển khai cho Nhà máy TV hoặc Auto Display, chỉ cần khai báo thêm dòng ngân sách mới với mã Cost Center tương ứng mà không làm xáo trộn cấu trúc kế toán của toàn hệ thống.
+When expanding deployment to the TV plant or Auto Display manufacturing facilities, administrators simply configure new budget allocation records linked to the corresponding Cost Centers without modifying the underlying accounting structure of the system.

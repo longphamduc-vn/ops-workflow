@@ -1,28 +1,28 @@
-# 00. Ma Trận Phân Định Màn Hình Theo Vai Trò Người Dùng (Role-Based Screen Matrix)
-> *Kiến trúc điều hướng và phân quyền truy cập: Loại bỏ Cổng Thủ Kho (thủ kho không dùng hệ thống, xuất kho lấy tự động từ EMS), Bỏ hệ thống duyệt (duyệt trên EMS, hệ thống chỉ kiểm soát tiến độ), Kỹ sư ngang hàng không chia công đoạn, Cost Management (Reviewer & Assistant là 1 người)*
+# 00. Role-Based Screen Matrix
+> *Navigation architecture and access control matrix: Warehouse Portal eliminated (warehouse staff do not use this system; inventory issuance is automatically synced from EMS), Approval system eliminated (approvals take place on EMS; this system strictly controls progress), Peer engineers with no process hierarchy, Cost Management (Reviewer & Assistant is a single person).*
 
 ---
 
-## 1. Khung Phân Quyền 5 Nhóm Vai Trò Cốt Lõi (User Role Architecture)
+## 1. 5 Core User Role Architecture
 
-Hệ thống được thiết kế theo nguyên tắc tối thiểu hóa quyền hạn và phân vùng phạm vi chặt chẽ (Principle of Least Privilege & Scoped Visibility). **Mỗi vai trò sở hữu 1 không gian làm việc chuyên biệt độc lập**:
+The system is designed following the Principle of Least Privilege & Scoped Visibility. **Each role possesses an independent, dedicated workspace**:
 
 ```mermaid
 graph TD
-    subgraph Roles["5 Không Gian Giao Diện Độc Lập Theo Vai Trò"]
-        R1["1. REQUESTOR PORTAL\n(Kỹ Sư Hiện Trường - Ngang hàng nhau)"]
-        R2["2. LEADER DASHBOARD\n(Leader Team / Part - Theo dõi tiến độ)"]
-        R3["3. LEC MASTER WORKBENCH\n(Quản Lý Spare Part - Pham Duc Long)"]
-        R5["4. ADMIN CONSOLE\n(Quản Trị Viên & Cài Đặt Hệ Thống)"]
-        R6["5. COST MANAGEMENT PORTAL\n(Bộ Phận Quản Lý Chi Phí - 1 Người)"]
+    subgraph Roles["5 Independent Role-Based Workspaces"]
+        R1["1. REQUESTOR PORTAL\n(Field Engineers - Peer-level)"]
+        R2["2. LEADER DASHBOARD\n(Team / Part Leader - Progress Tracking)"]
+        R3["3. LEC MASTER WORKBENCH\n(Spare Part Coordinator - Pham Duc Long)"]
+        R5["4. ADMIN CONSOLE\n(System Administrator & Settings)"]
+        R6["5. COST MANAGEMENT PORTAL\n(Cost Management Department - 1 Person)"]
     end
 
-    subgraph Scope["Phạm Vi Hiển Thị & Thao Tác (Visibility Scope)"]
-        S_Mach["Theo máy, cụm máy thân thiện (không phân công đoạn)"]
-        S_Team["Toàn bộ tiến độ mua sắm nội bộ Team (Team => Part)"]
-        S_LEC["Gom đơn, Interlock, tiến độ nhập hàng thủ công, cầu nối Reviewer-Kỹ sư"]
-        S_ADM["Toàn bộ tham số cấu hình, phân quyền, kết nối Gateway"]
-        S_CST["Toàn cảnh ngân sách SG, kiểm thảo tồn kho & thẩm định chi phí ĐẦU THÁNG"]
+    subgraph Scope["Visibility Scope & Operations"]
+        S_Mach["By machine & friendly unit name (no process hierarchy)"]
+        S_Team["Full team procurement progress (Team => Part)"]
+        S_LEC["Batching, Interlocks, manual goods receipt tracking, Reviewer-Engineer bridge"]
+        S_ADM["All configuration parameters, permissions, Gateway connections"]
+        S_CST["SG budget overview, inventory audit & BEGINNING-OF-MONTH expense appraisal"]
     end
 
     R1 --> S_Mach
@@ -32,24 +32,24 @@ graph TD
     R6 --> S_CST
 ```
 
-### Danh Mục Không Gian Giao Diện Theo Vai Trò & Màn Hình Chung:
-0. [**Màn Hình Chung: Dashboard Kiểm Soát Tiến Độ Tổng Hợp (UI-COMMON-00)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/00-common-dashboard/screen-universal-analytics-dashboard.md): Tháp chỉ huy dữ liệu thời gian thực: Phễu tiến độ mua sắm, KPIs tồn kho & Task giải trình, ngân sách 3-chiều, phân tích 6 mã Over (tách riêng do Mua Hàng vs Xuất Kho từ EMS).
-1. [**Giao Diện Kỹ Sư Hiện Trường (Requestor Portal - UI-ROLE-01)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/01-role-requestor/screen-requestor-portal.md): Tạo đơn theo tên máy thân thiện, snapshot tồn kho, lưới Excel, cây EBOM, **chuẩn bị dữ liệu folder CAD để LEC đăng ký QCode**, phản hồi làm rõ thông tin với LEC và **Task Giải Trình Tồn Kho Đầu Tháng**.
-2. [**Giao Diện Quản Lý Team / Part (Leader Dashboard - UI-ROLE-02)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/02-role-leader/screen-leader-team-dashboard.md): Giám sát tiến độ mua sắm phân tầng theo `Team => Part`, rà soát sơ bộ lý do Over và đôn đốc Task giải trình tồn kho của kỹ sư *(Tuyệt đối không phê duyệt thay EMS)*.
-3. [**Giao Diện LEC Trong Team (LEC Master Workbench - UI-ROLE-03)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/03-role-lec/screen-lec-master-workbench.md): Multi-LEC gom đơn toàn team, Interlock 4 bước (xử lý cờ `agingInterlockFlag` xuất dùng tồn kho Team bạn, `unitPriceFlag`), EOL reclassification, theo dõi RFQ, **nhập tiến độ nhập hàng thủ công**, **cầu nối phản hồi 3 bên** với Reviewer Cost Management.
-4. [**Giao Diện Quản Trị Hệ Thống (Admin Settings Console - UI-ROLE-05)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/05-role-admin/screen-admin-settings-portal.md): Cấu hình 6 Tab: Công thức logic mua, nhà xưởng, phân cấp Line `Left(Line,1)=Floor`, Cây Đa Team (bỏ trường công đoạn, kỹ sư ngang hàng), Ngân sách SG No-Rollover, Nexacro Gateway Rate Limiting.
-5. [**Giao Diện Bộ Phận Quản Lý Chi Phí (Cost Management Portal - UI-ROLE-06)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/06-role-management/screen-management-audit-portal.md): Dành cho **Reviewer & Assistant (1 người duy nhất)**: Thẩm định chi phí và kiểm thảo giải trình tồn kho ĐẦU THÁNG, rà soát danh sách Over, **nhập yêu cầu cần thêm thông tin gửi cho LEC** *(Phê duyệt chính thức diễn ra trên EMS)*.
+### Directory of Role-Based Workspaces & Universal Screens:
+0. [**Universal Screen: Universal Progress & Analytics Dashboard (UI-COMMON-00)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/00-common-dashboard/screen-universal-analytics-dashboard.md): Real-time operations intelligence control tower: Procurement progress funnel, inventory KPIs & aging audit tasks, 3-way budget reconciliation, analysis of 6 Over codes (segregated into PO Spend Over vs. Issue Expense Over from EMS).
+1. [**Field Engineer Workspace (Requestor Portal - UI-ROLE-01)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/01-role-requestor/screen-requestor-portal.md): Create requests by friendly machine names, inventory snapshots, Excel grids, visual EBOM tree, **CAD folder data preparation for LEC QCode registration**, 3-party clarification responses with LEC, and **Beginning-of-Month Inventory Justification Tasks**.
+2. [**Team / Part Management Workspace (Leader Dashboard - UI-ROLE-02)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/02-role-leader/screen-leader-team-dashboard.md): Monitor procurement progress hierarchical breakdown by `Team => Part`, preliminary review of Over reasons, and follow up on engineer inventory justification tasks *(Strictly no approvals; approvals take place on EMS)*.
+3. [**Team LEC Workspace (LEC Master Workbench - UI-ROLE-03)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/03-role-lec/screen-lec-master-workbench.md): Multi-LEC batching across the entire team, 4-step Interlocks (processing `agingInterlockFlag` to borrow/use peer team stock, `unitPriceFlag`), EOL reclassification, RFQ tracking, **manual goods receipt progress tracking**, and serving as the **3-party clarification bridge** with the Cost Management Reviewer.
+4. [**System Admin Workspace (Admin Settings Console - UI-ROLE-05)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/05-role-admin/screen-admin-settings-portal.md): 6 configuration tabs: 5-demand logic formulas, factory plants, Line hierarchy `Left(Line,1)=Floor`, Multi-Team Tree (eliminated process hierarchy; peer engineers), SG Budget No-Rollover, and Nexacro Gateway Rate Limiting.
+5. [**Cost Management Workspace (Cost Management Portal - UI-ROLE-06)**](file:///wsl.localhost/Ubuntu/home/longp/projects/ops-workflow/procurement-system/05-ui-ux-screen-specifications/06-role-management/screen-management-audit-portal.md): Dedicated to the **Reviewer & Assistant (a single individual)**: Cost appraisal and inventory aging justification review at the BEGINNING OF THE MONTH, Over item audit, **input clarification requests sent to LEC** *(Official approval takes place on EMS)*.
 
 ---
 
-## 2. Bảng Ma Trận Quyền Hạn Màn Hình
+## 2. Screen Authorization Matrix
 
-| Không Gian Chức Năng | Kỹ Sư Hiện Trường | Leader Team / Part | LEC Trong Team | Cost Management (1 Người) | System Admin |
+| Functional Workspace | Field Engineer (Requestor) | Team / Part Leader | Team LEC | Cost Management (1 Person) | System Admin |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **00. Dashboard Tiến Độ Chung** | 👁️ Xem phạm vi máy | 👁️ Xem Team/Part | 👁️ Xem toàn Team | 👁️ Xem toàn xưởng | **Toàn quyền** |
-| **01. Cổng Kỹ Sư (Requestor)**<br>• Tạo đơn theo tên thân thiện<br>• Chuẩn bị data folder QCode<br>• Phản hồi làm rõ thông tin<br>• Task giải trình tồn kho đầu tháng | **Toàn quyền**<br>(Tạo, Sửa nháp, Nộp data) | 👁️ Xem theo dõi | 👁️ Xem & Hỗ trợ | 🚫 Không truy cập | **Toàn quyền**<br>(Hỗ trợ kỹ thuật) |
-| **02. Bàn Theo Dõi Leader**<br>• Giám sát tiến độ Team => Part<br>• Đôn đốc Task giải trình tồn kho<br>• *(Không phê duyệt)* | 🚫 Không truy cập | **Toàn quyền theo dõi**<br>(Ghi chú nội bộ) | 👁️ Xem liên thông | 👁️ Xem đối soát | **Toàn quyền** |
-| **03. Bàn Làm Việc LEC**<br>• Gom đơn cùng trạng thái<br>• Đánh dấu Trong Target vs Over<br>• Mở Interlock & EOL<br>• Cầu nối thông tin Reviewer-Kỹ sư<br>• Nhập tiến độ nhập hàng thủ công | 🚫 Không truy cập | 👁️ Chỉ xem tiến độ | **Toàn quyền điều phối**<br>(Xử lý, Mở chặn, Nhập hàng) | 👁️ Xem hồ sơ chuẩn bị | **Toàn quyền** |
-| **04. Bàn Cost Management**<br>• Thẩm định chi phí ĐẦU THÁNG<br>• Kiểm thảo giải trình tồn kho<br>• Gửi yêu cầu thêm thông tin cho LEC<br>• Tra cứu đối soát EMS | 🚫 Không truy cập | 🚫 Không truy cập | 👁️ Xem yêu cầu bổ sung | **Toàn quyền kiểm soát**<br>(Yêu cầu làm rõ, Clearance) | **Toàn quyền** |
-| **05. Cài Đặt Hệ Thống (Settings)**<br>• Cấu hình công thức 5 nhu cầu<br>• Cây Đa Team (kỹ sư ngang hàng)<br>• Gateway EMS Rate Limiting | 🚫 Không truy cập | 🚫 Không truy cập | ⚙️ Cài đặt ngân sách Team | 🚫 Không truy cập | **Toàn quyền cấu hình** |
-| **06. Kéo - Thả EBOM Máy** | 👁️ Tra cứu & Chọn | 👁️ Tra cứu | **Toàn quyền gán mã** | 👁️ Tra cứu cơ cấu | **Toàn quyền** |
+| **00. Universal Progress Dashboard** | 👁️ Machine scope | 👁️ Team/Part scope | 👁️ Full Team scope | 👁️ Plant-wide scope | **Full Access** |
+| **01. Requestor Portal**<br>• Create requests with friendly names<br>• Prepare QCode data folder<br>• Clarification feedback loop<br>• Beginning-of-month aging tasks | **Full Access**<br>(Create, Edit draft, Submit data) | 👁️ Read-only (Tracking) | 👁️ View & Assist | 🚫 No Access | **Full Access**<br>(Tech Support) |
+| **02. Leader Monitoring Dashboard**<br>• Monitor progress Team => Part<br>• Follow up on aging tasks<br>• *(No approvals)* | 🚫 No Access | **Full Access (Tracking)**<br>(Internal notes) | 👁️ Cross-view | 👁️ Cross-audit view | **Full Access** |
+| **03. LEC Master Workbench**<br>• Batch orders by status<br>• Mark Target vs Over manually<br>• Release Interlocks & EOL<br>• Reviewer-Engineer info bridge<br>• Manual goods receipt entry | 🚫 No Access | 👁️ View progress only | **Full Coordination Access**<br>(Process, Unlock, Receipt) | 👁️ View prepared dossiers | **Full Access** |
+| **04. Cost Management Portal**<br>• BEGINNING-OF-MONTH cost appraisal<br>• Inventory aging audit review<br>• Send clarification requests to LEC<br>• EMS reconciliation lookup | 🚫 No Access | 🚫 No Access | 👁️ View clarification requests | **Full Control Access**<br>(Clarification request, Clearance) | **Full Access** |
+| **05. System Settings Console**<br>• Configure 5-demand formulas<br>• Multi-Team Tree (peer engineers)<br>• Gateway EMS Rate Limiting | 🚫 No Access | 🚫 No Access | ⚙️ Team budget settings | 🚫 No Access | **Full Config Access** |
+| **06. Machine EBOM Drag & Drop** | 👁️ Lookup & Select | 👁️ Lookup | **Full Mapping Access** | 👁️ Structure Lookup | **Full Access** |

@@ -1,40 +1,40 @@
-# 05. Sơ Đồ Quy Trình: Thẩm Định Đầu Tháng, Kiểm Thảo Tồn Kho & Luồng Phản Hồi 3 Bên
-> *Quy Trình Đầu Tháng: Kỹ Sư Giải Trình Tồn Kho Qua Task, Điều Kiện Bắt Buộc Có QCode, LEC Tự Phân Loại Target/Over, Thẩm Định Offline Đầu Tháng Với Cost Management (1 Người), Vòng Phản Hồi 3 Bên & Phê Duyệt Chính Thức Trên EMS*
+# 05. Process Workflow: Beginning-of-Month Audit, Aging Inventory Review & 3-Party Clarification Loop
+> *Beginning-of-Month Workflow: Engineers Submit Aging Justifications via Tasks, Mandatory Official QCode Prerequisite, LEC Manually Classifies Target/Over, Offline Beginning-of-Month Audit with Cost Management (1 Single Person), 3-Party Clarification Loop & Official Approval on EMS*
 
 ---
 
-## 1. Dòng Thời Gian Vận Hành Kỳ Thẩm Định Đầu Tháng
+## 1. Timeline of the Beginning-of-Month Audit Cycle
 
 ```mermaid
 flowchart TD
-    subgraph Phase1["Giai Đoạn 1: Cuối Tháng N-1 Đến Đầu Tháng N (Chuẩn Bị Dữ Liệu & Giải Trình)"]
-        P1["Kỹ sư hiện trường đăng ký nhu cầu mua theo tên máy thân thiện\n(Kèm folder CAD nếu cần đăng ký QCode mới)"]
-        P1_QCode["LEC đăng ký QCode trên ERP/EMS (Bắt buộc phải có QCode để thẩm định)"]
-        P1_Stock["Hệ thống quét tồn kho >30 ngày chưa xuất\n➔ Tự động phát sinh TASK GIẢI TRÌNH TỒN KHO cho Kỹ sư"]
-        P1_Task["Kỹ sư nộp Task giải trình tồn kho trước DEADLINE DO LEC QUY ĐỊNH (vd: 03 hàng tháng)"]
-        P1_LEC["LEC gom hạng mục đã có QCode, tự tay phân loại thủ công:\n[🟢 TRONG TARGET] hoặc [🔴 OVER PHÁT SINH]"]
+    subgraph Phase1["Phase 1: Late Month N-1 to Beginning of Month N (Data Preparation & Justifications)"]
+        P1["Field engineers register demand using friendly machine names\n(Attaching CAD folder if new QCode registration is needed)"]
+        P1_QCode["LEC registers official QCode on ERP/EMS (Official QCode mandatory for audit)"]
+        P1_Stock["System scans unissued inventory > 30 days\n➔ Automatically generates AGING INVENTORY JUSTIFICATION TASK for Engineer"]
+        P1_Task["Engineers submit aging justification task before DEADLINE CONFIGURED BY LEC (e.g., 3rd of month)"]
+        P1_LEC["LEC consolidates items with official QCodes, manually flags:\n[🟢 WITHIN TARGET] or [🔴 UNPLANNED OVER]"]
     end
 
-    subgraph Phase2["Giai Đoạn 2: Chốt Kỳ Hồ Sơ Thẩm Định Đầu Tháng (Do LEC Cấu Hình)"]
-        P2["Đúng hạn Deadline do LEC thiết lập (vd: 05 hàng tháng lúc 12:00):\nLEC bấm 'Chốt Hồ Sơ Thẩm Định Đầu Tháng' ➔ Đóng băng dữ liệu"]
-        P3["Hệ thống tự động tổng hợp Dashboard Báo Cáo & Hồ Sơ Thẩm Định:\n• Bảng tổng hợp tiến độ mua sắm & chỉ số tồn kho\n• Đối chiếu ngân sách SG tháng No-Rollover (Nhập thủ công)\n• Danh sách gây Over (Bóc tách Over Mua Hàng vs Over Xuất Kho từ EMS)\n• Báo cáo tổng hợp giải trình tồn kho của các kỹ sư"]
+    subgraph Phase2["Phase 2: Beginning-of-Month Audit Dossier Lock (Configured by LEC)"]
+        P2["Upon reaching deadline configured by LEC (e.g., 5th of month at 12:00):\nLEC clicks 'Lock Beginning-of-Month Audit Dossier' ➔ Freezes data"]
+        P3["System automatically aggregates Reporting Dashboard & Audit Dossier:\n• Procurement progress summary & inventory metrics table\n• Monthly SG budget reconciliation with Strict No-Rollover (Manual entry)\n• Breakdown of Over causes (Segregating Procurement Over vs Warehouse Issuance Over from EMS)\n• Consolidated report of engineer aging inventory justifications"]
     end
 
-    subgraph Phase3["Giai Đoạn 3: Phiên Thẩm Định Offline Đầu Tháng Với Cost Management"]
-        P4["Họp Thẩm Định Offline Trực Tiếp giữa LEC và Reviewer Bộ Phận Quản Lý Chi Phí\n(Reviewer & Assistant là 1 người duy nhất)\n• Thẩm tra các hạng mục Over ngoài kế hoạch (OVR-01..06)\n• Kiểm thảo các giải trình tồn kho chưa xuất của kỹ sư"]
+    subgraph Phase3["Phase 3: Offline Beginning-of-Month Audit Session with Cost Management"]
+        P4["Direct Offline Audit Meeting between LEC and Cost Management Reviewer\n(Reviewer & Assistant is 1 single person)\n• Audit unplanned Over items (OVR-01..06)\n• Review unissued aging inventory justifications from engineers"]
         
-        P4_Loop{"Reviewer yêu cầu làm rõ thêm thông tin?"}
-        P4_Loop -->|"Có yêu cầu"| ThreeWay["LUỒNG PHẢN HỒI 3 BÊN:\n1. Reviewer nhập câu hỏi trên Cost Management Portal\n2. LEC tiếp nhận & giao nhiệm vụ làm rõ cho Kỹ sư\n3. Kỹ sư cập nhật bằng chứng kỹ thuật gửi lại cho LEC\n4. LEC tổng hợp & gửi lại cho Reviewer Cost Management"]
+        P4_Loop{"Reviewer requests further clarification?"}
+        P4_Loop -->|"Inquiries raised"| ThreeWay["3-PARTY CLARIFICATION LOOP:\n1. Reviewer enters queries on Cost Management Portal\n2. LEC receives & assigns clarification task to responsible Engineer\n3. Engineer updates technical evidence and returns to LEC\n4. LEC consolidates & resubmits to Cost Management Reviewer"]
         ThreeWay --> P4_Loop
         
-        P4_Loop -->|"Đạt yêu cầu"| P5["Reviewer xác nhận thông qua thẩm định offline\n(Lưu biên bản số hóa lên hệ thống)"]
+        P4_Loop -->|"Criteria met"| P5["Reviewer confirms offline audit approval\n(Digitized audit minutes recorded in system)"]
     end
 
-    subgraph Phase4["Giai Đoạn 4: Phê Duyệt Chính Thức & Vận Hành Trên EMS"]
-        P6["LEC tạo mã PRV No trên hệ thống Core EMS kèm biên bản thẩm định"]
-        P7["Cost Management (Reviewer - 1 người) KÝ DUYỆT CHÍNH THỨC TRÊN EMS\n(Hệ thống mới hoàn toàn không có nút duyệt)"]
-        P8["LEC nhập mã PRV No vào hệ thống mới để bắt đầu đồng bộ tiến độ PO"]
-        P9["LEC nhập thủ công: Vendor Confirm ngày nhận, ETA, Phân bổ chi phí hàng tháng\nHàng về đối soát hoàn tất trên EMS"]
+    subgraph Phase4["Phase 4: Formal Approval & Execution on EMS"]
+        P6["LEC creates PRV No on Core EMS attaching audit minutes"]
+        P7["Cost Management (Reviewer - 1 single person) FORMALLY SIGNS OFF ON EMS\n(New system has strictly no approval buttons)"]
+        P8["LEC enters PRV No into new system to initiate PO progress synchronization"]
+        P9["LEC manually enters: Vendor Confirm dispatch date, ETA, Monthly expense allocation plan\nGoods receipt reconciliation completed on EMS"]
     end
 
     Phase1 --> Phase2 --> Phase3 --> Phase4
@@ -42,22 +42,22 @@ flowchart TD
 
 ---
 
-## 2. Các Nguyên Tắc Bắt Buộc Trong Kiểm Thảo & Thẩm Định Đầu Tháng
+## 2. Mandatory Principles in Beginning-of-Month Review & Audit
 
-1.  **Thời Điểm Diễn Ra Vào ĐẦU THÁNG**:
-    - Kỳ thẩm định chi phí và kiểm thảo giải trình tồn kho diễn ra tập trung vào **ĐẦU THÁNG** (thường từ ngày 01 đến ngày 05 hàng tháng) giữa LEC và Reviewer Cost Management, đảm bảo khớp với chu kỳ ngân sách SG tháng mới.
-2.  **Bộ Phận Quản Lý Chi Phí (Cost Management)**:
-    - Là bộ phận quản lý chi phí chuyên trách, **không phải Ban Giám Đốc/Hội đồng quản trị**.
-    - Vai trò **Reviewer và Assistant là 1 người duy nhất**.
-3.  **Điều Kiện Bắt Buộc: Phải Có Mã QCode Chính Thức**:
-    - Chỉ các phụ tùng đã có mã QCode chính thức trên ERP/EMS mới đủ điều kiện đưa vào danh sách thẩm định đầu tháng.
-    - Phụ tùng mới nộp folder CAD/Doc/ảnh chỉ là giai đoạn chuẩn bị dữ liệu kỹ thuật, mang mã tạm `TMP-HW-xxxx`, chưa được tham gia thẩm định.
-4.  **Phân Loại Target vs Over Là Thủ Công Bởi LEC**:
-    - Hệ thống không tự động phân loại. LEC là người trực tiếp đánh giá dựa trên tình trạng thiết bị, tính chất hư hỏng và ngân sách SG tháng để bấm chọn `[TRONG TARGET]` hoặc `[OVER PHÁT SINH]`.
-5.  **Thời Hạn (Deadlines) Do LEC Thiết Lập**:
-    - Hạn chót kỹ sư nộp giải trình tồn kho và hạn chốt hồ sơ thẩm định do chính LEC cấu hình trên hệ thống.
-6.  **Vòng Phản Hồi 3 Bên Chặt Chẽ**:
-    - Mọi yêu cầu làm rõ sau buổi thẩm định offline được quản lý trực tiếp trên phần mềm: Reviewer gửi câu hỏi cho LEC $\rightarrow$ LEC chuyển cho Kỹ sư $\rightarrow$ Kỹ sư phản hồi cho LEC $\rightarrow$ LEC tổng hợp nộp lại cho Reviewer, đảm bảo tính toàn vẹn và lưu vết lịch sử.
-7.  **Phê Duyệt Chính Thức Trên EMS & Không Có Cổng Thủ Kho**:
-    - Hệ thống mới đóng vai trò kiểm soát tiến độ và chuẩn bị tài liệu kỹ thuật.
-    - Mọi phê duyệt diễn ra trên EMS. Xuất kho phụ tùng được đồng bộ tự động từ EMS, không qua thủ kho trên ứng dụng này.
+1.  **Timing in the BEGINNING OF THE MONTH**:
+    - The cost audit cycle and aging inventory review take place concentrated at the **BEGINNING OF THE MONTH** (typically from Day 01 to Day 05 of each month) between the LEC and the Cost Management Reviewer, ensuring synchronization with the new month's SG budget cycle.
+2.  **Cost Management Department**:
+    - Dedicated operational cost management department, **not the Board of Directors / Executive Leadership**.
+    - The **Reviewer and Assistant roles are performed by 1 single individual**.
+3.  **Mandatory Prerequisite: Official QCode Required**:
+    - Only spare parts with registered official QCodes on ERP/EMS qualify for inclusion in the beginning-of-month audit list.
+    - New spare parts submitted with CAD/Doc/image folders represent technical data preparation only, carrying temporary codes `TMP-HW-xxxx`, and are strictly prohibited from participating in the audit.
+4.  **Target vs. Over Classification is Manually Handled by LEC**:
+    - The system does not auto-classify. The LEC directly evaluates equipment status, failure characteristics, and the monthly SG budget to click `[WITHIN TARGET]` or `[UNPLANNED OVER]`.
+5.  **Deadlines Configured by LEC**:
+    - Deadlines for engineers to submit aging justifications and the dossier closing cutoff are configured directly by the LEC in the system.
+6.  **Tight 3-Party Clarification Loop**:
+    - All clarification inquiries following the offline audit session are managed directly within the software: Reviewer sends queries to LEC $\rightarrow$ LEC forwards to Engineer $\rightarrow$ Engineer responds to LEC $\rightarrow$ LEC consolidates and resubmits to Reviewer, ensuring data integrity and full audit trail history.
+7.  **Formal Approval on EMS & No Warehouse Portal**:
+    - The new system acts as a progress tracking and technical document preparation tool.
+    - All approvals take place on EMS. Material issuance is synchronized automatically from EMS, with no warehouse keeper interface on this application.

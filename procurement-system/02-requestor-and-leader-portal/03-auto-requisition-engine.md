@@ -1,32 +1,32 @@
-# 03. Động Cơ Sinh Đơn Mua Định Kỳ Tự Động (Auto-Requisition Engine)
+# 03. Periodic Auto-Requisition Engine (Auto-Requisition Engine)
 
-> *Tài liệu đặc tả Động Cơ Gợi Ý Nhu Cầu Phụ Tùng Tự Động (Auto-Requisition Engine)*  
-> *Nguyên tắc cốt lõi: Phục vụ kỳ thẩm định đầu tháng; Không tự động phân loại Target/Over (LEC tự tay đánh giá phân loại); Kỹ sư ngang hàng trong Part (không phân chia công đoạn); Kiểm soát tiến độ và chuẩn bị dữ liệu.*
+> *Specification for Spare Parts Demand Suggestion Engine (Auto-Requisition Engine)*  
+> *Core Principles: Serves Beginning-of-Month audit; Strictly NO automated Target/Over classification (LEC manually evaluates and classifies); Peer engineers within Part (no process/stage division); Progress tracking and data preparation.*
 
 ---
 
-## 1. Cơ Chế Hoạt Động Định Kỳ
+## 1. Periodic Execution Mechanism
 
-Động cơ sinh đơn tự động chạy định kỳ vào cuối tháng để tính toán lượng phụ tùng tiêu hao cần bù đắp, sẵn sàng dữ liệu cho **đợt thẩm định chi phí vào ĐẦU THÁNG** giữa LEC và Bộ phận Quản Lý Chi Phí (Cost Management):
+The auto-requisition engine executes periodically at month-end to calculate consumable spare parts replenishment requirements, preparing data ready for the **BEGINNING-OF-MONTH cost review/audit session** between the LEC and the Cost Management department:
 
 ```mermaid
 flowchart TD
-    subgraph Inputs["Dữ Liệu Đầu Vào Tự Động"]
-        P_Plan["Kế hoạch sản lượng Smart Watch tháng tới\n(Model D111, D222, D333)"]
-        EBOM_Norm["Cây EBOM: Định mức tiêu hao / MTBF\ntheo từng Machine & Unit"]
-        Stock["Tồn kho Onhand kho HW + PO Remained đang về\n(Từ Read-Model ops-workflow)"]
+    subgraph Inputs["Automated Input Data"]
+        P_Plan["Upcoming month Smart Watch production plan\n(Models D111, D222, D333)"]
+        EBOM_Norm["EBOM Tree: Consumption quota / MTBF\nby Machine & Unit"]
+        Stock["Onhand inventory in HW warehouse + incoming PO Remained\n(From ops-workflow Read-Model)"]
     end
 
-    subgraph Calculation["Bộ Máy Tính Toán"]
-        Step1["Tính tổng nhu cầu tiêu hao lý thuyết (BOM Demand)"]
-        Step2["Khấu trừ tồn khả dụng: Net_Need = BOM Demand - (Onhand + PO Remained)"]
-        Step3["So sánh ngưỡng Target Stock & MOQ của nhà sản xuất"]
+    subgraph Calculation["Calculation Engine"]
+        Step1["Calculate theoretical consumable demand (BOM Demand)"]
+        Step2["Deduct available stock: Net_Need = BOM Demand - (Onhand + PO Remained)"]
+        Step3["Compare against Target Stock buffer & Vendor MOQ"]
     end
 
-    subgraph Output["Kết Quả Gợi Ý & Xử Lý"]
-        Draft["Tự động sinh Đơn Mua Gợi Ý (Suggested Draft Requisitions)\n(Yêu cầu bắt buộc phải có QCode chính thức)"]
-        LECEval["LEC tự tay rà soát và phân loại thủ công:\n[TARGET] hoặc [OVER PHÁT SINH]"]
-        Notify["Hiển thị trên màn hình Kỹ sư & Part Leader để rà soát tiến độ"]
+    subgraph Output["Suggested Output & Processing"]
+        Draft["Automatically generate Suggested Draft Requisitions\n(Strictly requires official QCode)"]
+        LECEval["LEC manually reviews and classifies:\n[TARGET] or [OVER BUDGET]"]
+        Notify["Displayed on Engineer & Part Leader dashboard for progress review"]
     end
 
     P_Plan & EBOM_Norm --> Step1
@@ -36,11 +36,11 @@ flowchart TD
 
 ---
 
-## 2. Công Thức Tính Toán Chi Tiết
+## 2. Detailed Mathematical Formula
 
-$$\text{Nhu Cầu Mua Bổ Sung} = \max\left(0, \left(\sum_{\text{Model}} \frac{\text{Sản Lượng Dự Kiến}}{\text{Định Mức Tuổi Thọ Phụ Tùng}} \times \text{SL Lắp/Máy}\right) + \text{Target Buffer} - (\text{Onhand} + \text{PO Remained})\right)$$
+$$\text{Replenishment Demand} = \max\left(0, \left(\sum_{\text{Model}} \frac{\text{Projected Production Volume}}{\text{Spare Part Life Expectancy Quota}} \times \text{Installed Qty/Machine}\right) + \text{Target Buffer} - (\text{Onhand} + \text{PO Remained})\right)$$
 
-*   Nếu kết quả $> 0$: Làm tròn lên theo **Số lượng đặt tối thiểu (MOQ)** hoặc **Quy cách đóng gói (Pack Size)**.
-*   **Điều kiện thẩm định**: Chỉ các hạng mục đã có **Mã QCode chính thức** mới đủ điều kiện đưa vào danh sách thẩm định đầu tháng. Các mã tạm (`TMP-HW-xxxx`) phải hoàn tất tải dữ liệu kỹ thuật để LEC đăng ký QCode trước.
-*   **Không tự động phân loại**: Hệ thống chỉ đưa ra số liệu tính toán gợi ý. **LEC là người trực tiếp đánh giá và phân loại thủ công** xem hạng mục đó thuộc diện `TARGET` (trong kế hoạch chi phí) hay `OVER` (vượt kế hoạch cần giải trình).
-*   **Kiểm soát tiến độ**: Kỹ sư phụ trách máy xem trước danh sách gợi ý, phản hồi thực tế tình trạng máy móc cho LEC trước thời hạn (Deadline) do LEC thiết lập.
+*   If the result is $> 0$: Round up to the nearest **Minimum Order Quantity (MOQ)** or **Packaging Unit (Pack Size)**.
+*   **Audit Prerequisite**: Only line items with **Official QCodes** are eligible for inclusion in the beginning-of-month audit package. Temporary codes (`TMP-HW-xxxx`) must complete technical documentation submission so the LEC can register official QCodes first.
+*   **Strictly No Automated Classification**: The system solely outputs calculated demand suggestions. **The LEC directly evaluates and manually classifies** each item as either `TARGET` (within expense plan) or `OVER` (exceeding plan, requiring justification).
+*   **Progress Tracking**: Machine engineers preview suggested line items and submit feedback regarding physical equipment conditions to the LEC ahead of the deadline configured by the LEC.

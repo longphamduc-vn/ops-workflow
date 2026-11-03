@@ -1,40 +1,40 @@
-# 02. Cấu Trúc Cây Thiết Bị EBOM & Giải Mã Số Quản Lý Thiết Bị (EM No)
-> *Chuẩn hóa cấu trúc 14 ký tự EM No: HWBMTL21EC0101, Tách bạch Tên Thân Thiện vs EM No, Drag-and-Drop EBOM Slot Mapper & Khai Báo Chi Tiết Cơ Cấu Khai Báo Sau*
+# 02. EBOM Equipment Tree Structure & Equipment Management Number (EM No) Decoding
+> *Standardization of 14-Character EM No Structure: HWBMTL21EC0101, Separation of Business Friendly Names vs EM No, Drag-and-Drop EBOM Slot Mapper & Late Declaration Mechanism*
 
 ---
 
-## 1. Phân Tách Trách Nhiệm: Tên Thân Thiện Nghiệp Vụ vs Mã Kỹ Thuật EM No
+## 1. Separation of Responsibilities: Business Friendly Names vs Technical EM No Code
 
-Trong thực tế sản xuất tại nhà xưởng, việc bắt buộc Kỹ sư Hiện Trường (Peer Engineers — không phân chia công đoạn) phải nhớ hoặc gõ chính xác chuỗi mã 14 ký tự kỹ thuật (`HWBMTL21EC0101`) gây cản trở và dễ nhầm lẫn. Hệ thống áp dụng nguyên tắc phân tách ranh giới rõ ràng:
+In shop-floor manufacturing reality, forcing Field Engineers (Peer Engineers — no stage/process division) to memorize or type 14-character technical codes (`HWBMTL21EC0101`) creates friction and introduces errors. The system enforces a clear separation of operational boundaries:
 
 ```mermaid
 flowchart LR
-    subgraph RequestorRole["1. Kỹ Sư Hiện Trường (Peer Engineers / Requestor)"]
-        REQ_UI["Làm việc 100% bằng TÊN THÂN THIỆN NGHIỆP VỤ\n• Line: Smart Watch Line #201\n• Machine: Máy Dán Die Bonder (DB-01)\n• Assembly/Mechanism: Cụm Đầu Gắp (Bonding Head)"]
+    subgraph RequestorRole["1. Field Engineers (Peer Engineers / Requestor)"]
+        REQ_UI["Work 100% with BUSINESS FRIENDLY NAMES\n• Line: Smart Watch Line #201\n• Machine: Die Bonder Machine (DB-01)\n• Assembly/Mechanism: Bonding Head Mechanism"]
     end
 
-    subgraph SystemLookup["2. Bộ Giải Mã & Ánh Xạ Thông Minh (Smart EM Resolver)"]
-        RESOLVE["Tự động khớp nối Tên Thân Thiện ⟷ EM No 14 Ký Tự\n(Nếu đã cấu hình: Tự động gán EM No vào hồ sơ)"]
+    subgraph SystemLookup["2. Smart EM Resolver"]
+        RESOLVE["Automatically resolves Friendly Names ⟷ 14-Character EM No\n(If configured: Automatically attaches EM No to requisition record)"]
     end
 
-    subgraph LECRole["3. Kỹ Sư Quản Trị Thiết Bị (LEC - Line Equipment Coordinator)"]
-        LEC_UI["Chịu trách nhiệm Quản trị Master Data Thiết Bị\n• Đăng ký chuỗi mã chuẩn hóa 14 ký tự EM No\n• Thiết lập bảng mô tả ánh xạ (Mapping Descriptions)\n• Phân bổ EM No cho máy/cụm mới setup"]
+    subgraph LECRole["3. Line Equipment Coordinator (LEC)"]
+        LEC_UI["Responsible for Equipment Master Data Administration\n• Register standardized 14-character EM No string\n• Configure mapping descriptions\n• Allocate EM No for newly set-up machines/assemblies"]
     end
 
     REQ_UI --> RESOLVE
-    LECRole -->|Đăng ký & Cập nhật Master| RESOLVE
+    LECRole -->|Register & Update Master| RESOLVE
 ```
 
-- **Kỹ sư Requestor**: Chỉ thao tác với danh mục cấp bậc quen thuộc: **Tên Nhà Máy $\rightarrow$ Tên Dây Chuyền (Line Name) $\rightarrow$ Tên Máy (Machine Name) $\rightarrow$ Tên Cụm Cơ Cấu (Assembly / Mechanism Detail)**.
-- **LEC (Line Equipment Coordinator)**: Là người quản lý cấu hình Master Data. LEC đăng ký mã chuẩn 14 ký tự `EM No` lên hệ thống, kèm theo các trường mô tả tiếng Việt/Anh chuẩn mực. Khi Requestor chọn máy trên giao diện, hệ thống tự động ngầm gán `emNo` tương ứng vào hồ sơ mua sắm và Work Order.
+- **Requestor Engineers**: Work exclusively with familiar operational hierarchy levels: **Plant Name $\rightarrow$ Line Name $\rightarrow$ Machine Name $\rightarrow$ Assembly / Mechanism Detail**.
+- **LEC (Line Equipment Coordinator)**: Manages Master Data configurations. The LEC registers standardized 14-character `EM No` strings in the system along with official bilingual English/Vietnamese descriptions. When a Requestor selects a machine on the UI, the system automatically assigns the corresponding `emNo` behind the scenes to procurement records and Work Orders.
 
 ---
 
-## 2. Công Thức Giải Mã Số Quản Lý Thiết Bị 14 Ký Tự (EM No Decoder)
+## 2. 14-Character Equipment Management Number Formula (EM No Decoder)
 
-Mỗi vị trí lắp đặt linh kiện chuẩn hóa trong tập đoàn được định danh bằng **Số Quản Lý Thiết Bị (EM No - Equipment Management Number)** gồm 14 ký tự:
+Every standardized component installation position across the corporation is identified by a 14-character **Equipment Management Number (EM No)**:
 
-$$\mathbf{EM\ No:\ } \underbrace{\text{HW}}_{\text{Ký tự 1-2}} \underbrace{\text{BMTL}}_{\text{3-6}} \underbrace{\text{2}}_{\text{7}} \underbrace{\text{1}}_{\text{8}} \underbrace{\text{EC}}_{\text{9-10}} \underbrace{\text{01}}_{\text{11-12}} \underbrace{\text{01}}_{\text{13-14}}$$
+$$\mathbf{EM\ No:\ } \underbrace{\text{HW}}_{\text{Chars 1-2}} \underbrace{\text{BMTL}}_{\text{3-6}} \underbrace{\text{2}}_{\text{7}} \underbrace{\text{1}}_{\text{8}} \underbrace{\text{EC}}_{\text{9-10}} \underbrace{\text{01}}_{\text{11-12}} \underbrace{\text{01}}_{\text{13-14}}$$
 
 ```
 ┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┐
@@ -42,113 +42,113 @@ $$\mathbf{EM\ No:\ } \underbrace{\text{HW}}_{\text{Ký tự 1-2}} \underbrace{\t
 ├────┴────┼────┴────┴────┴────┼────┼────┼────┴────┼────┴────┼────┴────┤
 │   H    W│   B    M    T    L│  2 │  1 │   E    C│   0    1│   0    1│
 ├─────────┼───────────────────┼────┼────┼─────────┼─────────┼─────────┤
-│ Factory │ Phân Hệ Kỹ Thuật  │Tầng│Line│ Machine │  Unit   │Assembly │
-│  (HW)   │(Module Tech Line) │Floor(Hex)│  (Máy)  │ (Cụm)   │(Cụm Lắp)│
+│ Factory │ Technical Subsys  │Flr │Line│ Machine │  Unit   │Assembly │
+│  (HW)   │(Module Tech Line) │(2F)│(Hex│ (Equip) │(Assembly│(Mech Dtl│
 └─────────┴───────────────────┴────┴────┴─────────┴─────────┴─────────┘
 ```
 
-### Bảng tra cứu ý nghĩa từng phân đoạn trong EM No:
+### EM No Segment Reference Table:
 
-| Vị trí ký tự | Giá trị mẫu | Tên phân đoạn | Quy tắc giải mã nghiệp vụ | Dễ dàng áp dụng cho Nhà máy / Team khác |
+| Character Index | Sample Value | Segment Name | Business Decoding Rules | Adaptability to Other Plants / Teams |
 | :---: | :---: | :--- | :--- | :--- |
-| **1 $\rightarrow$ 2** | `HW` | **Factory (Nhà máy)** | `HW`: Smart Watch Plant 1.<br>Tham số hóa linh hoạt cho nhà máy khác. | `TV`: Factory TV Display.<br>`AU`: Automotive Display Plant.<br>`MO`: IT Monitor Plant. |
-| **3 $\rightarrow$ 6** | `BMTL` | **System / Line Group** | Phân hệ kỹ thuật dây chuyền (`BMTL` = Building / Module Tech Line). | `TMTL`: TV Module Tech Line.<br>`AMTL`: Auto Module Line. |
-| **7** | `2` | **Floor (Tầng)** | Tầng đặt máy: `2` = Tầng 2F, `6` = Tầng 6F. | Định dạng số tầng từ `1` đến `9`. |
-| **8** | `1` | **Line (Dây chuyền)** | **Định dạng Hexadecimal**:<br>• `1` $\rightarrow$ `9`: Line 1 đến Line 9.<br>• `A` $\rightarrow$ `F`: Line 10 đến Line 15. | Line #201 đến Line #215 của mọi phân xưởng. |
-| **9 $\rightarrow$ 10** | `EC` | **Machine (Cỗ máy)** | Mã định danh loại máy trên dây chuyền (ví dụ: `EC`, `DB`, `BP`, `PL`...). | Bảng mã máy linh hoạt theo từng chủng loại sản phẩm. |
-| **11 $\rightarrow$ 12** | `01` | **Unit (Cụm chức năng)** | Mã cụm cơ cấu chức năng (ví dụ: `01` = Cụm cấp liệu Feeder Unit, `02` = Bonding Head). | Chuẩn hóa theo sơ đồ cơ khí của từng loại máy. |
-| **13 $\rightarrow$ 14** | `01` | **Assembly (Chi tiết cơ cấu)**| Mã cụm cơ cấu lắp ráp cụ thể (ví dụ: `01` = Cụm xilanh trượt, `02` = Cụm gia nhiệt). | Gắn trực tiếp với phụ tùng spare part thay thế. |
+| **1 $\rightarrow$ 2** | `HW` | **Factory (Plant)** | `HW`: Smart Watch Plant 1.<br>Fully parameterized for other plants. | `TV`: Factory TV Display.<br>`AU`: Automotive Display Plant.<br>`MO`: IT Monitor Plant. |
+| **3 $\rightarrow$ 6** | `BMTL` | **System / Line Group** | Technical line subsystem (`BMTL` = Building / Module Tech Line). | `TMTL`: TV Module Tech Line.<br>`AMTL`: Auto Module Line. |
+| **7** | `2` | **Floor** | Equipment installation floor: `2` = Floor 2F, `6` = Floor 6F. | Numeric floor format from `1` to `9`. |
+| **8** | `1` | **Line** | **Hexadecimal Format**:<br>• `1` $\rightarrow$ `9`: Line 1 through Line 9.<br>• `A` $\rightarrow$ `F`: Line 10 through Line 15. | Line #201 to Line #215 across all workshops. |
+| **9 $\rightarrow$ 10** | `EC` | **Machine** | Machine model identifier on line (e.g., `EC`, `DB`, `BP`, `PL`...). | Flexible machine code table mapped per product family. |
+| **11 $\rightarrow$ 12** | `01` | **Unit (Assembly)** | Functional assembly code (e.g., `01` = Feeder Unit, `02` = Bonding Head). | Standardized per mechanical schematic of each equipment model. |
+| **13 $\rightarrow$ 14** | `01` | **Assembly (Mech Detail)**| Specific mechanism assembly detail (e.g., `01` = Slide cylinder mechanism, `02` = Heating block). | Linked directly to replaceable spare parts. |
 
 ---
 
-## 3. Matching Chi Tiết Cơ Cấu & Cơ Chế Khai Báo Sau (Late Declaration Policy)
+## 3. Mechanism Detail Matching & Late Declaration Policy
 
-### 3.1. Nguyên tắc Matching Bắt Buộc Với Chi Tiết Cơ Cấu
-Trong bảo trì và mua sắm phụ tùng công nghiệp, **mỗi phụ tùng mua mới hoặc xuất kho BẮT BUỘC phải được gắn với một Chi Tiết Cơ Cấu (Mechanism Detail / Assembly Slot) cụ thể của cỗ máy**.
-- **Mục đích**:
-  - Xác định chính xác phụ tùng mua về dùng để thay thế cho bộ phận nào khi máy xảy ra hư hại.
-  - Phục vụ phân tích độ tin cậy MTBF (Mean Time Between Failures) của từng cơ cấu cơ khí / điện tử.
-  - Ngăn ngừa tình trạng mua sắm tràn lan không rõ mục đích sử dụng.
+### 3.1. Mandatory Matching with Mechanism Detail
+In industrial spare parts maintenance and procurement, **every spare part newly purchased or issued from warehouse MUST be mapped to a specific Mechanism Detail / Assembly Slot of the machine**.
+- **Objectives**:
+  - Accurately identify which machine component the purchased spare part replaces when an equipment failure occurs.
+  - Enable MTBF (Mean Time Between Failures) reliability analytics for each mechanical/electrical mechanism.
+  - Prevent unchecked, arbitrary procurement without clear usage justification.
 
-### 3.2. Cơ Chế Khai Báo Sau (Late Declaration Workflow)
-Trong điều kiện vận hành sản xuất thực tế, khi máy gặp sự cố cần mua phụ tùng thay thế gấp hoặc setup model mới nhưng cơ cấu đó **chưa kịp khai báo trong cây EBOM**:
-- **Hệ thống KHÔNG CHẶN luồng tạo Requisition / Mua hàng**:
-  - Requestor chọn Tên Máy $\rightarrow$ Tại mục Chi Tiết Cơ Cấu chọn: `[+] Cơ cấu chưa có trong EBOM (Khai báo sau)`.
-  - Requestor nhập ghi chú ngắn mô tả cơ cấu (ví dụ: *"Cơ cấu gạt phôi phụ ca đêm chế thêm"*).
-  - Hệ thống tự động cấp cờ **`EBOM_PENDING_MAPPING = true`**.
-- **Cơ chế Khai Báo Bổ Sung Sau (Post-Procurement EBOM Enrollment)**:
-  - Hệ thống tự động sinh một **Task chờ hoàn thiện EBOM** trong mục `Công Việc Của Tôi` trên giao diện của Requestor và Leader.
-  - Sau khi gửi yêu cầu mua, trong thời hạn SLA (Quy định: 7 ngày làm việc), Kỹ sư và LEC phải mở màn hình EBOM để bổ sung chính thức cơ cấu này vào cây thiết bị.
-  - Khi cơ cấu được thêm vào EBOM, hệ thống tự động giải phóng cờ `EBOM_PENDING_MAPPING` và cập nhật lịch sử mã thiết bị cho đơn hàng.
+### 3.2. Late Declaration Workflow
+In shop-floor manufacturing operations, when unexpected equipment breakdowns require emergency spare part procurement or during new product line setup where the mechanism **has not yet been declared in the EBOM tree**:
+- **The system DOES NOT BLOCK the Requisition / Procurement workflow**:
+  - Requestor selects Machine Name $\rightarrow$ Under Mechanism Detail selects: `[+] Mechanism not in EBOM (Late Declaration)`.
+  - Requestor inputs a brief note describing the mechanism (e.g., *"Auxiliary night-shift scrap ejector mechanism added"*).
+  - The system automatically tags the record with flag **`EBOM_PENDING_MAPPING = true`**.
+- **Post-Procurement EBOM Enrollment**:
+  - The system automatically generates a **Pending EBOM Completion Task** in the `My Tasks` inbox of the Requestor and Leader.
+  - After submitting the purchase request, within the defined SLA grace period (Standard: 7 business days), the Engineer and LEC must open the EBOM interface to officially register this mechanism into the equipment tree.
+  - Once the mechanism is added to EBOM, the system automatically clears the `EBOM_PENDING_MAPPING` flag and synchronizes equipment history for the order.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor REQ as Requestor (Kỹ Sư)
-    participant SYS as Hệ Thống Requisition
-    actor LEC as LEC (Quản Trị EM No)
+    actor REQ as Requestor (Field Engineer)
+    participant SYS as Requisition System
+    actor LEC as LEC (EM No Admin)
     actor MGR as Leader / Audit
 
-    REQ->>SYS: Tạo yêu cầu mua phụ tùng cho Máy DB-01
-    alt Chi tiết cơ cấu ĐÃ CÓ trong EBOM
-        REQ->>SYS: Chọn Cơ cấu: Cụm Trượt Xylanh (Assy 01)
-        SYS-->>REQ: Gán trực tiếp EM No HWBMTL21EC0101
-    else Chi tiết cơ cấu CHƯA CÓ trong EBOM
-        REQ->>SYS: Chọn "Cơ cấu chưa có (Khai báo sau)" + Nhập mô tả
-        SYS-->>SYS: Đánh dấu cờ EBOM_PENDING_MAPPING = true
-        SYS-->>SYS: KHÔNG CHẶN đơn mua! Tiếp tục xử lý tiến độ bình thường
-        SYS->>REQ: Tự động tạo Task: "Khai báo bổ sung EBOM trước 7 ngày"
+    REQ->>SYS: Create spare parts purchase requisition for Machine DB-01
+    alt Mechanism detail ALREADY EXISTS in EBOM
+        REQ->>SYS: Select Mechanism: Slide Cylinder Assembly (Assy 01)
+        SYS-->>REQ: Directly attach EM No HWBMTL21EC0101
+    else Mechanism detail NOT YET in EBOM
+        REQ->>SYS: Select "Mechanism not in EBOM (Late Declaration)" + Enter description
+        SYS-->>SYS: Tag flag EBOM_PENDING_MAPPING = true
+        SYS-->>SYS: DO NOT BLOCK requisition! Continue standard procurement processing
+        SYS->>REQ: Automatically generate Task: "Complete EBOM declaration within 7 days"
     end
-    SYS->>LEC: Chuyển hồ sơ xử lý Interlock & Gom mua
-    Note over REQ,LEC: Sau khi gửi đơn mua (trong vòng 7 ngày)
-    REQ->>SYS: Mở màn hình Kéo - Thả EBOM, khai báo cơ cấu mới
-    LEC->>SYS: Xác nhận đăng ký EM No chuẩn cho cơ cấu mới
-    SYS-->>SYS: Tự động gỡ cờ PENDING & đồng bộ lịch sử đơn mua
+    SYS->>LEC: Route record for Interlock handling & Purchase aggregation
+    Note over REQ,LEC: Post-requisition submission (within 7 business days)
+    REQ->>SYS: Open Drag-and-Drop EBOM mapper, declare new mechanism
+    LEC->>SYS: Confirm and register standardized EM No for new mechanism
+    SYS-->>SYS: Automatically clear PENDING flag & synchronize order history
 ```
 
 ---
 
-## 4. Màn Hình Kéo - Thả EBOM Trực Quan (Drag-and-Drop EBOM Slot Mapper)
+## 4. Visual Drag-and-Drop EBOM Slot Mapper
 
-Để giảm thiểu tối đa độ phức tạp của việc bảo trì cây thiết bị nhiều tầng bậc, hệ thống phát triển giao diện **Drag-and-Drop Visual EBOM Slot Mapper**:
+To minimize the complexity of maintaining multi-tier equipment trees, the system provides a **Drag-and-Drop Visual EBOM Slot Mapper**:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  BÀN THIẾT KẾ CÂY THIẾT BỊ EBOM TRỰC QUAN (DRAG-AND-DROP EBOM SLOT MAPPER)             [💾 Lưu Cấu Hình]  [➕ Thêm Cơ Cấu Mới]    │
+│  VISUAL DRAG-AND-DROP EBOM SLOT MAPPER                                                 [💾 Save Config]   [➕ Add New Mechanism]   │
 ├───────────────────────────────────┬──────────────────────────────────────────────────┬───────────────────────────────────────────┤
-│ 🌳 CÂY THIẾT BỊ (THEO TÊN THÂN THIỆN)│ 🧩 SƠ ĐỒ CƠ CẤU MÁY (SLOT SCHEMATIC CANVAS)       │ 📦 KHO PHỤ TÙNG CHỜ GẮN (SPARE PARTS TRAY)│
+│ 🌳 EQUIPMENT TREE (FRIENDLY NAME) │ 🧩 SLOT SCHEMATIC CANVAS                         │ 📦 SPARE PARTS TRAY (WAITING ASSIGNMENT)  │
 ├───────────────────────────────────┼──────────────────────────────────────────────────┼───────────────────────────────────────────┤
-│ ▼ Factory HW (Smart Watch)        │  MÁY ĐANG CHỌN: DB-01 (Die Bonder #201)          │ [🔍 Tìm kiếm QCode / Tên phụ tùng...]    │
-│   ▼ Line #201 (Smart Watch Line 1)│  Mã EM No Gốc: HWBMTL21EC0000                    │                                           │
-│     ▼ Máy DB-01 (Die Bonder 01)   │ ┌──────────────────────────────────────────────┐ │ ▧ QDAB03583 - Cảm biến quang vuông    │
-│       ├─► 01. Feeder Unit (Cấp liệu)│ │ [ Cơ Cấu 01: Cụm Cấp Liệu Feeder ]           │ │   (Maker: Panasonic / Model: CN-73-C2)  │
-│       │   ├─ Mech 01: Ray trượt phôi│ │   • Slot 01: [ QDAB03583 - Cảm biến quang ]  │ │   [KÉO THẢ VÀO SLOT TRÊN CANVAS ➔]      │
-│       │   └─ Mech 02: Kẹp phôi      │ │   • Slot 02: [ ➕ Thả linh kiện vào đây... ] │ │                                           │
-│       └─► 02. Bonding Head (Đầu gắp)│ └──────────────────────────────────────────────┘ │ ▧ QCAD38190 - Xylanh đôi SMC 16-100B    │
-│           ├─ Mech 01: Xylanh gắp    │ ┌──────────────────────────────────────────────┐ │   (Maker: SMC / Model: MXQ16-100B)      │
-│           └─ Mech 02: Đầu gia nhiệt │ │ [ Cơ Cấu 02: Cụm Đầu Gắp Bonding Head ]      │ │   [KÉO THẢ VÀO SLOT TRÊN CANVAS ➔]      │
-│     ► Máy EC-01 (Cleaner 01)      │ │   • Slot 01: [ QCAD38190 - Xylanh đôi SMC ]    │ │                                           │
-│     ► Máy PL-01 (Polarizer Attach)│ │   • Slot 02: [ QDAD12236 - Board nguồn CPX ]   │ │ ▧ QDAD12236 - Board nguồn CPX V4 Trumpf │
-│   ► Line #202 (Smart Watch Line 2)│ │   • Slot 03: [ ➕ Thả linh kiện vào đây... ] │ │   (Maker: Trumpf / Model: 2912146)       │
+│ ▼ Factory HW (Smart Watch)        │  ACTIVE MACHINE: DB-01 (Die Bonder #201)         │ [🔍 Search QCode / Part Name...]          │
+│   ▼ Line #201 (Smart Watch Line 1)│  Base EM No: HWBMTL21EC0000                      │                                           │
+│     ▼ Machine DB-01 (Die Bonder)  │ ┌──────────────────────────────────────────────┐ │ ▧ QDAB03583 - Square Photoelectric Sensor │
+│       ├─► 01. Feeder Unit         │ │ [ Mechanism 01: Feeder Assembly Unit ]       │ │   (Maker: Panasonic / Model: CN-73-C2)    │
+│       │   ├─ Mech 01: Slide Rail  │ │   • Slot 01: [ QDAB03583 - Photo Sensor ]    │ │   [DRAG & DROP TO CANVAS SLOT ➔]        │
+│       │   └─ Mech 02: Clamping    │ │   • Slot 02: [ ➕ Drop spare part here... ]   │ │                                           │
+│       └─► 02. Bonding Head Unit   │ └──────────────────────────────────────────────┘ │ ▧ QCAD38190 - SMC Dual Rod Cyl 16-100B    │
+│           ├─ Mech 01: Grip Cyl    │ ┌──────────────────────────────────────────────┐ │   (Maker: SMC / Model: MXQ16-100B)        │
+│           └─ Mech 02: Heating Blk │ │ [ Mechanism 02: Bonding Head Assembly Unit ] │ │   [DRAG & DROP TO CANVAS SLOT ➔]        │
+│     ► Machine EC-01 (Cleaner 01)  │ │   • Slot 01: [ QCAD38190 - SMC Dual Cyl ]    │ │                                           │
+│     ► Machine PL-01 (Polarizer)   │ │   • Slot 02: [ QDAD12236 - CPX Power Board ] │ │ ▧ QDAD12236 - Trumpf CPX Power Board V4 │
+│   ► Line #202 (Smart Watch Line 2)│ │   • Slot 03: [ ➕ Drop spare part here... ]   │ │   (Maker: Trumpf / Model: 2912146)         │
 └───────────────────────────────────┴──────────────────────────────────────────────────┴───────────────────────────────────────────┘
 ```
 
-### Các tính năng trực quan vượt trội:
-1.  **Kéo - Thả Phụ Tùng Vào Cơ Cấu**: Kỹ sư hoặc LEC chỉ cần nắm kéo thẻ phụ tùng từ Khay linh kiện bên phải thả trực tiếp vào ô Slot của Cơ cấu ở giữa.
-2.  **Tự động cập nhật quan hệ BOM**: Khi thả linh kiện vào Slot, hệ thống tự động lưu cặp quan hệ `(em_no, q_code, mechanism_id, std_qty)`.
-3.  **Hỗ trợ Tạo Nhanh Cơ Cấu Chưa Có**: Bấm nút `[➕ Thêm Cơ Cấu Mới]` ngay trên giao diện để bổ sung chi tiết cơ cấu phát sinh ngoài hiện trường mà không cần reload trang.
+### Key Visual Capabilities:
+1.  **Drag-and-Drop Parts into Mechanisms**: Engineers or LECs simply drag spare part cards from the Spare Parts Tray on the right and drop them directly into Mechanism Slots in the center canvas.
+2.  **Automatic BOM Relationship Persistence**: Upon dropping a part into a slot, the system automatically stores the tuple relationship `(em_no, q_code, mechanism_id, std_qty)`.
+3.  **Quick Creation of Missing Mechanisms**: Click `[➕ Add New Mechanism]` directly on the workspace to register newly emerging shop-floor mechanism slots without reloading the page.
 
 ---
 
-## 5. Khả Năng Mở Rộng & Áp Dụng Dễ Dàng Cho Team Khác / Nhà Máy Khác (Multi-Plant Scalability)
+## 5. Multi-Plant Scalability & Easy Rollout to Other Teams / Plants
 
-Toàn bộ kiến trúc dữ liệu của module Cây Thiết Bị EBOM được thiết kế hướng **Tham Số Hóa Toàn Diện (Parametric Multi-Tenant Architecture)**, cho phép áp dụng ngay lập tức cho các Team khác hoặc Nhà máy khác trong tập đoàn (Factory TV, Automotive Display, IT Monitor...):
+The data architecture of the EBOM Equipment Tree module is engineered around a **Parametric Multi-Tenant Architecture**, enabling immediate adoption across other Teams or Plants in the enterprise (Factory TV, Automotive Display, IT Monitor...):
 
 ```json
 {
   "plant_configuration": {
     "factory_code": "TV",
-    "factory_name": "Nhà Máy Module TV Siêu Lớn (TV Module Plant)",
+    "factory_name": "TV Large-Size Display Module Plant",
     "line_prefix": "TMTL",
     "floor_options": ["1F", "2F", "3F"],
     "em_no_pattern": "^TV[A-Z]{4}[1-9][0-9A-F][A-Z0-9]{6}$",
@@ -165,8 +165,7 @@ Toàn bộ kiến trúc dữ liệu của module Cây Thiết Bị EBOM được
 }
 ```
 
-- **Khi chuyển sang Nhà máy TV hoặc Auto Display**:
-  - Không cần sửa một dòng mã nguồn nào.
-  - Quản trị viên Admin chỉ cần tạo một Plant Profile mới trên cổng cài đặt.
-  - Hệ thống tự động kích hoạt bộ giải mã EM No, danh mục máy, sơ đồ slot cơ cấu tương ứng cho phân xưởng mới.
-
+- **When rolling out to TV Plant or Automotive Display**:
+  - Zero application source code modifications required.
+  - System Administrators simply provision a new Plant Profile via the Admin Console.
+  - The system automatically initializes the corresponding EM No decoder, equipment catalog, and mechanism slot schemas for the new manufacturing facility.

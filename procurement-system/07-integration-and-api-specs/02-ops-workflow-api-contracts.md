@@ -1,50 +1,50 @@
-# 02. Hợp Đồng API REST v1 & Schemas Kỹ Thuật
-> *Đặc tả hợp đồng API REST v1 cho Hệ thống Mua sắm & Tối ưu Tồn kho Factory HW*  
-> *Hỗ trợ luồng thẩm định đầu tháng, kiểm soát tiến độ nhập hàng thủ công (Vendor confirm, ETA, phân bổ chi phí), luồng phản hồi 3 bên, và cờ agingInterlock tồn kho khác Team.*
+# 02. REST API v1 Contracts & Technical Schemas
+> *REST API v1 Contract Specification for the Factory HW Spare Parts Procurement & Inventory Optimization System*  
+> *Supports beginning-of-month audit workflow, manual inbound progress tracking (Vendor confirm, ETA, monthly expense allocation plan), 3-party clarification loop, and cross-team agingInterlock inventory flags.*
 
 ---
 
-## 1. Cấu Trúc Các Endpoint Mới (REST API v1 Contract)
+## 1. Endpoint Structure (REST API v1 Contract)
 
-Tất cả các endpoint phục vụ giao diện người dùng được cung cấp bởi `ops-workflow` (FastAPI cổng `8000`):
+All endpoints serving the user interface are hosted by `ops-workflow` (FastAPI on port `8000`):
 
 ```
-POST /api/v1/master/batch-qcode-onboard              # Nhập hàng loạt data kỹ thuật QCode từ folder/bảng & mã tạm
-POST /api/v1/master/media/bulk-upload               # Tải lên hàng loạt hình ảnh & auto-matching
-GET  /api/v1/ebom/tree                              # Lấy cây Machine > Unit > Line (Tên thân thiện)
-POST /api/v1/procurement/requisitions               # Tạo yêu cầu mua (Bắt buộc QCode cho thẩm định)
-GET  /api/v1/procurement/team-requisitions          # Leader & Kỹ sư xem tiến độ mua nội bộ team
-POST /api/v1/procurement/requisitions/{id}/shipping-progress # LEC nhập thủ công: Vendor confirm, ETA, Phân bổ chi phí
-POST /api/v1/procurement/requisitions/{id}/purchase # LEC cập nhật tiến độ báo giá RFQ với Purchase
-POST /api/v1/procurement/interlocks/resolve-batch   # Đánh giá Interlock Y/N & CheckDisuse
-GET  /api/v1/inventory/cross-team-alerts            # Danh sách cờ agingInterlockFlag tồn kho Team khác & persistent tasks
-POST /api/v1/monthly-cycles/deadlines               # LEC cấu hình hạn Deadline giải trình & chốt thẩm định
-POST /api/v1/monthly-cycles/{cycle_id}/close        # LEC chốt hồ sơ thẩm định ĐẦU THÁNG (Có QCode)
-GET  /api/v1/monthly-cycles/{cycle_id}/audit-package# Xuất file báo cáo thẩm định đầu tháng
-POST /api/v1/monthly-cycles/{cycle_id}/inquiries    # Reviewer Cost Management gửi yêu cầu làm rõ cho LEC
-POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/assign  # LEC điều phối câu hỏi cho Kỹ sư
-POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/respond # Kỹ sư nộp bằng chứng phản hồi cho LEC/Reviewer
-POST /api/v1/monthly-cycles/{cycle_id}/confirm-scan # LEC tải file scan biên bản duyệt giấy sau thẩm định
-GET  /api/v1/settings/calculation-rules             # Lấy cấu hình công thức cho 5 loại nhu cầu
-PUT  /api/v1/settings/calculation-rules             # Cập nhật công thức tính số lượng mua
-GET  /api/v1/settings/plant-line-hierarchy          # Lấy cấu hình nhà xưởng, tòa, tầng, line (Left(Line,1)=Floor)
-PUT  /api/v1/settings/plant-line-hierarchy          # Cập nhật cấu hình nhà xưởng & quy tắc line
-GET  /api/v1/settings/organization-rbac             # Lấy cây tổ chức 3 cấp (Team => Part => Peers)
-PUT  /api/v1/settings/organization-rbac             # Cập nhật phân quyền & chỉ định LEC
-GET  /api/v1/settings/sg-budget-parameters          # Lấy tham số ngân sách SG No-Rollover & deadlines
-PUT  /api/v1/settings/sg-budget-parameters          # Cập nhật hạn mức ngân sách SG tháng thủ công
-GET  /api/v1/settings/ems-gateway-config            # Lấy tham số kết nối Nexacro Gateway
-PUT  /api/v1/settings/ems-gateway-config            # Cập nhật tham số kết nối & Rate limiting
-POST /api/v1/settings/ems-gateway/test-ping         # Kiểm thử kết nối ping tức thì sang EMS
-GET  /api/v1/settings/dictionaries                  # Lấy danh mục 6 mã Over (OVR-01..06) & quy tắc mã tạm
-PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục chuẩn hóa
+POST /api/v1/master/batch-qcode-onboard              # Bulk onboarding of QCode technical data from folder/spreadsheet & temp codes
+POST /api/v1/master/media/bulk-upload               # Bulk image upload & auto-matching
+GET  /api/v1/ebom/tree                              # Retrieve Machine > Unit > Line tree (Friendly machine names)
+POST /api/v1/procurement/requisitions               # Create purchase requisition (Official QCode mandatory for audit)
+GET  /api/v1/procurement/team-requisitions          # Leaders & Engineers view internal team procurement progress
+POST /api/v1/procurement/requisitions/{id}/shipping-progress # LEC manual entry: Vendor confirm, ETA, Monthly expense allocation
+POST /api/v1/procurement/requisitions/{id}/purchase # LEC updates RFQ quotation progress with Purchase
+POST /api/v1/procurement/interlocks/resolve-batch   # Evaluate Interlock Y/N flags & CheckDisuse
+GET  /api/v1/inventory/cross-team-alerts            # List cross-team agingInterlockFlag alerts & persistent tasks
+POST /api/v1/monthly-cycles/deadlines               # LEC configures justification deadlines & audit closing cutoff
+POST /api/v1/monthly-cycles/{cycle_id}/close        # LEC locks BEGINNING-OF-MONTH audit dossier (Items with QCode only)
+GET  /api/v1/monthly-cycles/{cycle_id}/audit-package# Export beginning-of-month audit report dossier
+POST /api/v1/monthly-cycles/{cycle_id}/inquiries    # Cost Management Reviewer submits clarification request to LEC
+POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/assign  # LEC routes clarification query to responsible Engineer
+POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/respond # Engineer submits clarification evidence to LEC/Reviewer
+POST /api/v1/monthly-cycles/{cycle_id}/confirm-scan # LEC uploads scanned signed minutes post-audit
+GET  /api/v1/settings/calculation-rules             # Retrieve calculation formula configuration across 5 demand types
+PUT  /api/v1/settings/calculation-rules             # Update purchase quantity calculation formulas
+GET  /api/v1/settings/plant-line-hierarchy          # Retrieve plant, building, floor, line hierarchy (Left(Line,1)=Floor)
+PUT  /api/v1/settings/plant-line-hierarchy          # Update plant layout & line mapping rules
+GET  /api/v1/settings/organization-rbac             # Retrieve 3-tier organizational hierarchy (Team => Part => Peers)
+PUT  /api/v1/settings/organization-rbac             # Update RBAC permissions & assign LEC
+GET  /api/v1/settings/sg-budget-parameters          # Retrieve SG budget parameters (Strict No-Rollover) & deadlines
+PUT  /api/v1/settings/sg-budget-parameters          # Update monthly SG budget ceiling manually
+GET  /api/v1/settings/ems-gateway-config            # Retrieve Nexacro Gateway connection parameters
+PUT  /api/v1/settings/ems-gateway-config            # Update connection parameters & Rate limiting
+POST /api/v1/settings/ems-gateway/test-ping         # Instant ping test to EMS gateway
+GET  /api/v1/settings/dictionaries                  # Retrieve 6 Over cause codes (OVR-01..06) & temporary code formats
+PUT  /api/v1/settings/dictionaries                  # Update standardized dictionary taxonomies
 ```
 
 ---
 
-## 2. Chi Tiết Schemas Payload Tiêu Biểu
+## 2. Representative Payload Schemas
 
-### 2.1. Đăng Ký Hàng Loạt Dữ Liệu QCode Từ Folder/Bảng (`POST /api/v1/master/batch-qcode-onboard`)
+### 2.1. Bulk QCode Data Onboarding from Folder/Spreadsheet (`POST /api/v1/master/batch-qcode-onboard`)
 ```json
 {
   "operator_id": "658359",
@@ -53,7 +53,7 @@ PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục ch
     {
       "temp_code": "TMP-HW-0101",
       "official_qcode": null,
-      "item_name": "Board Nguồn CPX V4 Trumpf Controls",
+      "item_name": "Trumpf Controls CPX V4 Power Board",
       "maker": "TRUMPF",
       "model": "2912146",
       "buy_item_type": "SPR",
@@ -72,7 +72,7 @@ PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục ch
 }
 ```
 
-### 2.2. Nhập Tiến Độ Nhập Hàng Thủ Công (`POST /api/v1/procurement/requisitions/{id}/shipping-progress`)
+### 2.2. Manual Inbound Progress Milestone Entry (`POST /api/v1/procurement/requisitions/{id}/shipping-progress`)
 ```json
 {
   "operator_id": "658359",
@@ -83,13 +83,13 @@ PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục ch
       "month": "2026-11",
       "allocated_qty": 1,
       "allocated_amount_usd": 3150.00,
-      "notes": "Lắp thay thế ngay cho máy DB-01"
+      "notes": "Immediate replacement installation for DB-01 machine"
     }
   ]
 }
 ```
 
-### 2.3. Cầu Nối Phản Hồi 3 Bên: Reviewer Tạo Yêu Cầu Làm Rõ (`POST /api/v1/monthly-cycles/{cycle_id}/inquiries`)
+### 2.3. 3-Party Clarification Bridge: Reviewer Creates Clarification Request (`POST /api/v1/monthly-cycles/{cycle_id}/inquiries`)
 ```json
 {
   "reviewer_id": "89012",
@@ -97,25 +97,25 @@ PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục ch
   "requisition_id": "REQ-2611-0012",
   "qcode": "QDAD12236",
   "inquiry_type": "OVER_EXPLANATION",
-  "question": "Mã này báo OVR-01 sự cố máy, yêu cầu cung cấp báo cáo kỹ thuật xác nhận không thể sửa chữa bo mạch cũ và biên bản sự cố ca đêm."
+  "question": "This item was tagged OVR-01 machine breakdown; submit technical report confirming old board is unrepairable along with night shift incident log."
 }
 ```
 
-### 2.4. Kỹ Sư / LEC Phản Hồi Làm Rõ Cho Reviewer (`POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/respond`)
+### 2.4. Engineer / LEC Responds to Reviewer Query (`POST /api/v1/monthly-cycles/{cycle_id}/inquiries/{id}/respond`)
 ```json
 {
   "respondent_id": "87021",
   "respondent_role": "REQUESTOR",
   "lec_reviewer_id": "658359",
-  "answer": "Đã đính kèm biên bản sự cố chập nổ tụ C14 và email hãng TRUMPF từ chối sửa chữa bo mạch nhiều lớp.",
+  "answer": "Attached failure report for shorted capacitor C14 and official TRUMPF email declining multilayer PCB repair.",
   "attachments": [
-    "/uploads/inquiries/BB_su_co_2489.pdf",
+    "/uploads/inquiries/Incident_Report_2489.pdf",
     "/uploads/inquiries/Email_Trumpf_Reject_Repair.pdf"
   ]
 }
 ```
 
-### 2.5. Tạo Đơn Mua Với Cảnh Báo Tồn Kho Khác Team (`POST /api/v1/procurement/requisitions`)
+### 2.5. Create Purchase Requisition with Cross-Team Aging Stock Alert (`POST /api/v1/procurement/requisitions`)
 ```json
 {
   "requestor_id": "87021",
@@ -139,7 +139,7 @@ PUT  /api/v1/settings/dictionaries                  # Cập nhật danh mục ch
 }
 ```
 
-### 2.6. Cấu Hình Tham Số Kết Nối EMS Gateway (`PUT /api/v1/settings/ems-gateway-config`)
+### 2.6. EMS Gateway Connection Parameters Configuration (`PUT /api/v1/settings/ems-gateway-config`)
 ```json
 {
   "updated_by": "admin",

@@ -1,55 +1,55 @@
-# 02. Sơ Đồ Quy Trình: Giao Dịch Liên Pháp Nhân (Chuyển Giao Tồn Kho & Mua Giá Thấp Nhất)
-> *Chuẩn Hóa 2 Nhánh Giao Dịch Liên Pháp Nhân, Cơ Chế Chờ Xác Nhận Y/N, Điều Kiện Bắt Buộc Có QCode & Kích Hoạt Sau Thẩm Định Đầu Tháng*
+# 02. Process Workflow: Inter-Entity Transactions (Inventory Transfer & Lowest-Cost Proxy Purchase)
+> *Standardizing 2 Inter-Entity Transaction Branches, Y/N Confirmation Mechanism, Mandatory Official QCode Prerequisite & Execution Post Beginning-of-Month Audit*
 
 ---
 
-## 1. Lưu Đồ Chi Tiết 2 Nhánh Giao Dịch Liên Pháp Nhân
+## 1. Detailed Flowchart: 2 Inter-Entity Transaction Branches
 
 ```mermaid
 flowchart TD
-    Start["Hạng mục cần xử lý Liên Pháp Nhân\n(Sau khi kiểm tra Interlock stopPoFlag == 'Y')"] --> HasQCode{"Đã Có Mã QCode Chính Thức?"}
+    Start["Item Requiring Inter-Entity Handling\n(Triggered when Interlock check stopPoFlag == 'Y')"] --> HasQCode{"Official QCode Exists?"}
     
-    HasQCode -->|"Chưa có (Mã tạm TMP)"| HoldData["Chuẩn bị dữ liệu CAD/Doc/ảnh\nLEC đăng ký QCode ERP trước"]
+    HasQCode -->|"Missing (Temporary TMP Code)"| HoldData["Data Preparation: CAD/Doc/Images\nLEC registers ERP QCode first"]
     HoldData --> HasQCode
     
-    HasQCode -->|"Đã có QCode chuẩn"| SelectRoute{"Lựa chọn Phương Án Giao Dịch"}
+    HasQCode -->|"Standard QCode Verified"| SelectRoute{"Select Transaction Route"}
     
-    SelectRoute -->|"Phương Án 1: Chuyển Giao Tồn Kho"| TransferRoute["Yêu cầu Transfer Tồn Kho Nhàn Rỗi\n(LGD HQ, Nanjing, Guangzhou...)"]
-    SelectRoute -->|"Phương Án 2: Mua Với Giá Thấp Nhất"| BuyCheapRoute["Ủy thác Pháp Nhân Bạn Mua Hộ\n(Hợp đồng khung giá thấp nhất)"]
+    SelectRoute -->|"Route 1: Inventory Transfer"| TransferRoute["Request Idle Inventory Transfer\n(LGD HQ, Nanjing, Guangzhou...)"]
+    SelectRoute -->|"Route 2: Lowest-Cost Proxy Purchase"| BuyCheapRoute["Delegate Sister Entity to Purchase\n(Framework contract with lowest price)"]
     
-    TransferRoute --> SendReq1["Gửi Request qua API retPartsTransferReqList"]
-    BuyCheapRoute --> SendReq2["Gửi Request qua API retOtherSitePoRevReqList\n(Nếu bị khóa: xử lý tương tự Transfer)"]
+    TransferRoute --> SendReq1["Send Request via API retPartsTransferReqList"]
+    BuyCheapRoute --> SendReq2["Send Request via API retOtherSitePoRevReqList\n(If locked: handled identically to Transfer)"]
     
-    SendReq1 --> StatusWait["Chuyển trạng thái:\n⏳ PENDING_OTHER_ENTITY_CONFIRMATION\n(Đồng hồ đếm SLA: 48h làm việc)"]
+    SendReq1 --> StatusWait["Transition status:\n⏳ PENDING_OTHER_ENTITY_CONFIRMATION\n(SLA Countdown Timer: 48 business hours)"]
     SendReq2 --> StatusWait
     
-    StatusWait --> WaitConfirm{"Pháp nhân bạn phản hồi (Y/N)?"}
+    StatusWait --> WaitConfirm{"Peer Entity Response (Y/N)?"}
     
-    WaitConfirm -->|"1. Xác nhận thành công ('Y')"| PassHold["Hạng mục được đưa vào Danh Sách Chờ Thẩm Định\n(Họp Thẩm Định Đầu Tháng với Cost Management)"]
+    WaitConfirm -->|"1. Confirmed successfully ('Y')"| PassHold["Item queued into Audit Pending List\n(Beginning-of-Month Audit Meeting with Cost Management)"]
     
-    WaitConfirm -->|"2. Không giao được / vướng thủ tục ('N')"| StepNext["CHUYỂN TIẾP SANG BƯỚC INTERLOCK TIẾP THEO\n(Kiểm tra CheckDisuse ➔ Kiểm tra Sửa chữa SPR)"]
+    WaitConfirm -->|"2. Unavailable / Procedural obstacle ('N')"| StepNext["ADVANCE TO NEXT INTERLOCK STEP\n(Check Disuse Parts ➔ Check SPR Repair)"]
     
-    WaitConfirm -->|"3. Quá hạn SLA 48h"| Timeout["Cảnh báo quá hạn\nLEC ghi chú lý do và mở khóa chuyển bước"]
+    WaitConfirm -->|"3. SLA 48h Expired"| Timeout["SLA Breach Warning\nLEC logs justification and unlocks step progression"]
     
-    PassHold --> AuditEarlyMonth{"Phiên Thẩm Định Đầu Tháng Thông Qua?"}
+    PassHold --> AuditEarlyMonth{"Passed Beginning-of-Month Audit?"}
     
-    AuditEarlyMonth -->|"Được Thẩm Định Thông Qua"| ExecAction["LEC TẠO ĐƠN PRV TRÊN EMS ĐỂ KÝ DUYỆT CHÍNH THỨC\n(EMS phê duyệt xong mới phát hành đơn/vận chuyển)"]
-    AuditEarlyMonth -->|"Bác Bỏ / Hoãn"| CancelAction["Hủy hoặc điều chỉnh kế hoạch kỳ sau"]
+    AuditEarlyMonth -->|"Approved in Audit"| ExecAction["LEC CREATES PRV ON EMS FOR FORMAL APPROVAL SIGN-OFF\n(Dispatched/transported only after EMS approval)"]
+    AuditEarlyMonth -->|"Rejected / Deferred"| CancelAction["Cancelled or rescheduled for subsequent cycle"]
 ```
 
 ---
 
-## 2. Đặc Tả Nghiệp Vụ & Ràng Buộc Tuần Tự
+## 2. Business Specifications & Sequential Constraints
 
-### 2.1. Phân Biệt Rõ Ràng Hai Nhánh
-1.  **Chuyển Giao Tồn Kho (Inventory Transfer)**:
-    - Áp dụng khi phụ tùng đang nằm sẵn trong kho của pháp nhân bạn dưới dạng tồn kho an toàn vượt mức hoặc phụ tùng nhàn rỗi.
-    - Tiết kiệm 100% chi phí mua mới từ nhà cung cấp bên ngoài.
-2.  **Mua Với Giá Thấp Nhất Từ Pháp Nhân Khác (Lowest-Cost Proxy Purchase)**:
-    - Áp dụng khi nhà cung cấp ngoài bán cùng một linh kiện cho LGD Hàn Quốc hoặc Trung Quốc với đơn giá rẻ hơn so với báo giá cho LGD Việt Nam.
-    - Nếu kênh mua qua pháp nhân bạn cũng bị khóa hệ thống: Quy trình xử lý tương tự lệnh Transfer (gửi yêu cầu đối tác xác nhận, chờ phản hồi trong vòng 48h).
+### 2.1. Clear Distinction Between the Two Branches
+1.  **Inventory Transfer**:
+    - Applied when spare parts are already available in a peer entity's warehouse as excess safety stock or idle inventory.
+    - Saves 100% of the cost of purchasing new parts from external suppliers.
+2.  **Lowest-Cost Proxy Purchase from Peer Entity**:
+    - Applied when an external supplier provides the identical component to LGD Korea or China at a lower unit contract price than quoted for LGD Vietnam.
+    - If the purchase channel via the peer entity is also system-locked: Process identically to a Transfer order (dispatch request for partner confirmation, await response within 48 hours).
 
-### 2.2. Điều Kiện Kích Hoạt Bắt Buộc: Sau Khi Thẩm Định Đầu Tháng
-> ⚠️ **RÀNG BUỘC PHÊ DUYỆT & PHÁP LÝ**:  
-> Dù pháp nhân bạn đã phản hồi đồng ý chuyển giao hoặc mua hộ (`status == 'CONFIRMED'`), **tuyệt đối không được phát hành lệnh xuất kho hay ký đơn trước phiên Thẩm Định Đầu Tháng với Bộ Phận Quản Lý Chi Phí (Cost Management - Reviewer & Assistant là 1 người)**.  
-> Sau khi thẩm định offline thông qua, LEC mới tiến hành tạo PRV trên EMS để các cấp lãnh đạo ký duyệt chính thức. Mọi giao dịch chỉ có hiệu lực khi EMS hoàn tất phê duyệt.
+### 2.2. Mandatory Trigger Condition: After Beginning-of-Month Audit
+> ⚠️ **APPROVAL & LEGAL CONSTRAINT**:  
+> Even if the peer entity confirms agreement to transfer or purchase on our behalf (`status == 'CONFIRMED'`), **strictly no warehouse issuance orders or purchase orders may be issued prior to the Beginning-of-Month Audit review with the Cost Management department (Reviewer & Assistant is 1 single person)**.  
+> Only after passing the offline audit will the LEC proceed to create a PRV on EMS for official management approval sign-off. Any transaction takes legal and financial effect only when EMS approval is fully completed.
