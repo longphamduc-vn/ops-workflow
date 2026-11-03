@@ -47,12 +47,19 @@ Tập Đoàn / Công Ty (Nhiều Pháp Nhân & Nhiều Nhà Máy)
 
 ---
 
-## 2. Vị Trí & Vai Trò Của LEC Trong Team
+## 2. Vị Trí & Vai Trò Của Nhóm LEC Trong Team (Hỗ Trợ Nhiều Nhân Sự LEC)
 
-- **LEC là 1 người hoặc 1 nhóm người trong Team**:
+- **Team có thể tạo và phân quyền cho Nhiều LEC (Multi-LEC)**:
   - LEC không phải là một phòng ban xa lạ bên ngoài, mà trực thuộc ngay trong Team (ví dụ: `PO Module Technology Team 2`).
-  - Là đầu mối chuyên trách am hiểu sâu về kỹ thuật phụ tùng của các `Part` và `Process`.
-  - Phụ trách gom nhu cầu từ các `Engineer Process`, chuẩn hóa thông số, cấp mã tạm `TMP-HW-xxxx`, làm việc với bộ phận `Purchase`, điều phối Interlock và tổng hợp kỳ mua sắm trình `Team Management`.
+  - Hệ thống cho phép cấu hình **nhiều nhân sự LEC cùng phụ trách trong Team** (ví dụ: Pham Duc Long - User ID: 658359 cùng các đồng sự LEC khác).
+  - Phân công linh hoạt: Có thể phân chia theo Part (LEC phụ trách CP/SG Part 1, LEC phụ trách CP/SG Part 2), theo công đoạn (POL, TAB, DIP, LT, DB, BD), hoặc cùng chia sẻ danh sách xử lý chung để san sẻ khối lượng công việc, không phụ thuộc vào một cá nhân duy nhất.
+- **Trách nhiệm cốt lõi của nhóm LEC**:
+  - Gom và kiểm tra các hạng mục đăng ký từ các `Engineer Process` trong Team.
+  - Chuẩn hóa thông số kỹ thuật, quản lý dải mã tạm `TMP-HW-xxxx`.
+  - Phối hợp với bộ phận `Purchase` đàm phán giá.
+  - Điều phối quy trình Interlock tuần tự (Transfer, Mua qua pháp nhân khác, Mở khóa mua thường).
+  - Xuất báo cáo giải trình tồn kho và kiểm thảo định kỳ hàng tháng ra **file Excel form cố định** để họp thẩm định với Team Management.
+  - Thao tác tạo đơn trên hệ thống EMS, sau đó quay lại nhập mã PRV/PO để hệ thống đồng bộ trạng thái.
 
 ---
 
@@ -71,11 +78,36 @@ $$\mathbf{Process\ (C\hat{o}ng\ \text{đ}o\text{ạ}n)} \longrightarrow \mathbf{
 
 ---
 
-## 4. Bản Chất Giao Dịch Liên Pháp Nhân (Inter-Entity vs Intra-Plant)
+## 4. Bản Chất Hai Nhánh Giao Dịch Liên Pháp Nhân (Inter-Entity Transactions)
 
-Hệ thống phân biệt rõ ràng 2 phạm vi điều chuyển:
-1.  **Nội bộ nhà máy Factory HW (Intra-Plant / Same Entity)**: Điều chuyển phụ tùng giữa các kho H1, H2, H3 trong cùng Factory HW.
+Hệ thống phân biệt rõ ràng các phạm vi giao dịch:
+1.  **Nội bộ nhà máy (Intra-Plant / Same Entity)**: Điều chuyển phụ tùng giữa các kho H1, H2, H3 trong cùng một nhà máy.
 2.  **Liên pháp nhân (Different Legal Entities)**:
-    *   Các giao dịch qua API `/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn` và `retOtherSitePoRevReqList.lgdn` là với **các pháp nhân độc lập** (ví dụ: LGD Hàn Quốc, LGD Trung Quốc, hoặc các công ty con liên kết).
-    *   **Nguyên tắc vận hành**: **Pháp nhân không có quyền từ chối chuyển giao đơn phương**, mà phiếu yêu cầu sẽ ở trạng thái **Chờ pháp nhân khác xác nhận (Pending External Entity Confirmation)**.
-    *   Chỉ khi có phản hồi chính thức từ pháp nhân đó (do vướng kiểm kê thực tế thiếu hụt hoặc thủ tục hải quan xuất nhập khẩu giữa 2 quốc gia), hệ thống mới ghi nhận kết quả chuyển bước.
+    *   Các giao dịch qua API `/emsspareparts/sp40/sp401Nav/retPartsTransferReqList.lgdn` và `retOtherSitePoRevReqList.lgdn` là với **các pháp nhân độc lập trong tập đoàn** (LGD Hàn Quốc, LGD Nam Kinh, LGD Quảng Châu...).
+    *   Gồm 2 phương thức rõ ràng:
+        - **Phương án 1: Chuyển giao tồn kho (Inventory Transfer)**: Lấy linh kiện tồn kho nhàn rỗi từ pháp nhân bạn chuyển về xưởng.
+        - **Phương án 2: Mua với giá thấp nhất từ pháp nhân khác**: Pháp nhân bạn có hợp đồng giá rẻ hơn $\rightarrow$ mua ủy thác qua pháp nhân đó.
+    *   **Nguyên tắc vận hành**: Nếu bị khóa: chuyển trạng thái **Chờ pháp nhân khác xác nhận (Pending External Entity Confirmation)** với SLA 48h. Cả 2 phương án đều **BẮT BUỘC DIỄN RA SAU KHI THẨM ĐỊNH NGÀY 25 PHÊ DUYỆT**.
+
+---
+
+## 5. Kiến Trúc Cấu Hình Đa Nhà Máy / Đa Phân Hệ (Multi-Plant / Multi-Team Scalability)
+
+Toàn bộ hệ thống được thiết kế theo mô hình **Tham Số Hóa Master Data (Parametric Hierarchy Model)**, cho phép **áp dụng tức thì cho các Team khác hoặc Nhà máy khác** trong tập đoàn (Factory TV, Automotive Display, IT Monitor...) mà không cần lập trình lại:
+
+```mermaid
+flowchart TD
+    Config["Cấu Hình Master Data Nhà Máy Mới (Admin Console)"] --> PlantSelector{"Chọn Nhà Máy / Phân Xưởng"}
+    
+    PlantSelector --> FactoryHW["🏭 Factory HW (Smart Watch - SW)\n• Line: #201..#210 (2F, 6F)\n• Cost Center: 87321\n• EM No: HWBMTL21EC0101"]
+    PlantSelector --> FactoryTV["📺 Factory TV (TV Display Module)\n• Line: #101..#108 (1F, 3F)\n• Cost Center: 87410\n• EM No: TVTMTL11EC0101"]
+    PlantSelector --> FactoryAuto["🚗 Factory AU (Automotive Display)\n• Line: #301..#306 (3F)\n• Cost Center: 87520\n• EM No: AUBMTL31EC0101"]
+```
+
+### Các tham số cấu hình động độc lập theo từng Team / Nhà máy:
+- **`plant_code` & `plant_name`**: Mã và tên nhà máy (`HW`, `TV`, `AU`).
+- **`process_list`**: Danh mục công đoạn đặc thù của nhà máy đó (ví dụ TV có thêm công đoạn `BLU - Backlight Unit`, `OPEN_CELL`).
+- **`budget_profile`**: Hạn mức ngân sách tháng độc lập, mã Cost Center và GL Account riêng.
+- **`lec_roster`**: Danh sách tài khoản Multi-LEC phụ trách phân xưởng đó.
+- **`ebom_schema`**: Quy tắc phân rã cây máy theo chủng loại sản phẩm.
+

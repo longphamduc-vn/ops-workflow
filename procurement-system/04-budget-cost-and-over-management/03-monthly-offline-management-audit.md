@@ -1,47 +1,50 @@
-# 03. Quy Trình Chốt Kỳ Tháng & Thẩm Định Offline Với Team Management
+# 03. Quy Trình Chốt Kỳ Tháng, Giải Trình Tồn Kho & Kiểm Thảo Định Kỳ (Xuất Excel Form Cố Định)
 
-## 1. Cơ Chế Thẩm Định Offline (Offline Management Governance)
+## 1. Cơ Chế Thẩm Định & Kiểm Thảo Hàng Tháng (Monthly Inventory Audit & Governance)
 
-Do **Team Management tạm thời chưa đưa vào hệ thống**, mọi quyết định phê duyệt cấp cao (đặc biệt là duyệt các khoản Over ngoài kế hoạch và duyệt phát hành PO tháng) được vận hành theo cơ chế hồ sơ giấy kết hợp xác thực số:
+Hệ thống phục vụ công tác **Giải trình tồn kho và kiểm thảo định kỳ hàng tháng** với Ban Quản Lý (Team Management). Do Team Management tạm thời chưa đưa vào phần mềm, quy trình được vận hành thực tế và tinh gọn như sau:
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor LEC as LEC (Pham Duc Long - 658359)
+    actor LEC as Nhóm LEC Trong Team
     participant SYS as Hệ Thống Mua Bán Mới
     actor MNG as Team Management (Reviewer)
-    participant EMS as Hệ Thống EMS
+    participant EMS as Hệ Thống EMS Nexacro
 
-    Note over LEC,SYS: Ngày 25 hàng tháng: Khóa kỳ thẩm định nội bộ
-    LEC->>SYS: Bấm "Chốt kỳ mua sắm tháng [YYYY-MM]"
-    SYS-->>SYS: Tự động gom nhóm: Tách riêng danh sách Trong Target vs Over (OVR-01..06)
-    SYS-->>LEC: Xuất "Hồ Sơ Báo Cáo Thẩm Định Offline" (File Excel + PDF chuẩn hóa)
+    Note over LEC,SYS: Ngày 25 hàng tháng: Khóa kỳ kiểm thảo nội bộ
+    LEC->>SYS: Bấm "Chốt kỳ & Xuất Báo Cáo Kiểm Thảo Tháng [YYYY-MM]"
+    SYS-->>LEC: Xuất file Excel theo Form Cố Định Chuẩn Hóa (Giải trình tồn kho, Trong Target vs Over)
     
-    Note over LEC,MNG: Họp Thẩm định Trực tiếp Offline
-    LEC->>MNG: Trình hồ sơ giấy, giải trình các khoản chi ngoài kế hoạch (Over)
-    MNG->>MNG: Rà soát tính cấp thiết, ký phê duyệt trực tiếp trên văn bản
-    MNG-->>LEC: Trao biên bản phê duyệt có đầy đủ chữ ký
+    Note over LEC,MNG: Họp Thẩm định & Kiểm thảo Trực tiếp Offline
+    LEC->>MNG: Trình file Excel in/chiếu, giải trình tồn kho và các khoản chi Over
+    MNG->>MNG: Rà soát tính cấp thiết, ký duyệt trên biên bản họp
+    MNG-->>LEC: Thống nhất danh mục được phép phát hành PO
     
-    Note over LEC,SYS: Cập nhật kết quả vào phần mềm
-    LEC->>SYS: Bấm "Xác Nhận Đã Phê Duyệt Offline" & Tải bản scan biên bản có chữ ký
-    SYS-->>SYS: Khóa toàn bộ dữ liệu kỳ tháng, kích hoạt trạng thái "READY_FOR_EMS_PO"
-    SYS->>EMS: Đóng gói và gọi API save130PrvData.lgdn để phát hành PO chính thức
+    Note over LEC,EMS: Giai Đoạn 1: LEC tạo trên EMS & Cập nhật mã đối soát
+    LEC->>EMS: Thao tác tạo PRV / PO trên giao diện EMS Nexacro
+    LEC->>SYS: Nhập thông tin PRV No / PO No vào hệ thống mới
+    SYS->>EMS: Gọi API tra cứu tự động lấy dữ liệu chi tiết
+    SYS-->>SYS: Cập nhật trạng thái "EMS_PO_SYNCED" và hoàn tất chu kỳ tháng
+
+    Note over SYS,EMS: Giai Đoạn 2 (Sau này mở rộng): Gọi API tự động sinh PRV
 ```
 
 ---
 
-## 2. Cấu Trúc Hồ Sơ Thẩm Định Offline (Offline Audit Package)
+## 2. Cấu Trúc Báo Cáo Excel Form Cố Định (Fixed Standard Excel Template)
 
-File hồ sơ xuất ra từ hệ thống bao gồm 4 phần tiêu chuẩn:
-1.  **Phần 1: Bảng tổng hợp cân đối ngân sách SG tháng ($33\% - 33\% - 34\%$)**:
-    *   Hạn mức phân bổ tháng: \$150,000 USD.
+Báo cáo xuất ra từ hệ thống sử dụng duy nhất một **Mẫu Excel Cố Định (Standard Fixed Template)** gồm 4 Sheet tiêu chuẩn:
+1.  **Sheet 1: Giải Trình Biến Động Tồn Kho & Chi Phí (Inventory & Cost Variance)**:
+    *   Tồn kho đầu kỳ, lượng nhập kho, lượng xuất kho lắp máy trong tháng, tồn kho cuối kỳ.
+    *   Đối soát tồn kho an toàn (Target Stock) vs Tồn kho thực tế On-hand tại kho HW.
+2.  **Sheet 2: Bảng Cân Đối Ngân Sách SG Tháng ($33\% - 33\% - 34\%$)**:
+    *   Hạn mức phân bổ tháng: \$150,000 USD (kèm số dư dồn từ tháng trước nếu có).
     *   Tổng cam kết mua Trong Target: \$125,000 USD.
     *   Tổng phát sinh Mua Ngoài Kế Hoạch (Over): \$28,000 USD.
-    *   Tổng đề xuất duyệt: \$153,000 USD (Vượt trần \$3,000 USD).
-2.  **Phần 2: Bảng giải trình chi tiết các dòng Over ngoài kế hoạch**:
-    *   Bảng kê chi tiết từng phụ tùng Over kèm mã nguyên nhân (**OVR-01 đến OVR-06**), số tiền chênh lệch, mã máy hỏng và số Work Order.
-3.  **Phần 3: Báo cáo hiệu quả xử lý Interlock**:
-    *   Số tiền đã tiết kiệm được nhờ điều chuyển từ pháp nhân khác hoặc sửa chữa phục hồi linh kiện SPR nội bộ thay vì mua mới 100%.
-4.  **Phần 4: Trang ký duyệt pháp lý**:
-    *   Khu vực chữ ký của **Đại diện LEC (Pham Duc Long)** và **Đại diện Ban Quản Lý (Team Management Reviewer)**.
+    *   Tổng đề xuất duyệt: \$153,000 USD.
+3.  **Sheet 3: Danh Mục Chi Tiết Các Hạng Mục Over Ngoài Kế Hoạch**:
+    *   Bảng kê từng chi tiết Over kèm mã nguyên nhân (**OVR-01 đến OVR-06**), mã lệnh máy `Work Order`, đơn giá và người đề xuất.
+4.  **Sheet 4: Báo Cáo Hiệu Quả Xử Lý Interlock (Transfer / Pháp nhân khác)**:
+    *   Tổng hợp các hạng mục đã xử lý điều chuyển liên pháp nhân hoặc mua qua pháp nhân khác thành công, giúp tiết kiệm chi phí mua mới.
 

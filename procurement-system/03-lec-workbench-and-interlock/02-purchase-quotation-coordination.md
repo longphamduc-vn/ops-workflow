@@ -1,52 +1,85 @@
-# 02. Phối Hợp Báo Giá Với Bộ Phận Mua Hàng (Purchase Coordination)
+# 02. Theo Dõi Trạng Thái Báo Giá & Xử Lý Bất Thường Từ Email (RFQ Coordination)
+> *LEC Theo Dõi Trạng Thái Báo Giá, Xử Lý Bất Thường Nhận Qua Mail, Cập Nhật Hệ Thống Để Phản Hồi Requestor & Đề Xuất Phương Án Kỹ Thuật*
 
-## 1. Bản Chất Ranh Giới Nghiệp Vụ Giữa LEC Và Purchase
+---
+
+## 1. Ranh Giới Nghiệp Vụ: LEC Không Làm Giá, Chỉ Theo Dõi & Xử Lý Bất Thường
 
 Trong thực tế sản xuất tại LG Display:
-- **LEC trong Team (1 người hoặc 1 nhóm người, đại diện: Pham Duc Long - 658359)**: Chịu trách nhiệm về **Kỹ thuật & Quản lý Spare Parts trong Team** (Đúng quy cách, đúng máy, mở Interlock, quản lý mã tạm `TMP-HW-xxxx`).
-- **Purchase Dept (Bộ phận Mua Hàng ngoài)**: Chịu trách nhiệm về **Thương mại & Làm giá với Nhà cung cấp ngoài** (Làm việc với ServeOne, SMC, Keyence, Trumpf, đàm phán hợp đồng, chiết khấu số lượng).
-- **Hạn chế của hệ thống EMS cũ**: EMS **hoàn toàn không có dữ liệu** về tiến độ báo giá trung gian của Purchase.
+- **Bộ Phận Mua Hàng Ngoài (Purchase Dept)**: Là đơn vị chuyên trách về thương mại, trực tiếp làm việc với các nhà cung cấp (ServeOne, SMC, Keyence, Trumpf...), chịu trách nhiệm đàm phán hợp đồng, chiết khấu và đơn giá.
+- **LEC trong Team (Multi-LEC)**:
+  - **CHỈ CẦN THEO DÕI TRẠNG THÁI** (Theo dõi trạng thái RFQ - Request Báo Giá).
+  - **XỬ LÝ BẤT THƯỜNG (EXCEPTION HANDLING)**: Khi có thông tin bất thường nhận từ Email của Purchase Dept (ví dụ: nhà cung cấp ngừng sản xuất, lead-time quá dài, giá tăng đột biến, yêu cầu số lượng đặt hàng tối thiểu MOQ quá lớn...), LEC tiếp nhận, nhập thông tin bất thường lên hệ thống để:
+    1. **Phản hồi chính thức cho Requestor (Kỹ Sư Quy Trình)**.
+    2. **Phát hành cảnh báo thông báo hoặc phối hợp đưa ra phương án kỹ thuật thay thế**.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor REQ as Requestor (Kỹ sư)
-    actor LEC as LEC (Pham Duc Long)
+    actor REQ as Requestor (Kỹ sư Process)
+    actor LEC as LEC (Line Equipment Coordinator)
     participant SYS as Hệ Thống Mua Bán Mới
     actor PUR as Chuyên viên Purchase
     actor VEN as Nhà Cung Cấp Ngoài
 
-    REQ->>SYS: Gửi yêu cầu mua (Gắn QCode hoặc TMP-HW-xxxx)
-    LEC->>SYS: Thẩm tra kỹ thuật đạt yêu cầu
-    LEC->>PUR: Gửi phiếu Request Báo Giá (RFQ) qua Email / Kênh nội bộ
-    LEC->>SYS: Cập nhật "Ngày gửi Request Báo Giá" (vd: 2026-11-03)
+    SYS->>PUR: Gửi Request Báo Giá (RFQ)
+    SYS-->>LEC: Cập nhật Trạng thái RFQ: ⏳ CHỜ NHÀ CUNG CẤP CHÀO GIÁ
     
-    Note over PUR,VEN: Giai đoạn đàm phán ngoài (EMS không có thông tin)
-    PUR->>VEN: Gửi bảng yêu cầu chào giá
-    VEN-->>PUR: Phản hồi báo giá sơ bộ
-    PUR->>VEN: Đàm phán giảm giá
-    
-    Note over LEC,PUR: LEC chủ động liên hệ Purchase để nắm tiến độ
-    PUR-->>LEC: Cung cấp tiến độ & đơn giá qua điện thoại / email / họp
-    LEC->>SYS: Cập nhật THỦ CÔNG tiến độ & Đơn giá sơ bộ lên hệ thống
-    SYS-->>REQ: Kỹ sư nhìn thấy tiến độ cập nhật trên màn hình
+    alt Trường hợp 1: Tiến độ bình thường (Normal Flow)
+        PUR->>SYS: Cập nhật đơn giá & ngày dự kiến giao
+        SYS-->>REQ: Kỹ sư theo dõi được giá và tiến độ tự động
+    else Trường hợp 2: Có BẤT THƯỜNG từ Nhà Cung Cấp (Exception via Email)
+        VEN-->>PUR: Báo bất thường qua Mail (Hết hàng / Tăng giá 300% / Ngừng SX / Leadtime 180 ngày)
+        PUR-->>LEC: Chuyển tiếp (Forward) Email cảnh báo cho LEC
+        LEC->>SYS: Mở popup "Xử Lý Bất Thường RFQ", nhập nội dung từ Email
+        SYS-->>SYS: Đổi trạng thái dòng thành ⚠️ BẤT THƯỜNG BÁO GIÁ (RFQ_EXCEPTION)
+        SYS->>REQ: Bắn thông báo cảnh báo & Task phản hồi cho Kỹ sư
+        REQ->>SYS: Kỹ sư xác nhận đổi mã tương đương hoặc chấp nhận giá mới
+        LEC->>SYS: Chốt phương án & phản hồi lại Purchase
+    end
 ```
 
 ---
 
-## 2. Bảng Theo Dõi Tiến Độ Báo Giá Thủ Công Của LEC
+## 2. Giao Diện Theo Dõi Trạng Thái RFQ & Form Tiếp Nhận Bất Thường Từ Email
 
-Trên giao diện hệ thống, LEC được cung cấp các trường nhập liệu để cập nhật thông tin từ Purchase:
+Trên Bàn làm việc của LEC, tab **Theo Dõi Báo Giá (RFQ Tracking)** được tinh gọn:
+- Danh sách hiển thị rõ: Mã phụ tùng, Tên kỹ sư yêu cầu, Tên máy, Trạng thái RFQ, Ngày gửi yêu cầu, Deadline cam kết.
+- Khi nhận được email bất thường từ Purchase, LEC chỉ cần click nút **`[⚠️ Nhập Bất Thường Từ Email]`** trên dòng tương ứng:
 
-| Tên trường dữ liệu | Trách nhiệm nhập | Ý nghĩa theo dõi | Ví dụ giá trị |
-| :--- | :---: | :--- | :--- |
-| `request_rfq_date` | LEC | Ngày LEC chính thức chuyển yêu cầu sang Purchase | `2026-11-03` |
-| `purchase_officer_name` | LEC | Chuyên viên Purchase thụ lý hồ sơ | `Nguyễn Văn Nam (Ext: 3421)` |
-| `purchase_status` | LEC | Trạng thái hiện tại do Purchase báo | `WAITING_VENDOR_QUOTE` (Đang chờ NCC) |
-| `expected_quote_date` | LEC | Hạn cam kết trả giá từ Purchase | `2026-11-08` |
-| `preliminary_unit_price`| LEC | Đơn giá sơ bộ đã đàm phán được | `3,150.00 USD` |
-| `quotation_file_url` | LEC | Đính kèm file PDF báo giá của NCC | `quote_serveone_cpx_v4.pdf` |
-| `lec_purchase_notes` | LEC | Ghi chú cuộc gọi / email trao đổi | *"ServeOne cam kết giao hàng trong 14 ngày nếu chốt PO trước 15/11"* |
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│  FORM TIẾP NHẬN BẤT THƯỜNG TỪ EMAIL BÁO GIÁ (RFQ EXCEPTION LOGGING)                                             [X Đóng]          │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│  Mã Hạng Mục: PR-2611-0089  |  QCode: QDAD12236  |  Linh kiện: Board nguồn CPX V4 Trumpf  |  Requestor: Nguyễn Văn Thắng (DB)    │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│  Loại Bất Thường Nhận Qua Mail: (*)                                                                                              │
+│  (🔘) Hãng đã ngừng sản xuất (Maker EOL / Discontinued)                                                                          │
+│  ( ) Lead-time quá dài bất thường (> 120 ngày, nguy cơ dừng chuyền)                                                             │
+│  ( ) Đơn giá tăng vọt so với lịch sử (> 150%)                                                                                    │
+│  ( ) Yêu cầu MOQ (Số lượng đặt hàng tối thiểu) quá lớn (vd: cần 1 EA nhưng NCC bắt mua 50 EA)                                  │
+│  ( ) Nhà cung cấp từ chối bán cho thị trường Việt Nam (Cần chuyển kênh mua liên pháp nhân)                                      │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│  Nội Dung Trích Dẫn Từ Email Của Purchase: (*)                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ "Kính gửi anh Long (LEC), bên đại diện Trumpf thông báo mã board 2912146 đã ngưng sản xuất từ tháng 08/2026. Hãng đề xuất    │  │
+│  │  chuyển sang phiên bản nâng cấp CPX V5 (Part No: 3019882) với đơn giá 3,450 USD, thời gian giao hàng 3 tuần..."           │  │
+│  └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
+│  Đính kèm Email / Tài liệu báo giá (.eml, .msg, .pdf): [📎 Chon file email đính kèm: FW_Trumpf_EOL_Notice.msg]                   │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│  Đề Xuất Hướng Xử Lý Của LEC Gửi Cho Requestor: (*)                                                                              │
+│  [🔘 Đề nghị Kỹ sư duyệt mã thay thế CPX V5]    [ Đề xuất cải tiến gá lắp khác]    [ Hủy mua & tìm nguồn sửa chữa SPR]         │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                        [↩️ HỦY BỎ]   [📨 PHẢN HỒI CHO REQUESTOR & CẬP NHẬT TIẾN ĐỘ]                               │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
-Việc chuẩn hóa các trường này giúp toàn bộ Kỹ sư và Leader trong team nhìn thấy tiến độ rõ ràng, triệt tiêu tình trạng hỏi đi hỏi lại gây lãng phí thời gian.
+---
+
+## 3. Lợi Ích Của Cơ Chế Báo Giá Tinh Gọn
+
+1.  **Giải phóng LEC khỏi gánh nặng kế toán/mua bán**: LEC không cần tốn thời gian gọi điện mặc cả giá hay nhập thủ công từng con số chi tiết nếu không có bất thường.
+2.  **Thông tin thông suốt, có bằng chứng minh bạch**: Toàn bộ cảnh báo từ Purchase được lưu vết cùng tệp email gốc, Requestor nhìn thấy ngay lý do chậm trễ hoặc lý do phải đổi mã linh kiện mà không cần gọi điện hỏi LEC.
+3.  **Tự động phân luồng xử lý**: Khi LEC chọn loại bất thường là *"Hãng đã ngừng sản xuất"*, hệ thống tự động kích hoạt tính năng **Đổi Trạng Thái EOL** trên Master Data và cảnh báo cho toàn nhà xưởng.
+
 

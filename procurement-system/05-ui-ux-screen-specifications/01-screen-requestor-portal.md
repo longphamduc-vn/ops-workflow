@@ -33,7 +33,10 @@ Màn hình Kỹ sư Requestor được chia thành 4 phân vùng chức năng ch
 │  Hoặc chọn phân cấp thủ công:                                                                                                    │
 │  Factory: [ HW (Smart Watch) ▼ ]  Tầng: [ 2F ▼ ]  Line: [ #201 (Hex: 1) ▼ ]  Machine: [ EC ▼ ]  Unit: [ 01 ▼ ]  Assy: [ 01 ▼ ]   │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 2. CHẾ ĐỘ ĐẶT HÀNG & LỆNH BẢO TRÌ SẢN XUẤT (ORDER TYPE & WORK ORDER)                                                             │
+│ 2. CHẾ ĐỘ ĐẶT HÀNG & PHÂN LOẠI NHU CẦU (ORDER TYPE & DEMAND CATEGORY)                                                             │
+│  Phân Loại Lý Do Nhu Cầu Cơ Sở: [ 3. Thay thế hỏng đột xuất (BREAKDOWN_REPLACE)                                             ▼ ]   │
+│  ↳ Danh sách chọn: Setup máy mới | Cải tiến (Improve) | Thay thế hỏng (Breakdown) | Bảo dưỡng PM | Dự phòng tồn (Safety Stock)   │
+│                                                                                                                                  │
 │  Chế độ đặt hàng:                                                                                                                │
 │    ( ) Bổ sung định kỳ / Bù tồn an toàn (In-Plan Replenishment)                                                                  │
 │    (•) KHẨN CẤP / DÙNG NGAY TRÊN DÂY CHUYỀN (즉사용 - Ready-to-use Emergency)                                                       │
@@ -50,9 +53,11 @@ Màn hình Kỹ sư Requestor được chia thành 4 phân vùng chức năng ch
 │  ┌──────────────────────┬──────────────────────┬──────────────────────┬────────────────────┬──────────────────────────────────┐  │
 │  │  Tồn Kho Khả Dụng HW │  PO Remained Đang Về │  PO Standby Chờ Duyệt│  Target Stock Chuẩn│  Số Lượng Đặt Hàng Tối Thiểu     │  │
 │  │        0 EA          │         1 EA         │         0 EA         │        2 EA        │  MOQ: 1 EA  |  Pack Size: 1 EA   │  │
-│  └──────────────────────┴──────────────────────┴──────────────────────┴────────────────────┴──────────────────────────────────┘  │
+│  │  └──────────────────────┴──────────────────────┴──────────────────────┴────────────────────┴──────────────────────────────────┘  │
 │                                                                                                                                  │
 │  Số Lượng Cần Mua: [ 1 ] EA               Đơn Giá Ước Tính: $3,150.00 USD          Thành Tiền Dự Kiến: $3,150.00 USD             │
+│  Logic Tính Toán Số Lượng Mua (Theo Rule/Quy định):                                                                              │
+│  [ Rule BREAKDOWN: Qty = Actual_Damaged (1 EA máy EC trên Line #201) - Onhand (0 EA) = 1 EA (Khớp MOQ: 1 EA)                   ]│
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 4. ĐÁNH GIÁ KẾ HOẠCH & GIẢI TRÌNH (PLAN EVALUATION & JUSTIFICATION)                                                             │
 │  Hệ Thống Tự Động Phân Loại Kế Hoạch:                                                                                            │
@@ -62,7 +67,7 @@ Màn hình Kỹ sư Requestor được chia thành 4 phân vùng chức năng ch
 │  └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                                                                  │
 │  Mã Nguyên Nhân Over (Bắt buộc): [ OVR-01: Sự cố máy hỏng bất thường (Machine Breakdown)                                  ▼ ]   │
-│  Mô tả sự cố & Lý do: [ Cháy nổ bo mạch công suất do xung sét ca đêm, máy EC trên Line #201 dừng hoạt động hoàn toàn.      ]    │
+│  Lý do mua sắm:       [ Thay thế bo mạch nguồn cấp nhiệt cụm gắp chip bị chập cháy do quá tải điện áp ca đêm.              ]    │
 │  Vấn đề & Hậu quả:    [ Nếu không có board thay trong 48h, toàn bộ dây chuyền Smart Watch D111 bị chậm tiến độ giao hàng.  ]    │
 │  Hiện trạng máy:      [ Máy EC báo lỗi Alarm E-502, cầu chì nguồn F1 bị đứt, cuộn cảm biến nhiệt độ quá ngưỡng an toàn.   ]    │
 │  Hình ảnh hiện trường:[ 🖼️ board_chay_01.jpg (1.8MB) ❌ ] [ 🖼️ error_screen_E502.png (850KB) ❌ ] [ ➕ Kéo thả thêm ảnh... ]      │
