@@ -1,20 +1,21 @@
 # Giao Diện Dành Riêng Cho Vai Trò: System Administrator (Quản Trị Hệ Thống)
 > **Mã Giao Diện: UI-ROLE-05 — System Settings & Administration Console**  
-> *Dành riêng cho: Quản trị viên hệ thống & Chuyên viên cấu hình vận hành nhà máy*
+> *Dành riêng cho: Quản trị viên hệ thống & Chuyên viên cấu hình vận hành nhà máy*  
+> *Nguyên tắc cốt lõi: Không phân chia công đoạn (kỹ sư ngang hàng trong Part), Bỏ qua Cổng thủ kho HW (xuất kho đồng bộ từ EMS), Ngân sách SG No-Rollover nghiêm ngặt, Thời hạn thẩm định do LEC quy định.*
 
 ---
 
 ## 1. Tổng Quan Không Gian Làm Việc Của Quản Trị Viên (Workspace Anatomy)
 
-Giao diện Admin Settings Console là **trung tâm đầu não cấu hình toàn bộ tham số vận hành của hệ thống**. Quản trị viên có toàn quyền kiểm soát logic tính toán, cơ cấu phân cấp nhà xưởng, chính sách ngân sách và tầng tích hợp Gateway mà không cần can thiệp vào mã nguồn backend.
+Giao diện Admin Settings Console là **trung tâm đầu não cấu hình toàn bộ tham số vận hành của hệ thống**. Quản trị viên kiểm soát logic tính toán, cơ cấu phân cấp nhà xưởng, chính sách ngân sách và tầng tích hợp Gateway mà không cần can thiệp vào mã nguồn backend.
 
 Cấu trúc giao diện gồm **6 Tab cấu hình chuyên sâu**:
-1.  **Tab 1: 🧮 Cấu Hình Công Thức & Logic Mua Hàng (Reorder Logic Rules)**: Thiết lập quy tắc tính số lượng mua cho 5 loại nhu cầu cơ sở (`SETUP`, `IMPROVE`, `BREAKDOWN`, `PM`, `SAFETY_STOCK`), định mức tuổi thọ MTBF theo Model Smart Watch (D111, D222, D333) và ngưỡng cảnh báo Over toàn team.
-2.  **Tab 2: 🏭 Cấu Hình Master Data Nhà Xưởng & Dây Chuyền (Plant & Line Topology)**: Cấu hình Factory HW (Smart Watch), Tòa nhà H1, H2, H3, Tầng 2F, 6F, Dây chuyền `#201` ~ `#210`, `#601`, `#604` với quy tắc tự động `Left(Line, 1) = Floor`, cùng 6 công đoạn kỹ thuật: `POL | TAB | DIP | LT | DB | BD`.
-3.  **Tab 3: 👥 Cấu Hình Cây Tổ Chức, Vai Trò & Phân Quyền RBAC (Organization & Roles)**: Quản lý cây phân cấp `Team (PO Module Tech Team 2) => Part (CP/SG Part 1) => Process => Users`, chỉ định tài khoản phụ trách chuyên trách LEC (Pham Duc Long - 658359).
-4.  **Tab 4: 💰 Cấu Hình Ngân Sách SG 33-33-34 & Chu Kỳ Khóa Sổ (SG Budget & Billing Cycle)**: Tỷ trọng phân bổ ngân sách mua sắm quý $33\% - 33\% - 34\%$, cơ chế dồn số dư Rollover sang tháng sau, mốc khóa sổ kỳ tháng (ngày 25 hàng tháng lúc 17:00), và SLA đếm ngược chờ pháp nhân bạn xác nhận (48h).
+1.  **Tab 1: 🧮 Cấu Hình Công Thức & Logic Mua Hàng (Reorder Logic Rules)**: Thiết lập quy tắc tính số lượng mua cho 5 loại nhu cầu cơ sở (`SETUP`, `IMPROVE`, `BREAKDOWN`, `PM`, `SAFETY_STOCK`), định mức tiêu hao theo Model Smart Watch (D111, D222, D333) và ngưỡng cảnh báo Over toàn team.
+2.  **Tab 2: 🏭 Cấu Hình Master Data Nhà Xưởng & Dây Chuyền (Plant & Line Topology)**: Cấu hình Factory HW (Smart Watch - Org ID: 28753), Tòa nhà H1, H2, H3, Tầng 2F, 6F, Dây chuyền `#201` ~ `#210`, `#601`, `#604` với quy tắc tự động `Left(Line, 1) = Floor`. Tuyệt đối không chia công đoạn; danh mục máy và vị trí thân thiện gắn trực tiếp vào Line.
+3.  **Tab 3: 👥 Cấu Hình Cây Tổ Chức, Vai Trò & Phân Quyền RBAC (Organization & Roles)**: Quản lý cây phân cấp 3 tầng chuẩn `Team (PO Module Tech Team 2) => Part (CP/SG Part 1) => Kỹ Sư Ngang Hàng (Peers)`. Chỉ định tài khoản chuyên trách LEC (Pham Duc Long - 658359) và tài khoản Cost Management (Reviewer & Assistant là 1 người).
+4.  **Tab 4: 💰 Cấu Hình Ngân Sách SG & Thiết Lập Hạn Deadline Của LEC (SG Budget & Deadlines)**: Quản lý hạn mức ngân sách SG tháng, **chính sách Không Bảo Lưu (No-Rollover)** nghiêm ngặt giữa các tháng, và giao diện cho phép LEC thiết lập các mốc thời hạn (Deadline nộp giải trình tồn kho đầu tháng, Deadline chốt hồ sơ thẩm định đầu tháng).
 5.  **Tab 5: 🔌 Cấu Hình Kết Nối EMS Gateway & Giao Thức Nexacro (Gateway & Rate Limiting)**: URL máy chủ EMS (`http://ems.lgdisplay.com:9000`), thông số bảo vệ máy chủ (`max_concurrent: 3`, `min_interval: 100ms`, `timeout: 30s`), danh sách dịch vụ trắng `allowed_services`, và nút kiểm thử kết nối trực tiếp `[⚡ KIỂM THỬ KẾT NỐI TỨC THÌ (PING)]`.
-6.  **Tab 6: 🏷️ Cấu Hình Danh Mục Chuẩn Hóa & Mã Over (Master Dictionaries)**: Quản lý danh mục 6 mã nguyên nhân Over (`OVR-01` đến `OVR-06`), tiền tố quy tắc sinh mã tạm thời (`TMP-HW-YYYY-xxxx`), quy định dung lượng và định dạng tệp đính kèm.
+6.  **Tab 6: 🏷️ Cấu Hình Danh Mục Chuẩn Hóa & Mã Over (Master Dictionaries)**: Quản lý danh mục 6 mã nguyên nhân Over (`OVR-01` đến `OVR-06`), tiền tố sinh mã tạm thời (`TMP-HW-xxxx`), quy định dung lượng và định dạng tệp đính kèm.
 
 ---
 
@@ -27,38 +28,23 @@ Cấu trúc giao diện gồm **6 Tab cấu hình chuyên sâu**:
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ CÁC TAB CẤU HÌNH HỆ THỐNG:                                                                                                       │
 │ [🧮 1. LOGIC & CÔNG THỨC MUA] [🏭 2. NHÀ XƯỞNG & DÂY CHUYỀN] [👥 3. TỔ CHỨC & PHÂN QUYỀN]                                        │
-│ [💰 4. NGÂN SÁCH SG & KỲ THÁNG] [🔌 5. KẾT NỐI EMS GATEWAY]    [🏷️ 6. DANH MỤC & MÃ OVER]                                        │
+│ [💰 4. NGÂN SÁCH SG & DEADLINES] [🔌 5. KẾT NỐI EMS GATEWAY]    [🏷️ 6. DANH MỤC & MÃ OVER]                                        │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 📌 ĐANG CHỌN TAB 1: CẤU HÌNH CÔNG THỨC TÍNH TOÁN & LOGIC MUA HÀNG (CALCULATION LOGIC RULES)                                     │
+│ 📌 ĐANG CHỌN TAB 4: CẤU HÌNH CHÍNH SÁCH NGÂN SÁCH SG & THIẾT LẬP THỜI HẠN (DEADLINES DO LEC QUẢN LÝ)                             │
 │                                                                                                                                  │
-│ 1.1. CẤU HÌNH QUY TẮC TÍNH SỐ LƯỢNG MUA CHO 5 LOẠI NHU CẦU CƠ SỞ:                                                                │
-│ ┌──────────────────┬──────────────────────────────────────────────────────────┬───────────────────┬──────────────┬─────────────┐ │
-│ │ Loại Nhu Cầu     │ Công Thức / Quy Tắc Tính Số Lượng Mua Chuẩn (Logic Rule) │ Tham Số Bắt Buộc  │ Phân Loại KH │ Thao Tác    │ │
-│ ├──────────────────┼──────────────────────────────────────────────────────────┼───────────────────┼──────────────┼─────────────┤ │
-│ │ 1. SETUP         │ Qty = (Norm_Per_Machine * New_Machines) + Buffer - Onhand│ Machine_Count, ECO│ 🔴 Over Ngoài│ [✏️ Chỉnh Sửa]│ │
-│ │    (Máy/Model mới│                                                          │                   │ Kế Hoạch     │             │ │
-│ ├──────────────────┼──────────────────────────────────────────────────────────┼───────────────────┼──────────────┼─────────────┤ │
-│ │ 2. IMPROVE       │ Qty = Proposed_Trial_Qty (Giới hạn tối đa: 2 EA/Máy)     │ Kaizen_Project_Id │ 🔴 Over Ngoài│ [✏️ Chỉnh Sửa]│ │
-│ │    (Cải tiến SX) │                                                          │                   │ Kế Hoạch     │             │ │
-│ ├──────────────────┼──────────────────────────────────────────────────────────┼───────────────────┼──────────────┼─────────────┤ │
-│ │ 3. BREAKDOWN     │ Qty = Actual_Damaged_Qty (Bù đúng số lượng linh kiện hỏng│ Work_Order_No,    │ 🔴 Over Ngoài│ [✏️ Chỉnh Sửa]│ │
-│ │    (Thay thế hỏng│                                                          │ Incident_Photos   │ Kế Hoạch     │             │ │
-│ ├──────────────────┼──────────────────────────────────────────────────────────┼───────────────────┼──────────────┼─────────────┤ │
-│ │ 4. PM            │ Qty = (Monthly_Plan_Output / MTBF_Life) * Norm - PO_Rem  │ PM_Schedule_Date, │ 🟢 Trong     │ [✏️ Chỉnh Sửa]│ │
-│ │    (Bảo dưỡng đk)│                                                          │ MTBF_Hours        │ Target       │             │ │
-│ ├──────────────────┼──────────────────────────────────────────────────────────┼───────────────────┼──────────────┼─────────────┤ │
-│ │ 5. SAFETY_STOCK  │ Qty = max(0, Target_Stock - (Onhand + PO_Remained))      │ Target_Stock_Qty, │ 🟢 Trong     │ [✏️ Chỉnh Sửa]│ │
-│ │    (Dự phòng tồn)│ Làm tròn lên theo MOQ / Pack Size                        │ MOQ, Pack_Size    │ Target       │             │ │
-│ └──────────────────┴──────────────────────────────────────────────────────────┴───────────────────┴──────────────┴─────────────┘ │
+│ 4.1. CHÍNH SÁCH NGÂN SÁCH SG THÁNG (STRICT NO-ROLLOVER POLICY):                                                                  │
+│ • Cơ Chế Bảo Lưu Số Dư Cuối Tháng: [🔴 KHÔNG BẢO LƯU (STRICT NO-ROLLOVER)] (Số dư chưa dùng hết trong tháng sẽ tự động hủy bỏ)  │
+│ • Phương Thức Nhập Ngân Sách SG:   [ THỦ CÔNG THEO TỪNG THÁNG (MANUAL ENTRY BY LEC) ]                                            │
+│ • Hạn Mức Ngân Sách Mua Sắm Tháng N: [ $65,000.00 USD ]      Hạn Mức Ngân Sách Xuất Kho Tháng N: [ $48,000.00 USD ]              │
 │                                                                                                                                  │
-│ 1.2. THAM SỐ ĐỊNH MỨC THEO MODEL SMART WATCH & NGƯỠNG CẢNH BÁO OVER:                                                             │
-│ • Áp dụng định mức tiêu hao phụ tùng cho các Model: [☑ D111 (Cơ bản)]  [☑ D222 (Cao cấp)]  [☑ D333 (Thể thao Siêu mỏng)]          │
-│ • Hệ số an toàn tồn kho (Safety Stock Buffer Factor):   [ 1.15 ] (Tăng 15% dự phòng cho các linh kiện có Lead Time > 30 ngày)     │
-│ • Ngưỡng cảnh báo chi phí Over toàn Team trong tháng:   [ $25,000.00 USD ] (Bắn thông báo cảnh báo vàng khi vượt 80% ngưỡng)      │
-│ • Ép buộc nhập Work Order đối với loại đơn:             [☑ Ready-to-use (Tức sử dụng)]   [☑ Breakdown Replacement]                 │
+│ 4.2. THIẾT LẬP THỜI HẠN THẨM ĐỊNH & GIẢI TRÌNH (LEC CONFIGURABLE DEADLINES):                                                     │
+│ • Kỳ Thẩm Định Chi Phí Định Kỳ:    [ ĐẦU THÁNG (TỪ NGÀY 01 ĐẾN NGÀY 05 HÀNG THÁNG) ]                                             │
+│ • Thời Hạn Kỹ Sư Nộp Giải Trình Tồn Kho:  [ Ngày 03 hàng tháng ] lúc [ 17:00 ] (Sau giờ này tự động khóa form nộp)              │
+│ • Thời Hạn LEC Chốt Hồ Sơ Thẩm Định:      [ Ngày 05 hàng tháng ] lúc [ 12:00 ] (Đóng băng dữ liệu chuyển Cost Management)        │
+│ • Cảnh Báo Tồn Kho Khác Team (agingInterlockFlag): Duy trì Task bắt buộc cho đến khi EMS đồng bộ lại trạng thái 'N'              │
 │                                                                                                                                  │
 │ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
-│                                                                                  [↩️ Khôi Phục Mặc Định]   [💾 LƯU CẤU HÌNH TAB 1] │
+│                                                                                  [↩️ Khôi Phục Mặc Định]   [💾 LƯU CẤU HÌNH TAB 4] │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -91,5 +77,4 @@ Cấu trúc giao diện gồm **6 Tab cấu hình chuyên sâu**:
 
 1. **Thay đổi công thức logic mua hàng**: Quản trị viên là người duy nhất được chỉnh sửa cấu trúc biểu thức tính số lượng mua để áp dụng cho toàn bộ kỹ sư.
 2. **Cấu hình tham số Gateway Nexacro**: Điều chỉnh Rate Limiting, timeout và danh sách endpoint được phép gọi để bảo vệ an toàn tuyệt đối cho hệ thống máy chủ core EMS.
-3. **Phân quyền và tạo tài khoản**: Quản lý cấp quyền RBAC cho các chức danh Requestor, Leader, LEC và Warehouse.
-
+3. **Phân quyền và tạo tài khoản**: Quản lý cấp quyền RBAC cho 5 chức danh: Requestor, Leader, LEC, Cost Management (1 người), và Admin *(Hoàn toàn loại bỏ quyền Thủ kho)*.

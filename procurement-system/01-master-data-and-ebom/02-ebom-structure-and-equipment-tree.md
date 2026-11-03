@@ -5,11 +5,11 @@
 
 ## 1. Phân Tách Trách Nhiệm: Tên Thân Thiện Nghiệp Vụ vs Mã Kỹ Thuật EM No
 
-Trong thực tế sản xuất tại nhà xưởng, việc bắt buộc Kỹ sư quy trình (`Engineer Process`) phải nhớ hoặc gõ chính xác chuỗi mã 14 ký tự kỹ thuật (`HWBMTL21EC0101`) gây cản trở và dễ nhầm lẫn. Hệ thống áp dụng nguyên tắc phân tách ranh giới rõ ràng:
+Trong thực tế sản xuất tại nhà xưởng, việc bắt buộc Kỹ sư Hiện Trường (Peer Engineers — không phân chia công đoạn) phải nhớ hoặc gõ chính xác chuỗi mã 14 ký tự kỹ thuật (`HWBMTL21EC0101`) gây cản trở và dễ nhầm lẫn. Hệ thống áp dụng nguyên tắc phân tách ranh giới rõ ràng:
 
 ```mermaid
 flowchart LR
-    subgraph RequestorRole["1. Kỹ Sư Quy Trình (Engineer Process / Requestor)"]
+    subgraph RequestorRole["1. Kỹ Sư Hiện Trường (Peer Engineers / Requestor)"]
         REQ_UI["Làm việc 100% bằng TÊN THÂN THIỆN NGHIỆP VỤ\n• Line: Smart Watch Line #201\n• Machine: Máy Dán Die Bonder (DB-01)\n• Assembly/Mechanism: Cụm Đầu Gắp (Bonding Head)"]
     end
 
@@ -96,7 +96,7 @@ sequenceDiagram
     else Chi tiết cơ cấu CHƯA CÓ trong EBOM
         REQ->>SYS: Chọn "Cơ cấu chưa có (Khai báo sau)" + Nhập mô tả
         SYS-->>SYS: Đánh dấu cờ EBOM_PENDING_MAPPING = true
-        SYS-->>SYS: KHÔNG CHẶN đơn mua! Chuyển tiếp phê duyệt bình thường
+        SYS-->>SYS: KHÔNG CHẶN đơn mua! Tiếp tục xử lý tiến độ bình thường
         SYS->>REQ: Tự động tạo Task: "Khai báo bổ sung EBOM trước 7 ngày"
     end
     SYS->>LEC: Chuyển hồ sơ xử lý Interlock & Gom mua

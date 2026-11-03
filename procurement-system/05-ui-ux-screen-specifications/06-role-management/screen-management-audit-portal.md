@@ -1,23 +1,25 @@
-# Giao Diện Dành Riêng Cho Vai Trò: Team Management (Lãnh Đạo Thẩm Định Offline)
-> **Mã Giao Diện: UI-ROLE-06 — Executive Management Offline Audit Portal**  
-> *Dành riêng cho: Ban Lãnh Đạo & Quản Lý Nhà Máy: Reviewer (Quản lý cấp cao phê duyệt) và Assistant (Trợ lý điều phối)*
+# Giao Diện Dành Riêng Cho Vai Trò: Cost Management (Bộ Phận Quản Lý Chi Phí)
+> **Mã Giao Diện: UI-ROLE-06 — Cost Management Audit Portal**  
+> *Dành riêng cho: Bộ Phận Quản Lý Chi Phí — Reviewer & Assistant LÀ 1 NGƯỜI DUY NHẤT (Chuyên viên thẩm định chi phí / Cost Controller, KHÔNG PHẢI Ban Giám Đốc hay Ban Lãnh Đạo)*
 
 ---
 
-## 1. Tổng Quan Không Gian Làm Việc Của Ban Quản Lý (Workspace Anatomy)
+## 1. Tổng Quan Không Gian Làm Việc Của Cost Management (Workspace Anatomy)
 
-Theo nguyên tắc vận hành cốt lõi của nhà máy:
-> *"Mua bán (phát hành PO) và Chuyển giao (Transfer liên pháp nhân) BẮT BUỘC PHẢI DIỄN RA SAU THẨM ĐỊNH PHÊ DUYỆT. Hàng tháng (ngày 25), LEC tổng hợp hồ sơ, trình Ban Quản Lý (Team Management) thẩm định kiểm thảo chi tiết về tồn kho chưa dùng và các khoản chi Over. Sau khi Lãnh đạo thẩm định phê duyệt xong, hệ thống mới chính thức kích hoạt các lệnh điều chuyển và phát hành PO."*
+Theo nguyên tắc vận hành chuẩn hóa:
+> *"Cost Management là bộ phận chuyên trách quản lý chi phí, kiểm soát ngân sách SG và giải trình tồn kho. Đầu mỗi tháng, Reviewer (Cost Management) họp thẩm định offline với các LEC để thẩm tra chi tiết về tồn kho chưa dùng và các khoản chi Over. Sau khi thẩm định offline, nếu cần thêm thông tin, Reviewer nhập yêu cầu gửi LEC; LEC gửi Kỹ sư phản hồi rồi chuyển lại cho Reviewer. Khi hoàn tất xác nhận chi phí, việc phê duyệt chính thức diễn ra trên hệ thống EMS."*
 
-Để phục vụ tốt nhất quy trình này, giao diện **Executive Management Portal** đóng vai trò là **Cổng Tra Cứu & Đối Soát Số Hóa (Digital Audit Mirror)** liên kết trực tiếp với [Dashboard Báo Cáo Phân Tích Tổng Hợp (UI-COMMON-00)](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/00-common-dashboard/screen-universal-analytics-dashboard.md) giúp Ban Giám Đốc và Trợ Lý:
-- Xem trước toàn cảnh báo cáo trước buổi họp thẩm định trực tiếp ngày 25.
-- Rà soát danh sách chi tiết các hạng mục gây **Over Ngoài Kế Hoạch** (tách riêng Over do Mua Hàng vs Over do Xuất Kho) kèm hình ảnh hiện trường, mã Work Order và biên bản sự cố.
-- Rà soát các **Task Giải Trình Tồn Kho Không Sử Dụng** của các Kỹ sư công đoạn để kiểm soát hiện tượng găm tồn kho chết (Dead stock).
-- Lưu trữ và tra cứu lịch sử các biên bản phê duyệt giấy đã được ký và scan tải lên hệ thống.
+Giao diện **Cost Management Audit Portal** đóng vai trò là **Công cụ kiểm soát chi phí & Cầu nối thông tin số hóa**:
+- Thẩm định chi phí và kiểm thảo giải trình tồn kho vào **ĐẦU MỖI THÁNG**.
+- Rà soát danh mục 100% các dòng phát sinh **Over Ngoài Kế Hoạch** (tách riêng Over do Mua Hàng vs Over do Xuất Kho từ EMS).
+- Rà soát các **Task Giải Trình Tồn Kho Chưa Dùng (>30 ngày)** của các kỹ sư hiện trường để kiểm soát hiện tượng găm hàng.
+- **Nhập yêu cầu cần thêm thông tin** gửi cho LEC điều phối kỹ sư làm rõ.
+- Tra cứu đối soát trước khi thao tác duyệt chính thức trên hệ thống EMS.
 
-Cấu trúc giao diện gồm **2 Chế Độ Xem Chuyên Biệt**:
-1.  **View 1: 📑 Bảng Tổng Hợp Kỳ Mua Sắm Tháng (Monthly Executive Package)**: Tách bạch rõ ràng giữa hạn mức ngân sách SG tháng ($33\% - 33\% - 34\%$), tổng cam kết **🟢 TRONG TARGET**, và danh sách chi tiết các dòng **🔴 OVER NGOÀI KẾ HOẠCH** (phân loại theo 6 mã `OVR-01` đến `OVR-06`).
-2.  **View 2: 📂 Kho Lưu Trữ Biên Bản Phê Duyệt Scan (Signed Paperwork Archive)**: Tra cứu toàn bộ các bản scan PDF biên bản họp thẩm định hàng tháng có đầy đủ chữ ký tươi của Ban Lãnh Đạo, gắn liền với mã lô PRV đã đẩy sang EMS.
+Cấu trúc giao diện gồm **3 Chế Độ Xem Chuyên Biệt**:
+1.  **View 1: 📑 Bảng Thẩm Định Chi Phí & Tồn Kho Đầu Tháng**: So sánh hạn mức SG tháng (nhập thủ công, No-Rollover) với cam kết Trong Target và danh sách Over (`OVR-01..06`).
+2.  **View 2: 💬 Quản Lý Yêu Cầu Làm Rõ Thông Tin**: Nhập các câu hỏi / yêu cầu giải trình gửi cho LEC để kỹ sư trả lời.
+3.  **View 3: 📂 Kho Lưu Trữ Biên Bản & Đối Soát EMS**: Lưu trữ bản scan biên bản thẩm định và tra cứu mã PRV/PO đã đối soát từ EMS.
 
 ---
 
@@ -25,73 +27,44 @@ Cấu trúc giao diện gồm **2 Chế Độ Xem Chuyên Biệt**:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ [LOGO OPS]  CỔNG TRA CỨU THẨM ĐỊNH LÃNH ĐẠO — FACTORY HW (SMART WATCH)           [🔔 1 Kỳ Chờ Thẩm Định] [👤 Reviewer (Ban GĐ)]  │
-│ Phạm vi: Toàn bộ Nhà máy HW (Display Module Plant 1)                             Kỳ thẩm định: Tháng 11/2026 (Chốt ngày 25)       │
+│ [LOGO OPS]  CỔNG THẨM ĐỊNH CHI PHÍ — COST MANAGEMENT (FACTORY HW)                [🔔 2 Cần Làm Rõ] [👤 Reviewer (Cost Control)]   │
+│ Phạm vi: Toàn bộ Nhà máy HW (Display Module Plant 1)                             Kỳ thẩm định: ĐẦU THÁNG 11/2026                   │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ CÁC CHẾ ĐỘ XEM CỦA BAN LÃNH ĐẠO:                                                                                                │
-│ [📑 VIEW 1: BẢNG TỔNG HỢP KỲ MUA SẮM THÁNG 11]            [📂 VIEW 2: KHO BIÊN BẢN PHÊ DUYỆT GIẤY SCAN (12 KỲ ĐÃ DUYỆT)]         │
+│ CÁC CHẾ ĐỘ XEM CỦA COST MANAGEMENT:                                                                                              │
+│ [📑 VIEW 1: THẨM ĐỊNH CHI PHÍ ĐẦU THÁNG]   [💬 VIEW 2: YÊU CẦU LÀM RÕ (GỬI LEC)]   [📂 VIEW 3: KHO BIÊN BẢN & ĐỐI SOÁT EMS]      │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 📌 ĐANG XEM: VIEW 1 — HỒ SƠ TỔNG HỢP MUA SẮM PHỤ TÙNG KỲ THÁNG 11/2026 (PHỤC VỤ HỌP OFFLINE)                                    │
+│ 📌 ĐANG XEM: VIEW 1 — HỒ SƠ THẨM ĐỊNH CHI PHÍ & TỒN KHO ĐẦU THÁNG 11/2026                                                        │
 │                                                                                                                                  │
-│ 1.1. BẢNG CÂN ĐỐI NGÂN SÁCH MUA SẮM SG (QUÝ 4/2026 - TỶ LỆ 33% - 33% - 34%):                                                     │
-│ ┌──────────────────────┬──────────────────────┬──────────────────────┬─────────────────────────────────────────────────────────┐ │
-│ │ Tổng Hạn Mức SG Quý  │ Hạn Mức Tháng 11 (M2)│ Dồn Số Dư Tháng 10   │ TỔNG TRẦN MUA CHO PHÉP THÁNG 11 (PO COMMIT LIMIT)        │ │
-│ │    $450,000 USD      │ 33% = $148,500 USD   │ + $4,200 USD         │ $152,700 USD                                            │ │
-│ └──────────────────────┴──────────────────────┴──────────────────────┴─────────────────────────────────────────────────────────┘ │
-│ • Tổng cam kết đề xuất Trong Target (Bù tồn an toàn EBOM):  $124,500 USD (81.5% trần) [🟢 Nằm trong hạn mức]                    │
-│ • Tổng phát sinh Mua Ngoài Kế Hoạch (Over Unplanned):        $28,200 USD (18.5% trần) [🔴 Bắt buộc giải trình tại cuộc họp]     │
-│ ➔ TỔNG ĐỀ XUẤT KÝ DUYỆT THÁNG 11:                           $152,700 USD (Vừa khít 100.0% hạn mức trần)                        │
+│ 1.1. BẢNG CÂN ĐỐI NGÂN SÁCH MUA SẮM SG THÁNG 11 (TUYỆT ĐỐI KHÔNG ROLLOVER):                                                      │
+│ ┌────────────────────────────────────────┬───────────────────────────────────────┬─────────────────────────────────────────────┐ │
+│ │ Hạn Mức SG Tháng 11 (LEC Nhập Thủ Công)│ Tổng Cam Kết Đề Xuất Trong Target     │ Tổng Phát Sinh Mua Ngoài Kế Hoạch (Over)    │ │
+│ │              $150,000 USD              │      $122,000 USD (81.3% ngân sách)   │         $28,000 USD (18.7% ngân sách)       │ │
+│ └────────────────────────────────────────┴───────────────────────────────────────┴─────────────────────────────────────────────┘ │
+│ • Tình trạng ngân sách tháng: 🟢 Tổng chi tiêu đề xuất ($150,000 USD) vừa khít trần ngân sách phân bổ tháng 11.                   │
 │                                                                                                                                  │
-│ 1.2. DANH MỤC 8 HẠNG MỤC PHÁT SINH OVER BẮT BUỘC THẨM ĐỊNH (OVR-01 ĐẾN OVR-06):                                                  │
-│ ┌──┬────────────┬─────────────────────────────┬───────────┬─────────────┬─────────────┬──────────┬──────────────┬───────────────┐ │
-│ │ST│ Mã QCode   │ Tên Phụ Tùng & Maker        │ Công Đoạn │ Số Lượng Mua│ Thành Tiền  │ Mã Lý Do │ Mã Lệnh Máy  │ Hồ Sơ Minh    │ │
-│ │T │ / Mã Tạm   │                             │ & Line    │             │ Dự Kiến     │ Over     │ (Work Order) │ Chứng Sự Cố   │ │
-│ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼───────────────┤ │
-│ │1 │ QDAD12236  │ Board nguồn CPX V4 Trumpf   │ DB / #201 │ 1 EA        │ $3,150.00   │ OVR-01   │ WO-248926091 │ [🖼️ 2 Ảnh máy]│ │
-│ │  │            │ ↳ Lý do: Cháy board nguồn do xung sét ca đêm, máy EC line #201 dừng hẳn                │ [📋 Alarm log]│ │
-│ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼───────────────┤ │
-│ │2 │ TMP-HW-0104│ Xylanh trượt kép SMC MXQ16  │ TAB/ #202 │ 2 EA        │ $440.00     │ OVR-03   │ WO-248926098 │ [📄 Công văn] │ │
-│ │  │            │ ↳ Lý do: LGD Korea vướng thủ tục hải quan chưa transfer kịp, mua tạm 2 chiếc tránh dừng│ [📧 Email HQ] │ │
-│ └──┴────────────┴─────────────────────────────┴───────────┴─────────────┴─────────────┴──────────┴──────────────┴───────────────┘ │
+│ 1.2. DANH MỤC CÁC HẠNG MỤC PHÁT SINH OVER CẦN THẨM TRA (OVR-01 ĐẾN OVR-06):                                                      │
+│ ┌──┬────────────┬─────────────────────────────┬───────────┬─────────────┬─────────────┬──────────┬──────────────┬──────────────────┐ │
+│ │ST│ Mã QCode   │ Tên Phụ Tùng & Maker        │ Vị Trí    │ Số Lượng Mua│ Thành Tiền  │ Mã Lý Do │ Mã Lệnh Máy  │ Thao Tác Của     │ │
+│ │T │ / Mã Tạm   │                             │ Máy & Line│             │ Dự Kiến     │ Over     │ (Work Order) │ Reviewer         │ │
+│ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼──────────────────┤ │
+│ │1 │ QDAD12236  │ Board nguồn CPX V4 Trumpf   │ DB-01/#201│ 1 EA        │ $3,150.00   │ OVR-01   │ WO-248926091 │[❓ Yêu Cầu Làm Rõ│ │
+│ │  │            │ ↳ Lý do kỹ sư: Cháy board do xung sét ca đêm, dừng máy DB-01                         │   Gửi Cho LEC]   │ │
+│ ├──┼────────────┼─────────────────────────────┼───────────┼─────────────┼─────────────┼──────────┼──────────────┼──────────────────┤ │
+│ │2 │ QCAD38190  │ Xylanh trượt kép SMC MXQ16  │ TAB-02/#20│ 2 EA        │ $440.00     │ OVR-03   │ WO-248926098 │[✅ Đồng Ý Duyệt] │ │
+│ │  │            │ ↳ Lý do kỹ sư: LGD Korea chưa transfer kịp, mua gấp tránh dừng chuyền                │                  │ │
+│ └──┴────────────┴─────────────────────────────┴───────────┴─────────────┴─────────────┴──────────┴──────────────┴──────────────────┘ │
 │                                                                                                                                  │
-│  [📥 TẢI BÁO CÁO GIẢI TRÌNH TỒN KHO & KIỂM THẢO (EXCEL FORM CỐ ĐỊNH)]      [👁️ XEM THÔNG TIN ĐỐI SOÁT EMS ĐÃ ĐỒNG BỘ]     │
+│  [📥 XUẤT BÁO CÁO EXCEL FORM CỐ ĐỊNH]      [✍️ KÝ BIÊN BẢN XÁC NHẬN CHI PHÍ (COST CLEARANCE)]     [↗️ CHUYỂN SANG DUYỆT TRÊN EMS] │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Quy Trình Phê Duyệt Giấy & Lưu Trữ Số Hóa
+## 3. View 2 Chi Tiết: Gửi Yêu Cầu Cần Thêm Thông Tin Cho LEC
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor LEC as LEC (Pham Duc Long - 658359)
-    actor AST as Trợ Lý Lãnh Đạo (Assistant)
-    actor REV as Ban Giám Đốc (Reviewer)
-    participant SYS as Hệ Thống Mua Bán Mới
-    participant EMS as Máy Chủ EMS Nexacro
-
-    Note over LEC,SYS: Ngày 25: LEC xuất Hồ Sơ Báo Cáo Offline
-    LEC->>SYS: Bấm "Xuất Hồ Sơ Thẩm Định Offline"
-    SYS-->>LEC: File PDF/Excel chuẩn hóa (Tách riêng Trong Target vs Over)
-    
-    Note over LEC,REV: Cuộc Họp Thẩm Định Trực Tiếp Offline
-    LEC->>AST: Nộp bộ hồ sơ in giấy kèm các ảnh chụp hiện trường
-    AST->>REV: Trình Lãnh đạo thẩm tra các khoản phát sinh Over (OVR-01..06)
-    REV->>REV: Đánh giá tính cấp thiết cho dây chuyền Smart Watch
-    REV-->>AST: Ký tươi phê duyệt trên văn bản giấy
-    AST-->>LEC: Bàn giao biên bản có đầy đủ chữ ký
-    
-    Note over LEC,SYS: Cập nhật kết quả vào hệ thống
-    LEC->>SYS: Bấm "Xác Nhận Đã Duyệt Offline" & Tải tệp scan PDF
-    SYS-->>REV: Hiển thị biên bản đã duyệt tại Cổng Tra Cứu Lãnh Đạo (View 2)
-    SYS->>EMS: Đóng gói và phát hành PO chính thức (API save130PrvData.lgdn)
-```
-
----
-
-## 4. Quyền Hạn Của Ban Lãnh Đạo (Team Management)
-
-1. **Thẩm quyền phê duyệt ngân sách tối cao**: Ban Lãnh Đạo là cấp duy nhất có quyền ký phê duyệt các khoản chi ngoài kế hoạch (Over-budget) để phụ tùng được phép phát hành PO.
-2. **Quyền đình chỉ hoặc cắt giảm hạng mục**: Nếu tại cuộc họp phát hiện hạng mục mua không cấp thiết, Ban Lãnh Đạo gạch bỏ trực tiếp trên biên bản giấy, LEC sẽ cập nhật xóa dòng đó trên phần mềm trước khi phát hành PO sang EMS.
-
+Khi Reviewer phát hiện một dòng chi phí chưa đủ bằng chứng hoặc nghi ngờ tính xác thực:
+1. Reviewer bấm **`[❓ Yêu Cầu Làm Rõ Gửi Cho LEC]`**.
+2. Form popup mở ra:
+   - Reviewer nhập nội dung câu hỏi (ví dụ: *"Cần bổ sung biên bản giám định hỏng hóc và giải trình tại sao không xuất dùng tồn kho của Team 1?"*).
+3. Hệ thống chuyển nội dung này trực tiếp đến tab `Cầu Nối Reviewer` trên Bàn làm việc của LEC.
+4. Sau khi Kỹ sư phản hồi và LEC gửi lại, Reviewer nhận được thông báo để xem xét phê duyệt.

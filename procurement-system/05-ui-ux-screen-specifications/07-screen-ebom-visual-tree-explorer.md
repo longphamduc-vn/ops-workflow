@@ -25,7 +25,7 @@ Màn hình **UI-EBOM-01** được thiết kế lại toàn diện nhằm đạt
 │ KHUNG 1: CÂY CƠ CẤU MÁY           │ KHUNG 2: BÀN LÀM VIỆC CƠ CẤU (SLOT SCHEMATIC)    │ KHUNG 3: KHAY PHỤ TÙNG CHỜ GẮN            │
 │ (THÂN THIỆN THEO PHÂN CẤP)        │ Máy Đang Chọn: 🤖 Die Bonder 01 (DB-01)          │ (SPARE PARTS TRAY - KÉO THẢ)              │
 ├───────────────────────────────────┼──────────────────────────────────────────────────┼───────────────────────────────────────────┤
-│ ▼ 🏭 Factory HW (Smart Watch 1)   │ Vị Trí: Line #201 (2F) | Công đoạn: DB           │ [🔍 Lọc theo Maker / QCode / Tên...]      │
+│ ▼ 🏭 Factory HW (Smart Watch 1)   │ Vị Trí: Line #201 (2F) | Part: CP/SG Part 1      │ [🔍 Lọc theo Maker / QCode / Tên...]      │
 │   ▼ 🌐 Line #201 (Smart Watch L1) │ Mã Quản Lý Master: HWBMTL21EC0000 (LEC Đăng Ký)  │                                           │
 │     ▼ 🤖 Máy DB-01 (Die Bonder 01)│ ──────────────────────────────────────────────── │ ┌───────────────────────────────────────┐ │
 │       ├── 📂 Unit 01: Cụm Cấp Liệu│ 🧩 CƠ CẤU 01: RAY TRƯỢT DẪN HƯỚNG CẤP LIỆU       │ │ ▧ QDAB03583 - Cảm Biến Quang Vuông    │ │
@@ -66,8 +66,8 @@ Màn hình **UI-EBOM-01** được thiết kế lại toàn diện nhằm đạt
 - Bấm `Xác Nhận`, hệ thống tự động ghi nhận vào CSDL EBOM mà không cần viết mã phức tạp.
 
 ### 3.2. Xử Lý Cơ Cấu "Khai Báo Sau" (Late Declaration Queue Processing)
-- Khi một Kỹ sư Quy trình tạo requisition mua phụ tùng cho một cơ cấu phát sinh ngoài hiện trường chưa kịp tạo trong EBOM:
-  - Requisition được duyệt bình thường với cờ `EBOM_PENDING_MAPPING = true`.
+- Khi một Kỹ sư Hiện trường tạo requisition mua phụ tùng cho một cơ cấu phát sinh ngoài hiện trường chưa kịp tạo trong EBOM:
+  - Yêu cầu được tiếp nhận bình thường với cờ `EBOM_PENDING_MAPPING = true` để không cản trở tiến độ.
   - Hạng mục tự động rơi vào mục **`⚠️ HÀNG ĐỢI KHAI BÁO SAU`** ở góc dưới Khung 1.
 - Để hoàn tất hồ sơ:
   1. Kỹ sư click vào hạng mục đang chờ trong hàng đợi.

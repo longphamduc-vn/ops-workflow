@@ -1,5 +1,5 @@
 # 04. Sơ Đồ Quy Trình: Phân Loại Trong Target vs Over Ngoài Kế Hoạch & Thẩm Quyền Của LEC
-> *Kỹ Sư Cung Cấp Lý Do/Hiện Trạng, LEC Chính Thức Đánh Dấu Cờ Phân Loại, Đối Chiếu Hai Trục Chi Phí (Mua Hàng vs Xuất Kho) & Ngân Sách Không Rollover*
+> *Kỹ Sư Cung Cấp Lý Do/Hiện Trạng, Bắt Buộc Phải Có QCode, LEC Tự Tay Đánh Dấu Cờ Phân Loại Thủ Công (Không Tự Động), Đối Chiếu Hai Trục Chi Phí (Mua Hàng vs Xuất Kho Đọc Từ EMS), Ngân Sách Không Rollover & Vòng Phản Hồi 3 Bên Đầu Tháng*
 
 ---
 
@@ -7,37 +7,57 @@
 
 ```mermaid
 flowchart TD
-    Start["Kỹ Sư Process Gửi Nhu Cầu Mua / Xuất"] --> EngineerInput["Kỹ Sư Cung Cấp Dữ Liệu Hiện Trường:\n• Chọn Chế độ: Bù tồn định kỳ HOẶC Sự cố máy\n• Nhập mã Work Order sự cố (nếu có)\n• Đề xuất sơ bộ mã nguyên nhân (OVR-01 đến OVR-06)"]
+    Start["Kỹ Sư Hiện Trường Tạo Yêu Cầu Mua"] --> CheckQCode{"Đã Có Mã QCode Chính Thức?"}
     
-    EngineerInput --> LEC_Review["LEC Mở Bàn Làm Việc Đối Soát Ngân Sách:\n• Kiểm tra Hạn mức Ngân Sách Tháng (Thủ công, No Rollover)\n• Kiểm tra tồn kho khả dụng & tỷ lệ tiêu hao"]
+    CheckQCode -->|"Chưa có (Mã tạm TMP-HW-xxxx)"| HoldData["Chuẩn bị dữ liệu CAD/Doc/ảnh\nLEC đăng ký QCode ERP trước\n(Chưa đủ điều kiện thẩm định)"]
+    HoldData --> CheckQCode
     
-    LEC_Review --> EvalCheck{"Nhu cầu có nằm trong kế hoạch định mức ban đầu?"}
+    CheckQCode -->|"Đã có QCode chuẩn"| CheckStock{"Kiểm Tra Cờ agingInterlockFlag"}
     
-    EvalCheck -->|"Đúng định mức BOM & Tồn an toàn"| ActionTarget["LEC BẤM ĐÁNH DẤU: 🟢 TRONG TARGET\n(Cấp hạn mức chi tiêu thường xuyên)"]
+    CheckStock -->|"Y (Có tồn kho Team khác)"| StockAlert["⚠️ CẢNH BÁO TỒN KHO TEAM KHÁC TỨC THÌ\n• Mở Task bắt buộc mượn/xuất kho\n• Duy trì Task đến khi EMS load lại 'N'"]
+    StockAlert --> StockResolved{"Đã mượn tồn xong & EMS='N'?"}
+    StockResolved -->|"Chưa"| StockAlert
+    StockResolved -->|"Đã xong ('N')"| EngineerInput
     
-    EvalCheck -->|"Phát sinh ngoài kế hoạch / Vượt hạn mức"| ActionOver["LEC BẤM ĐÁNH DẤU: 🔴 OVER NGOÀI KẾ HOẠCH\n(Xác nhận 1 trong 6 mã nguyên nhân OVR-01..06)"]
+    CheckStock -->|"N"| EngineerInput["Kỹ Sư Cung Cấp Dữ Liệu Hiện Trường:\n• Chọn Chế độ: Bù tồn định kỳ HOẶC Sự cố máy\n• Nhập mã Work Order sự cố (nếu có)\n• Đề xuất sơ bộ mã nguyên nhân (OVR-01 đến OVR-06)"]
+    
+    EngineerInput --> LEC_Review["LEC Mở Bàn Làm Việc Đối Soát Ngân Sách:\n• Kiểm tra Hạn mức Ngân Sách Tháng (Thủ công, No Rollover)\n• Kiểm tra tính chất kỹ thuật & lịch sử máy"]
+    
+    LEC_Review --> EvalCheck{"LEC Đánh Giá Thủ Công (Không Tự Động)"}
+    
+    EvalCheck -->|"Đúng định mức BOM & Tồn an toàn"| ActionTarget["LEC BẤM ĐÁNH DẤU THỦ CÔNG: 🟢 TRONG TARGET\n(Nằm trong hạn mức chi tiêu thường xuyên)"]
+    
+    EvalCheck -->|"Phát sinh ngoài kế hoạch / Vượt hạn mức"| ActionOver["LEC BẤM ĐÁNH DẤU THỦ CÔNG: 🔴 OVER PHÁT SINH\n(Gắn 1 trong 6 mã nguyên nhân OVR-01..06)"]
     
     ActionOver --> SplitFlow{"Phân loại theo bản chất chi phí"}
     
-    SplitFlow -->|"Phát sinh từ Đơn Đặt Hàng Mới"| OverPO["🔴 OVER DO MUA HÀNG (PO COMMIT OVER)\n• Gắn mã PRV/PO, Nhà cung cấp\n• Đưa vào danh sách giải trình Thẩm định ngày 25"]
+    SplitFlow -->|"Phát sinh từ Yêu Cầu Mua Mới"| OverPO["🔴 OVER DO MUA HÀNG (PO COMMIT OVER)\n• Gắn mã PRV/PO, Nhà cung cấp\n• Đưa vào danh sách Thẩm Định ĐẦU THÁNG"]
     
-    SplitFlow -->|"Phát sinh từ Xuất Kho Lắp Máy"| OverIssue["🔴 OVER DO XUẤT KHO (ISSUE EXPENSE OVER)\n• Gắn mã Machine Name, Assembly Slot, Work Order\n• Ghi nhận vượt định mức vận hành công đoạn"]
+    SplitFlow -->|"Phát sinh từ Xuất Kho Lắp Máy (EMS)"| OverIssue["🔴 OVER DO XUẤT KHO (ISSUE EXPENSE OVER - EMS SYNC)\n• Gắn mã Machine Name, Work Order\n• Hệ thống đọc tự động từ dữ liệu xuất kho EMS"]
     
-    ActionTarget --> AuditQueue["GOM ĐƯA VÀO HỒ SƠ THẨM ĐỊNH NGÀY 25"]
+    ActionTarget --> AuditQueue["GOM ĐƯA VÀO HỒ SƠ THẨM ĐỊNH ĐẦU THÁNG (Có QCode)"]
     OverPO --> AuditQueue
-    OverIssue --> MonthlyReview["GỬI BÁO CÁO KIỂM THẢO CHI PHÍ VẬN HÀNH"]
+    
+    AuditQueue --> EarlyMonthAudit["HỌP THẨM ĐỊNH CHI PHÍ ĐẦU THÁNG (Cost Management - 1 người)"]
+    EarlyMonthAudit --> ThreeWayLoop{"Reviewer yêu cầu làm rõ?"}
+    ThreeWayLoop -->|"Có câu hỏi"| Clarify["Reviewer nhập yêu cầu ➔ LEC chuyển Kỹ sư ➔ Kỹ sư phản hồi ➔ LEC nộp Reviewer"]
+    Clarify --> EarlyMonthAudit
+    ThreeWayLoop -->|"Hoàn tất thẩm định"| EMS_Approve["LEC tạo PRV trên EMS ➔ Lãnh đạo ký duyệt chính thức trên EMS"]
 ```
 
 ---
 
 ## 2. Bảng Ma Trận Phân Định Trách Nhiệm (RACI Matrix)
 
-| Bước nghiệp vụ | Kỹ sư Quy trình (Requestor) | Kỹ sư Quản trị Thiết bị (LEC) | Leader Công Đoạn | Ban Quản Lý (Management) |
+| Bước nghiệp vụ | Kỹ sư Hiện Trường (Requestor) | Kỹ sư Quản trị Thiết bị (LEC) | Leader Team / Part | Cost Management (1 Người) |
 | :--- | :---: | :---: | :---: | :---: |
-| Nhập hiện trạng máy & Work Order | **R** (Thực hiện) | I (Nhận tin) | A (Phê duyệt WO) | I |
-| Đề xuất mã nguyên nhân Over | **R** (Đề xuất) | C (Tham vấn) | I | I |
-| **Đánh dấu chính thức `TARGET` / `OVER`** | I | **R / A (Thẩm quyền duy nhất)** | I | I |
-| Đối soát với hạn mức Ngân sách tháng | I | **R (Thực hiện)** | I | C |
-| Phê duyệt danh sách Over trong phiên 25 | I | C (Giải trình) | C (Giải trình) | **A (Quyết định tối cao)** |
+| Kéo thả folder CAD/Doc chuẩn bị data QCode | **R** (Thực hiện) | A (Đăng ký ERP/EMS) | I (Theo dõi) | I |
+| Nhập hiện trạng máy & Work Order | **R** (Thực hiện) | I (Nhận tin) | I (Giám sát) | I |
+| Đề xuất sơ bộ mã nguyên nhân Over | **R** (Đề xuất) | C (Xem xét) | I | I |
+| **Đánh dấu thủ công `TARGET` / `OVER` (Không tự động)** | I | **R / A (Thẩm quyền duy nhất)** | I | I |
+| Thiết lập hạn Deadline giải trình & thẩm định | I | **R / A (Toàn quyền thiết lập)** | I | I |
+| Đối soát ngân sách tháng No-Rollover | I | **R (Thực hiện)** | I | C (Rà soát) |
+| Thẩm định chi phí đầu tháng offline & Luồng 3 bên | C (Phản hồi LEC) | **R** (Đại diện giải trình & tổng hợp) | I (Theo dõi) | **A (Thẩm định viên duy nhất)** |
+| Phê duyệt PRV / PO chính thức trên EMS | I | **R** (Tạo đơn EMS) | A (Ký duyệt EMS) | **A (Duyệt ngân sách EMS)** |
 
-*(R: Responsible, A: Accountable, C: Consulted, I: Informed)*
+*(Ghi chú: R: Responsible - Người thực hiện, A: Accountable - Người chịu trách nhiệm/quyết định, C: Consulted - Người được tham vấn, I: Informed - Người nhận thông tin theo dõi)*
