@@ -1,4 +1,4 @@
-export type UserRole = 'COMMON' | 'REQUESTOR' | 'LEADER' | 'LEC' | 'COST_MGMT' | 'EBOM' | 'ADMIN';
+export type UserRole = 'COMMON' | 'REQUESTOR' | 'LEADER' | 'LEC' | 'WAREHOUSE' | 'COST_MGMT' | 'EBOM' | 'ADMIN';
 
 export type DemandType = 'SETUP' | 'IMPROVE' | 'BREAKDOWN' | 'PM' | 'SAFETY_STOCK';
 
