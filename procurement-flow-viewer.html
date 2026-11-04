@@ -1,1921 +1,673 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BPMN WORKFLOW: ĐĂNG KÝ HẠNG MỤC, ĐÁNH GIÁ INTERLOCK & THẨM ĐỊNH MUA SẮM PHỤ TÙNG (FACTORY HW)</title>
-  <style>
-    :root {
-      --bg: #0b1120;
-      --bg-panel: #131c31;
-      --bg-card: #1e293b;
-      --bg-card-hover: #27354f;
-      --border: #2e3e5c;
-      --border-light: #475569;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-subtle: #64748b;
-      
-      /* Department / Swimlane Colors */
-      --c-req: #2563eb;
-      --c-req-light: #60a5fa;
-      --c-req-bg: rgba(37, 99, 235, 0.12);
-      --c-req-border: rgba(96, 165, 250, 0.4);
-
-      --c-lec: #d97706;
-      --c-lec-light: #fbbf24;
-      --c-lec-bg: rgba(217, 119, 6, 0.12);
-      --c-lec-border: rgba(251, 191, 36, 0.4);
-
-      --c-mgr: #7c3aed;
-      --c-mgr-light: #c084fc;
-      --c-mgr-bg: rgba(124, 58, 237, 0.12);
-      --c-mgr-border: rgba(192, 132, 252, 0.4);
-
-      --c-proc: #059669;
-      --c-proc-light: #34d399;
-      --c-proc-bg: rgba(5, 150, 105, 0.12);
-      --c-proc-border: rgba(52, 211, 153, 0.4);
-
-      --c-danger: #dc2626;
-      --c-danger-light: #f87171;
-      --c-warning: #f59e0b;
-      --c-success: #10b981;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-
-    /* Top Navigation Header */
-    header {
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      z-index: 50;
-      flex-shrink: 0;
-    }
-    .brand-block { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
-      width: 38px; height: 38px; border-radius: 8px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-    .brand-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; color: #fff; }
-    .brand-subtitle { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
-
-    .header-tools { display: flex; align-items: center; gap: 10px; }
-    .search-input-wrap {
-      position: relative; display: flex; align-items: center;
-    }
-    .search-input {
-      background: #0f172a; border: 1px solid var(--border); border-radius: 6px;
-      padding: 6px 12px 6px 30px; font-size: 12px; color: #fff; width: 220px;
-      transition: all 0.2s;
-    }
-    .search-input:focus { outline: none; border-color: #3b82f6; width: 260px; }
-    .search-icon { position: absolute; left: 10px; font-size: 13px; color: var(--text-muted); pointer-events: none; }
-
-    .view-tabs {
-      display: flex; background: #0f172a; padding: 3px; border-radius: 8px; border: 1px solid var(--border);
-    }
-    .view-tab-btn {
-      background: transparent; border: none; color: var(--text-muted);
-      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
-      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-    }
-    .view-tab-btn:hover { color: #fff; }
-    .view-tab-btn.active { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
-
-    .btn-action {
-      background: #1e293b; border: 1px solid var(--border); color: #e2e8f0;
-      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
-      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-    }
-    .btn-action:hover { background: #334155; border-color: var(--border-light); color: #fff; }
-    .btn-primary { background: #2563eb; border-color: #3b82f6; color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
-
-    /* Filter Toolbar (Sub-header) */
-    .filter-toolbar {
-      background: #0f172a; border-bottom: 1px solid var(--border);
-      padding: 6px 20px; display: flex; align-items: center; justify-content: space-between;
-      font-size: 12px; z-index: 40; flex-shrink: 0;
-    }
-    .lane-filters { display: flex; align-items: center; gap: 8px; }
-    .lane-filter-btn {
-      background: transparent; border: 1px solid var(--border);
-      padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
-      cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted);
-      transition: all 0.2s;
-    }
-    .lane-filter-btn.active-req { background: var(--c-req-bg); color: var(--c-req-light); border-color: var(--c-req-border); font-weight: 700; }
-    .lane-filter-btn.active-lec { background: var(--c-lec-bg); color: var(--c-lec-light); border-color: var(--c-lec-border); font-weight: 700; }
-    .lane-filter-btn.active-mgr { background: var(--c-mgr-bg); color: var(--c-mgr-light); border-color: var(--c-mgr-border); font-weight: 700; }
-    .lane-filter-btn.active-proc { background: var(--c-proc-bg); color: var(--c-proc-light); border-color: var(--c-proc-border); font-weight: 700; }
-    
-    .view-stats { display: flex; gap: 16px; color: var(--text-muted); font-size: 11px; }
-    .stat-pill { display: flex; align-items: center; gap: 5px; }
-
-    /* Main Workspace Container */
-    .workspace-area { flex: 1; display: flex; position: relative; overflow: hidden; }
-
-    /* ======================================================== */
-    /* VIEW 1: WORKFLOW SWIMLANES CANVAS                        */
-    /* ======================================================== */
-    .workflow-viewport {
-      flex: 1; height: 100%; position: relative; overflow: hidden;
-      background: radial-gradient(circle, #1a2333 1px, transparent 1px);
-      background-size: 28px 28px; background-color: #0b1120;
-      cursor: grab;
-    }
-    .workflow-viewport:active { cursor: grabbing; }
-
-    .canvas-scaler {
-      width: 2500px; height: 1600px;
-      transform-origin: 0 0;
-      position: absolute; top: 0; left: 0;
-      transition: transform 0.05s ease-out;
-    }
-
-    svg.workflow-connections-svg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 5;
-    }
-
-    /* Swimlanes Layout */
-    .swimlanes-container {
-      position: absolute; top: 20px; left: 20px; width: 2400px;
-      display: flex; flex-direction: column; gap: 24px;
-      z-index: 2;
-    }
-
-    .swimlane {
-      position: relative; border-radius: 14px;
-      background: rgba(19, 28, 49, 0.7);
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      padding: 20px 24px;
-      transition: all 0.3s;
-    }
-    .swimlane.lane-req { border-left: 6px solid var(--c-req); }
-    .swimlane.lane-lec { border-left: 6px solid var(--c-lec); }
-    .swimlane.lane-mgr { border-left: 6px solid var(--c-mgr); }
-    .swimlane.lane-proc { border-left: 6px solid var(--c-proc); }
-
-    .swimlane-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .lane-label { display: flex; align-items: center; gap: 10px; }
-    .lane-icon {
-      width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center;
-      justify-content: center; font-size: 14px; font-weight: bold;
-    }
-    .lane-req .lane-icon { background: var(--c-req); color: #fff; }
-    .lane-lec .lane-icon { background: var(--c-lec); color: #fff; }
-    .lane-mgr .lane-icon { background: var(--c-mgr); color: #fff; }
-    .lane-proc .lane-icon { background: var(--c-proc); color: #fff; }
-
-    .lane-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .lane-desc { font-size: 11px; color: var(--text-muted); }
-    .lane-badge { font-size: 10px; padding: 3px 8px; border-radius: 999px; font-weight: 600; text-transform: uppercase; }
-
-    .swimlane-nodes-row {
-      display: flex; align-items: center; gap: 40px; position: relative; min-height: 190px;
-    }
-
-    /* Workflow Cards (Tasks & Steps) */
-    .wf-card {
-      width: 290px; border-radius: 10px; background: var(--bg-card);
-      border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      padding: 14px 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative; z-index: 10;
-    }
-    .wf-card:hover {
-      transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.5);
-      border-color: #60a5fa;
-    }
-    .wf-card.selected {
-      border-color: #38bdf8 !important;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), 0 12px 28px rgba(0,0,0,0.6) !important;
-    }
-    .wf-card.highlighted {
-      animation: pulseHighlight 1.5s infinite;
-    }
-    @keyframes pulseHighlight {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
-      50% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0); }
-    }
-
-    .wf-card-header {
-      display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;
-    }
-    .wf-step-tag {
-      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
-      letter-spacing: 0.5px; text-transform: uppercase;
-    }
-    .tag-req { background: rgba(37,99,235,0.25); color: #93c5fd; border: 1px solid rgba(96,165,250,0.4); }
-    .tag-lec { background: rgba(217,119,6,0.25); color: #fde68a; border: 1px solid rgba(251,191,36,0.4); }
-    .tag-mgr { background: rgba(124,58,237,0.25); color: #e9d5ff; border: 1px solid rgba(192,132,252,0.4); }
-    .tag-proc { background: rgba(5,150,105,0.25); color: #a7f3d0; border: 1px solid rgba(52,211,153,0.4); }
-
-    .wf-card-title {
-      font-size: 13px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 6px;
-    }
-    .wf-card-meta {
-      font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;
-    }
-    .wf-card-pills {
-      display: flex; flex-wrap: wrap; gap: 5px;
-    }
-    .pill {
-      font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #0f172a;
-      color: #cbd5e1; border: 1px solid var(--border); font-family: monospace;
-    }
-    .pill-danger { background: rgba(220,38,38,0.2); color: #fca5a5; border-color: rgba(239,68,68,0.4); }
-    .pill-success { background: rgba(16,185,129,0.2); color: #86efac; border-color: rgba(16,185,129,0.4); }
-    .pill-warning { background: rgba(245,158,11,0.2); color: #fde047; border-color: rgba(245,158,11,0.4); }
-    .pill-purple { background: rgba(139,92,246,0.2); color: #d8b4fe; border-color: rgba(139,92,246,0.4); }
-
-    /* Workflow Decision Diamonds (Gateways) */
-    .wf-gateway {
-      width: 140px; height: 140px; position: relative;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; cursor: pointer; z-index: 10;
-    }
-    .gateway-diamond {
-      width: 100px; height: 100px; background: #1e293b;
-      border: 2px solid #f59e0b; transform: rotate(45deg);
-      border-radius: 8px; box-shadow: 0 4px 20px rgba(245,158,11,0.25);
-      position: absolute; transition: all 0.25s;
-    }
-    .wf-gateway:hover .gateway-diamond {
-      border-color: #fbbf24; box-shadow: 0 0 25px rgba(245,158,11,0.5);
-      transform: rotate(45deg) scale(1.05);
-    }
-    .gateway-content {
-      position: relative; z-index: 2; text-align: center; padding: 10px;
-      font-size: 11px; font-weight: 700; color: #fff; line-height: 1.3;
-      max-width: 90px;
-    }
-    .gateway-icon { font-size: 16px; margin-bottom: 2px; }
-
-    /* Canvas Controls Floating Bar */
-    .canvas-hud {
-      position: absolute; bottom: 20px; left: 20px; z-index: 30;
-      background: var(--bg-panel); border: 1px solid var(--border);
-      border-radius: 10px; padding: 6px; display: flex; align-items: center; gap: 6px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
-    }
-    .hud-btn {
-      width: 32px; height: 32px; background: transparent; border: none;
-      color: var(--text); border-radius: 6px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; font-size: 15px; font-weight: bold;
-      transition: background 0.15s;
-    }
-    .hud-btn:hover { background: var(--bg-card-hover); }
-    .hud-divider { width: 1px; height: 20px; background: var(--border); margin: 0 2px; }
-    .hud-zoom-text { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 45px; text-align: center; }
-
-    /* ======================================================== */
-    /* SIDE DRAWER: STEP EXECUTION DETAILS                      */
-    /* ======================================================== */
-    .side-inspector {
-      width: 480px; height: 100%; background: var(--bg-panel);
-      border-left: 1px solid var(--border); display: flex; flex-direction: column;
-      z-index: 45; flex-shrink: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .side-inspector.closed { transform: translateX(100%); margin-right: -480px; }
-
-    .inspector-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(15,23,42,0.6);
-    }
-    .inspector-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
-    .inspector-close-btn {
-      background: transparent; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 18px; padding: 4px; border-radius: 4px;
-    }
-    .inspector-close-btn:hover { color: #fff; background: var(--bg-card); }
-
-    .inspector-scroll { flex: 1; overflow-y: auto; padding: 20px; font-size: 13px; line-height: 1.5; }
-    
-    .block-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-      padding: 14px; margin-bottom: 16px;
-    }
-    .block-card-title {
-      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-      color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-    }
-    
-    .raci-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; margin-top: 8px;
-    }
-    .raci-item {
-      background: #0f172a; padding: 6px 4px; border-radius: 6px; border: 1px solid var(--border);
-    }
-    .raci-code { font-weight: 800; font-size: 12px; margin-bottom: 2px; }
-    .raci-label { font-size: 9px; color: var(--text-muted); }
-
-    .rule-item {
-      display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px;
-    }
-    .rule-bullet { color: #3b82f6; font-size: 14px; line-height: 1; flex-shrink: 0; }
-
-    .ui-mockup-frame {
-      border: 1px dashed var(--border-light); border-radius: 8px; padding: 12px;
-      background: #0b1120; margin-top: 10px;
-    }
-
-    /* ======================================================== */
-    /* VIEW 2: HORIZONTAL STAGE PROGRESSION PIPELINE            */
-    /* ======================================================== */
-    .pipeline-view-wrap {
-      flex: 1; height: 100%; overflow-y: auto; padding: 30px;
-      display: none; background: #0b1120;
-    }
-    .pipeline-stepper {
-      max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;
-    }
-    .stage-row {
-      display: flex; gap: 20px; background: var(--bg-panel); border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px 24px; align-items: flex-start;
-      transition: all 0.2s; position: relative;
-    }
-    .stage-row:hover { border-color: #3b82f6; transform: translateX(4px); }
-    .stage-num-badge {
-      width: 44px; height: 44px; border-radius: 10px;
-      background: linear-gradient(135deg, #1e293b, #334155);
-      border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0;
-    }
-    .stage-content { flex: 1; }
-    .stage-header-line { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .stage-name { font-size: 15px; font-weight: 700; color: #fff; }
-    .stage-role-pill { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
-    .stage-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
-    .stage-subgrid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;
-      background: rgba(15,23,42,0.6); padding: 12px; border-radius: 8px; border: 1px solid var(--border);
-    }
-    .stage-sub-col h5 { font-size: 10px; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 4px; }
-
-    /* ======================================================== */
-    /* VIEW 3: LIVE WORKFLOW SIMULATOR (EXECUTION ENGINE)       */
-    /* ======================================================== */
-    .simulator-view-wrap {
-      flex: 1; height: 100%; overflow-y: auto; padding: 24px;
-      display: none; background: #0b1120;
-    }
-    .sim-layout {
-      max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 420px 1fr; gap: 24px;
-    }
-    .sim-control-panel {
-      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px;
-      padding: 20px; display: flex; flex-direction: column; gap: 16px;
-    }
-    .sim-form-group { display: flex; flex-direction: column; gap: 6px; }
-    .sim-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; }
-    .sim-select, .sim-input, .sim-textarea {
-      background: #0f172a; border: 1px solid var(--border); border-radius: 6px;
-      padding: 8px 12px; font-size: 13px; color: #fff; font-family: inherit;
-    }
-    .sim-select:focus, .sim-input:focus, .sim-textarea:focus { outline: none; border-color: #3b82f6; }
-    .sim-textarea { resize: vertical; min-height: 60px; }
-
-    .sim-switch-group {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-    }
-    .sim-switch-btn {
-      background: #0f172a; border: 1px solid var(--border); border-radius: 6px;
-      padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600;
-      color: var(--text-muted); transition: all 0.2s;
-    }
-    .sim-switch-btn.active {
-      background: rgba(37,99,235,0.2); border-color: #3b82f6; color: #60a5fa;
-    }
-
-    .sim-results-panel {
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .sim-log-terminal {
-      background: #050b14; border: 1px solid #1e293b; border-radius: 10px;
-      padding: 16px; font-family: "JetBrains Mono", Menlo, Consolas, monospace;
-      font-size: 12px; color: #94a3b8; height: 260px; overflow-y: auto; line-height: 1.6;
-    }
-    .log-line { margin-bottom: 4px; display: flex; gap: 8px; }
-    .log-time { color: #64748b; }
-    .log-info { color: #38bdf8; }
-    .log-warn { color: #fbbf24; }
-    .log-err { color: #f87171; }
-    .log-ok { color: #34d399; }
-
-    .interlock-cards-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-    }
-    .itlock-card {
-      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px;
-      padding: 14px; position: relative;
-    }
-    .itlock-card-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .itlock-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #fff; }
-    .itlock-val { font-size: 14px; font-weight: 800; font-family: monospace; }
-    .itlock-status { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
-
-    /* Modal for Export High-Res */
-    .export-modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 100; display: none;
-      align-items: center; justify-content: center;
-    }
-    .export-box {
-      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px;
-      padding: 24px; width: 500px; max-width: 90%;
-    }
-
-    /* Pulse animation for active workflow arrows */
-    @keyframes flowDash {
-      to { stroke-dashoffset: -40; }
-    }
-    .animated-flow {
-      stroke-dasharray: 8, 8;
-      animation: flowDash 1.2s linear infinite;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Procurement Flow – Spare Parts (Factory)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b1120;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:0 16px;height:56px;background:#0f172a;border-bottom:1px solid #1e3a5f;flex-shrink:0;z-index:30}
+header h1{font-size:14px;font-weight:700;color:#93c5fd;letter-spacing:.4px;white-space:nowrap}
+header span{font-size:11px;color:#64748b;flex:1}
+.btn{padding:5px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;cursor:pointer;transition:background .15s}
+.btn:hover{background:#334155;color:#e2e8f0}
+#vp{flex:1;overflow:hidden;position:relative;cursor:grab}
+#vp.panning{cursor:grabbing}
+#diag{display:block;transform-origin:0 0}
+/* detail panel */
+#dp{position:fixed;top:56px;right:0;width:400px;height:calc(100vh - 56px);background:#0f172a;border-left:1px solid #1e3a5f;transform:translateX(100%);transition:transform .25s ease;z-index:50;overflow-y:auto;display:flex;flex-direction:column}
+#dp.open{transform:translateX(0)}
+#dp-head{padding:14px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
+#dp-code{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:#1e293b}
+#dp-title{font-size:13px;font-weight:600;color:#e2e8f0;flex:1}
+#dp-close{background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+#dp-close:hover{color:#e2e8f0}
+#dp-body{padding:14px 16px;flex:1}
+.dp-sec{margin-bottom:14px}
+.dp-sec h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#64748b;margin-bottom:6px}
+.raci-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.raci-cell{background:#1e293b;border-radius:4px;padding:5px 8px;font-size:11px}
+.raci-cell b{color:#93c5fd;display:block;font-size:9px;margin-bottom:1px}
+.dp-list{list-style:none;padding:0}
+.dp-list li{font-size:11px;color:#cbd5e1;padding:3px 0 3px 12px;border-bottom:1px solid #1e293b30;position:relative}
+.dp-list li::before{content:'›';position:absolute;left:0;color:#475569}
+.lane-badge{font-size:10px;padding:2px 7px;border-radius:3px;color:#fff}
+/* SVG node styles via CSS */
+.n{cursor:pointer}
+.n:hover rect,.n:hover polygon{filter:brightness(1.18)}
+</style>
 </head>
 <body>
+<header>
+  <h1>⚙️ Spare Parts Procurement Flow</h1>
+  <span>UML Activity Diagram – 4 Swimlanes</span>
+  <button class="btn" onclick="fitView()">⊡ Fit</button>
+  <button class="btn" onclick="zoom(1.2)">＋</button>
+  <button class="btn" onclick="zoom(0.83)">－</button>
+</header>
 
-  <!-- ==================== HEADER ==================== -->
-  <header>
-    <div class="brand-block">
-      <div class="brand-logo">⚡</div>
-      <div>
-        <div class="brand-title">BPMN WORKFLOW: TIẾN TRÌNH THẨM ĐỊNH MUA SẮM PHỤ TÙNG FACTORY HW</div>
-        <div class="brand-subtitle">
-          <span>Smart Watch Cleanroom (Org ID: 28753)</span>
-          <span>•</span>
-          <span style="color: #60a5fa;">Chuẩn Hóa 9 Bước</span>
-          <span>•</span>
-          <span style="color: #34d399;">Cơ Chế Mua 3 Tầng</span>
-          <span>•</span>
-          <span style="color: #fbbf24;">Quét Interlock Đa Chiều</span>
-        </div>
-      </div>
+<div id="vp">
+<svg id="diag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2100 2300" width="2100" height="2300">
+<defs>
+  <!-- Arrowhead markers -->
+  <marker id="a0" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#475569"/></marker>
+  <marker id="ag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#10b981"/></marker>
+  <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#ef4444"/></marker>
+  <marker id="ay" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f59e0b"/></marker>
+  <marker id="ap" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#8b5cf6"/></marker>
+</defs>
+
+<!-- ══════════════ BACKGROUND & SWIMLANES ══════════════ -->
+<rect width="2100" height="2300" fill="#0b1120"/>
+
+<!-- Lane 0: Requestor -->
+<rect x="0" y="0" width="510" height="2300" fill="#0d1829" opacity="0.9"/>
+<rect x="0" y="0" width="510" height="68" fill="#1d4ed8" rx="0"/>
+<text x="255" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Requestor</text>
+<text x="255" y="50" text-anchor="middle" fill="#bfdbfe" font-size="11">(Người Yêu Cầu)</text>
+
+<!-- Lane 1: LEC -->
+<rect x="510" y="0" width="460" height="2300" fill="#12100a" opacity="0.9"/>
+<rect x="510" y="0" width="460" height="68" fill="#b45309" rx="0"/>
+<text x="740" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">LEC</text>
+<text x="740" y="50" text-anchor="middle" fill="#fde68a" font-size="11">(Lead Engineer Coordinator)</text>
+
+<!-- Lane 2: Management -->
+<rect x="970" y="0" width="480" height="2300" fill="#100a1a" opacity="0.9"/>
+<rect x="970" y="0" width="480" height="68" fill="#6d28d9" rx="0"/>
+<text x="1210" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Management</text>
+<text x="1210" y="50" text-anchor="middle" fill="#ddd6fe" font-size="11">(Quản Lý Phê Duyệt)</text>
+
+<!-- Lane 3: Procurement -->
+<rect x="1450" y="0" width="650" height="2300" fill="#040d08" opacity="0.9"/>
+<rect x="1450" y="0" width="650" height="68" fill="#065f46" rx="0"/>
+<text x="1750" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Procurement</text>
+<text x="1750" y="50" text-anchor="middle" fill="#a7f3d0" font-size="11">(Bộ Phận Mua Hàng)</text>
+
+<!-- Lane dividers -->
+<line x1="510" y1="68" x2="510" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+<line x1="970" y1="68" x2="970" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+<line x1="1450" y1="68" x2="1450" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+<!-- ══════════════ EDGES (drawn before nodes) ══════════════ -->
+
+<!-- 1. START → ACT1 -->
+<path d="M255,167 L255,208" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
+
+<!-- 2. ACT1 → GW1 -->
+<path d="M255,268 L255,311" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
+
+<!-- 3. GW1 left "Đã có ✓" → ACT2A -->
+<path d="M211,353 L110,353 L110,408" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="118" y="336" width="68" height="16" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="152" y="348" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Đã có ✓</text>
+
+<!-- 4. GW1 right "Chưa có" → ACT2B -->
+<path d="M299,353 L390,353 L390,408" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+<rect x="300" y="336" width="68" height="16" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="334" y="348" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Chưa có</text>
+
+<!-- 5. ACT2A merge -->
+<path d="M110,476 L110,543 L251,543" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+
+<!-- 6. ACT2B merge -->
+<path d="M390,488 L390,543 L259,543" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+
+<!-- 7. merge to ACT3 -->
+<path d="M255,543 L255,548" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
+
+<!-- 8. ACT3 → ACT4 -->
+<path d="M255,628 L255,678" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
+
+<!-- 9. ACT4 right → ACT5 (CROSS LANE) -->
+<path d="M390,715 L510,715 L740,715 L740,763" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="6,3"/>
+<rect x="490" y="699" width="88" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="534" y="711" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">→ LEC Review</text>
+
+<!-- 10. ACT5 → GW2 -->
+<path d="M740,838 L740,876" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)"/>
+
+<!-- 11. GW2 → ACT6 "Đạt ✓" -->
+<path d="M740,960 L740,966" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="748" y="956" width="46" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="771" y="967" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Đạt ✓</text>
+
+<!-- 12. GW2 loop back "Chưa đạt" -->
+<path d="M696,918 L608,918 L608,800 L618,800" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)" stroke-dasharray="5,3"/>
+<rect x="599" y="850" width="68" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="633" y="862" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Chưa đạt</text>
+
+<!-- 13. ACT6 → ACT7 (CROSS LANE) -->
+<path d="M740,1041 L740,1070 L1210,1070 L1210,1116" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ap)" stroke-dasharray="6,3"/>
+<rect x="940" y="1054" width="88" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="984" y="1066" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="600">→ Mgmt Review</text>
+
+<!-- 14. ACT7 → GW3 -->
+<path d="M1210,1196 L1210,1230" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ap)"/>
+
+<!-- 15. GW3 right "Có TMP-" → BLOCK -->
+<path d="M1254,1272 L1283,1272" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+<rect x="1256" y="1256" width="58" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1285" y="1267" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Có TMP-</text>
+
+<!-- 16. BLOCK loop to ACT7 "Fix xong" -->
+<path d="M1368,1250 L1368,1095 L1440,1095 L1440,1156 L1337,1156" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="5,3"/>
+<rect x="1375" y="1098" width="58" height="15" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1404" y="1110" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">Fix xong</text>
+
+<!-- 17. GW3 → ACT8 "Không ✓" -->
+<path d="M1210,1314 L1210,1358" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="1218" y="1314" width="56" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1246" y="1326" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Không ✓</text>
+
+<!-- 18. ACT8 → ACT9A (CROSS LANE) -->
+<path d="M1210,1438 L1210,1465 L1750,1465 L1750,1498" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)" stroke-dasharray="6,3"/>
+<rect x="1440" y="1449" width="100" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1490" y="1461" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">→ Procurement</text>
+
+<!-- 19. ACT9A → GW4 -->
+<path d="M1750,1573 L1750,1611" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+
+<!-- 20. GW4 → OK1 "Approve ✓" -->
+<path d="M1795,1653 L1933,1653" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="1810" y="1637" width="72" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1846" y="1648" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approve ✓</text>
+
+<!-- 21. GW4 → ACT9B "Reject" -->
+<path d="M1750,1695 L1750,1713" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+<rect x="1758" y="1696" width="42" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1779" y="1708" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject</text>
+
+<!-- 22. ACT9B → GW5 -->
+<path d="M1750,1788 L1750,1826" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)"/>
+
+<!-- 23. GW5 → OK2 "Approve ✓" -->
+<path d="M1795,1868 L1933,1868" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="1810" y="1852" width="72" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1846" y="1863" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approve ✓</text>
+
+<!-- 24. GW5 → ACT9C "Reject" -->
+<path d="M1750,1910 L1750,1928" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+<rect x="1758" y="1911" width="42" height="15" rx="3" fill="#131c31" opacity="0.85"/>
+<text x="1779" y="1923" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject</text>
+
+<!-- 25. ACT9C → END -->
+<path d="M1750,2038 L1750,2083" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
+
+<!-- ══════════════ NODES ══════════════ -->
+
+<!-- START node -->
+<g class="n" onclick="show('start')">
+  <circle cx="255" cy="147" r="18" fill="#1d4ed8" stroke="#60a5fa" stroke-width="2"/>
+  <text x="255" y="151" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">▶</text>
+  <text x="255" y="128" text-anchor="middle" fill="#93c5fd" font-size="10">START</text>
+</g>
+
+<!-- ACT1 -->
+<g class="n" onclick="show('act1')">
+  <rect x="143" y="208" width="224" height="60" rx="6" fill="#1a3561" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="255" y="224" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">ACT-1</text>
+  <text x="255" y="239" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">1. Định Vị Thiết Bị 4 Tầng</text>
+  <text x="255" y="254" text-anchor="middle" fill="#94a3b8" font-size="10">Line ► Machine ► Unit ► Assembly</text>
+</g>
+
+<!-- GW1 -->
+<g class="n" onclick="show('gw1')">
+  <polygon points="255,311 299,353 255,395 211,353" fill="#132030" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="255" y="348" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Mã QCode</text>
+  <text x="255" y="362" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">trong ERP?</text>
+</g>
+
+<!-- ACT2A -->
+<g class="n" onclick="show('act2a')">
+  <rect x="15" y="408" width="190" height="68" rx="6" fill="#1a3561" stroke="#10b981" stroke-width="1.5"/>
+  <text x="110" y="423" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-2A</text>
+  <text x="110" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2A. Đã Có: Bổ Sung QCode</text>
+  <text x="110" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">Auto-fill giá, tồn kho, CAD</text>
+  <text x="110" y="468" text-anchor="middle" fill="#6ee7b7" font-size="10">✓ Mã hợp lệ</text>
+</g>
+
+<!-- ACT2B -->
+<g class="n" onclick="show('act2b')">
+  <rect x="295" y="408" width="190" height="80" rx="6" fill="#1a3561" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="390" y="423" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">ACT-2B</text>
+  <text x="390" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2B. Chưa Có: ĐK Hạng Mục</text>
+  <text x="390" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">TMP-HW-xxxx</text>
+  <text x="390" y="468" text-anchor="middle" fill="#fca5a5" font-size="10">costBlocked=true</text>
+</g>
+
+<!-- ACT3 -->
+<g class="n" onclick="show('act3')">
+  <rect x="135" y="548" width="240" height="80" rx="6" fill="#1a3561" stroke="#475569" stroke-width="1.5"/>
+  <text x="255" y="563" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">ACT-3</text>
+  <text x="255" y="578" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">3. Nhập SL Xin Mua &amp; Lý Do</text>
+  <text x="255" y="593" text-anchor="middle" fill="#94a3b8" font-size="10">Setup/CIP/Breakdown/PM</text>
+  <text x="255" y="608" text-anchor="middle" fill="#fbbf24" font-size="10">🚨 Cờ Khẩn Cấp</text>
+</g>
+
+<!-- ACT4 -->
+<g class="n" onclick="show('act4')">
+  <rect x="120" y="678" width="270" height="75" rx="6" fill="#1a3561" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="255" y="693" text-anchor="middle" fill="#0ea5e9" font-size="10" font-weight="700">ACT-4</text>
+  <text x="255" y="708" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">4. Hệ Thống Quét 4 Chiều Interlock</text>
+  <text x="255" y="723" text-anchor="middle" fill="#94a3b8" font-size="10">① Giá UP001/UP004  ② Tồn kho &gt;30d</text>
+  <text x="255" y="738" text-anchor="middle" fill="#94a3b8" font-size="10">③ Tồn pháp nhân   ④ Chênh lệch giá</text>
+</g>
+
+<!-- ACT5 -->
+<g class="n" onclick="show('act5')">
+  <rect x="618" y="763" width="244" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="740" y="778" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-5</text>
+  <text x="740" y="793" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">5. Trao Đổi LEC ↔ Requestor</text>
+  <text x="740" y="808" text-anchor="middle" fill="#94a3b8" font-size="10">Thẩm tra kỹ thuật</text>
+  <text x="740" y="823" text-anchor="middle" fill="#94a3b8" font-size="10">&amp; ảnh hiện trường</text>
+</g>
+
+<!-- GW2 -->
+<g class="n" onclick="show('gw2')">
+  <polygon points="740,876 784,918 740,960 696,918" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="740" y="913" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">LEC đánh</text>
+  <text x="740" y="927" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">giá đạt?</text>
+</g>
+
+<!-- ACT6 -->
+<g class="n" onclick="show('act6')">
+  <rect x="618" y="966" width="244" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="740" y="981" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-6</text>
+  <text x="740" y="996" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">6. Gom Mẻ + Gán EM No 14 Ký Tự</text>
+  <text x="740" y="1011" text-anchor="middle" fill="#94a3b8" font-size="10">Nhãn TARGET / OVER (OVR-01..06)</text>
+  <text x="740" y="1026" text-anchor="middle" fill="#fbbf24" font-size="10">+ WO gắn kết</text>
+</g>
+
+<!-- ACT7 -->
+<g class="n" onclick="show('act7')">
+  <rect x="1083" y="1116" width="254" height="80" rx="6" fill="#1f0f40" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="1210" y="1131" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700">ACT-7</text>
+  <text x="1210" y="1146" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">7. Thẩm Định Offline (Ngày 01-05)</text>
+  <text x="1210" y="1161" text-anchor="middle" fill="#94a3b8" font-size="10">LEC Trung Gian: MGR↔LEC↔REQ</text>
+  <text x="1210" y="1176" text-anchor="middle" fill="#fca5a5" font-size="10">⛔ Chặn cứng mã TMP-</text>
+</g>
+
+<!-- GW3 -->
+<g class="n" onclick="show('gw3')">
+  <polygon points="1210,1230 1254,1272 1210,1314 1166,1272" fill="#150828" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="1210" y="1267" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Còn mã</text>
+  <text x="1210" y="1281" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">TMP-?</text>
+</g>
+
+<!-- BLOCK -->
+<g class="n" onclick="show('block')">
+  <rect x="1283" y="1250" width="170" height="52" rx="6" fill="#300" stroke="#ef4444" stroke-width="2"/>
+  <text x="1368" y="1270" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">⛔ CHẶN CỨNG</text>
+  <text x="1368" y="1288" text-anchor="middle" fill="#fca5a5" font-size="10">Yêu cầu QCode ERP</text>
+</g>
+
+<!-- ACT8 -->
+<g class="n" onclick="show('act8')">
+  <rect x="1083" y="1358" width="254" height="80" rx="6" fill="#1f0f40" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1210" y="1373" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-8</text>
+  <text x="1210" y="1388" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">8. Chốt List Mua + Cost Clearance</text>
+  <text x="1210" y="1403" text-anchor="middle" fill="#94a3b8" font-size="10">📜 CC-HW-YYYYMM-PASS</text>
+  <text x="1210" y="1418" text-anchor="middle" fill="#6ee7b7" font-size="10">Budget locked &amp; approved</text>
+</g>
+
+<!-- ACT9A -->
+<g class="n" onclick="show('act9a')">
+  <rect x="1628" y="1498" width="244" height="75" rx="6" fill="#061a10" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1750" y="1513" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-9A</text>
+  <text x="1750" y="1528" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9A. ⭐ Tầng 1: Điều Chuyển Kho</text>
+  <text x="1750" y="1543" text-anchor="middle" fill="#94a3b8" font-size="10">Liên Pháp Nhân (Transfer)</text>
+  <text x="1750" y="1558" text-anchor="middle" fill="#6ee7b7" font-size="10">Ưu tiên cao nhất</text>
+</g>
+
+<!-- GW4 -->
+<g class="n" onclick="show('gw4')">
+  <polygon points="1750,1611 1795,1653 1750,1695 1705,1653" fill="#031008" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1750" y="1648" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Transfer</text>
+  <text x="1750" y="1662" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approve?</text>
+</g>
+
+<!-- OK1 -->
+<g class="n" onclick="show('ok1')">
+  <rect x="1933" y="1633" width="128" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="1997" y="1648" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ HOÀN TẤT</text>
+  <text x="1997" y="1664" text-anchor="middle" fill="#6ee7b7" font-size="10">Tầng 1 – Transfer</text>
+</g>
+
+<!-- ACT9B -->
+<g class="n" onclick="show('act9b')">
+  <rect x="1628" y="1713" width="244" height="75" rx="6" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="1750" y="1728" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-9B</text>
+  <text x="1750" y="1743" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9B. Tầng 2: Mua Nội Bộ</text>
+  <text x="1750" y="1758" text-anchor="middle" fill="#94a3b8" font-size="10">Internal PO giữa hai pháp nhân</text>
+  <text x="1750" y="1773" text-anchor="middle" fill="#fde68a" font-size="10">Inter-company transaction</text>
+</g>
+
+<!-- GW5 -->
+<g class="n" onclick="show('gw5')">
+  <polygon points="1750,1826 1795,1868 1750,1910 1705,1868" fill="#0d0a00" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="1750" y="1863" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Internal PO</text>
+  <text x="1750" y="1877" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approve?</text>
+</g>
+
+<!-- OK2 -->
+<g class="n" onclick="show('ok2')">
+  <rect x="1933" y="1848" width="128" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="1997" y="1863" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ HOÀN TẤT</text>
+  <text x="1997" y="1879" text-anchor="middle" fill="#6ee7b7" font-size="10">Tầng 2 – Internal PO</text>
+</g>
+
+<!-- ACT9C -->
+<g class="n" onclick="show('act9c')">
+  <rect x="1618" y="1928" width="264" height="110" rx="6" fill="#061830" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="1750" y="1943" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">ACT-9C</text>
+  <text x="1750" y="1958" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9C. Tầng 3: Mua Thường – Nexacro EMS</text>
+  <text x="1750" y="1973" text-anchor="middle" fill="#94a3b8" font-size="10">PRV → Ký 100% trên EMS Core</text>
+  <text x="1750" y="1988" text-anchor="middle" fill="#94a3b8" font-size="10">→ PO-99xxx / Inbound</text>
+  <text x="1750" y="2003" text-anchor="middle" fill="#94a3b8" font-size="10">→ Nhập kho → ds_Inv</text>
+  <text x="1750" y="2018" text-anchor="middle" fill="#bfdbfe" font-size="10">External vendor procurement</text>
+</g>
+
+<!-- END node (double circle) -->
+<g class="n" onclick="show('end')">
+  <circle cx="1750" cy="2108" r="22" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <circle cx="1750" cy="2108" r="14" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="1750" y="2112" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">END</text>
+  <text x="1750" y="2088" text-anchor="middle" fill="#94a3b8" font-size="10">Quy Trình Hoàn Tất</text>
+</g>
+
+</svg>
+</div>
+
+<!-- Detail Panel -->
+<div id="dp">
+  <div id="dp-head">
+    <span id="dp-code"></span>
+    <span id="dp-title"></span>
+    <button id="dp-close" onclick="closePanel()">✕</button>
+  </div>
+  <div id="dp-body">
+    <div class="dp-sec" id="dp-lane-sec">
+      <h3>Actor / Swimlane</h3>
+      <span class="lane-badge" id="dp-lane-badge"></span>
     </div>
-
-    <div class="header-tools">
-      <div class="search-input-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" id="wfSearch" placeholder="Tìm kiếm bước, mã QCode, TMP..." oninput="searchWorkflow(this.value)">
-      </div>
-
-      <div class="view-tabs">
-        <button class="view-tab-btn active" id="tab-btn-canvas" onclick="switchMainView('canvas')">
-          <span>🌐</span> Sơ Đồ Swimlanes
-        </button>
-        <button class="view-tab-btn" id="tab-btn-pipe" onclick="switchMainView('pipeline')">
-          <span>🛤️</span> Băng Chuyền 9 Bước
-        </button>
-        <button class="view-tab-btn" id="tab-btn-sim" onclick="switchMainView('simulator')">
-          <span>⚡</span> Trình Giả Lập Luồng
-        </button>
-      </div>
-
-      <button class="btn-action" onclick="fitView()">🎯 Căn Giữa</button>
-      <button class="btn-action btn-primary" onclick="openExportModal()">📷 Xuất Đồ Họa 4K</button>
+    <div class="dp-sec">
+      <h3>RACI Matrix</h3>
+      <div class="raci-grid" id="dp-raci"></div>
     </div>
-  </header>
-
-  <!-- ==================== FILTER TOOLBAR ==================== -->
-  <div class="filter-toolbar" id="filterToolbar">
-    <div class="lane-filters">
-      <span style="font-weight: 600; color: var(--text-subtle); margin-right: 4px;">LỌC THEO PHÒNG BAN:</span>
-      <button class="lane-filter-btn active-req" id="filter-req" onclick="toggleLaneFilter('req')">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-req-light);"></span>
-        Kỹ Sư Hiện Trường (Requestor)
-      </button>
-      <button class="lane-filter-btn active-lec" id="filter-lec" onclick="toggleLaneFilter('lec')">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-lec-light);"></span>
-        Điều Phối Thiết Bị (LEC - Trung Gian)
-      </button>
-      <button class="lane-filter-btn active-mgr" id="filter-mgr" onclick="toggleLaneFilter('mgr')">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-mgr-light);"></span>
-        Ban Quản Lý Chi Phí (Management)
-      </button>
-      <button class="lane-filter-btn active-proc" id="filter-proc" onclick="toggleLaneFilter('proc')">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-proc-light);"></span>
-        Mua Hàng & Cổng EMS (Procurement)
-      </button>
+    <div class="dp-sec">
+      <h3>Inputs</h3>
+      <ul class="dp-list" id="dp-inputs"></ul>
     </div>
-
-    <div class="view-stats">
-      <div class="stat-pill"><span>Chốt chặn cứng:</span> <strong style="color: #f87171;">Mã TMP Chặn PO</strong></div>
-      <div class="stat-pill"><span>Kỳ Thẩm Định:</span> <strong style="color: #60a5fa;">01-05 Hàng Tháng</strong></div>
-      <div class="stat-pill"><span>Nexacro EMS:</span> <strong style="color: #34d399;">Duyệt PO 100% Core</strong></div>
+    <div class="dp-sec">
+      <h3>Business Rules</h3>
+      <ul class="dp-list" id="dp-rules"></ul>
+    </div>
+    <div class="dp-sec">
+      <h3>Outputs</h3>
+      <ul class="dp-list" id="dp-outputs"></ul>
     </div>
   </div>
-
-  <!-- ==================== MAIN WORKSPACE ==================== -->
-  <div class="workspace-area">
-
-    <!-- VIEW 1: WORKFLOW CANVAS WITH 4 SWIMLANES -->
-    <div class="workflow-viewport" id="viewport">
-      <div class="canvas-scaler" id="canvasScaler">
-        
-        <!-- SVG CONNECTOR PATHS -->
-        <svg class="workflow-connections-svg" id="connectionsSvg">
-          <defs>
-            <marker id="wf-arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
-            </marker>
-            <marker id="wf-arrow-req" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6"/>
-            </marker>
-            <marker id="wf-arrow-lec" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
-            </marker>
-            <marker id="wf-arrow-mgr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#a855f7"/>
-            </marker>
-            <marker id="wf-arrow-proc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
-            </marker>
-            <marker id="wf-arrow-danger" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
-            </marker>
-          </defs>
-
-          <!-- SVG Connector lines will be rendered dynamically and cleanly -->
-          <g id="pathGroup"></g>
-        </svg>
-
-        <!-- SWIMLANES CONTAINER -->
-        <div class="swimlanes-container" id="swimlanesBox">
-
-          <!-- ================= LANE 1: REQUESTOR ================= -->
-          <div class="swimlane lane-req" id="lane-req">
-            <div class="swimlane-header">
-              <div class="lane-label">
-                <div class="lane-icon">1</div>
-                <div>
-                  <div class="lane-title" style="color: #93c5fd;">LÀN 1: KỸ SƯ HIỆN TRƯỜNG (REQUESTOR)</div>
-                  <div class="lane-desc">Phát sinh nhu cầu • Định vị cấu trúc 4 tầng • Đăng ký Hạng mục & Thông tin kỹ thuật</div>
-                </div>
-              </div>
-              <span class="lane-badge" style="background: rgba(37,99,235,0.2); color: #93c5fd; border: 1px solid rgba(96,165,250,0.4);">
-                Khởi tạo dữ liệu gốc
-              </span>
-            </div>
-
-            <div class="swimlane-nodes-row">
-              <!-- STEP 1: VỊ TRÍ 4 TẦNG -->
-              <div class="wf-card" id="card-step-1" onclick="selectStep('1')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-req">WF-STEP-01</span>
-                  <span class="pill">4 Tầng</span>
-                </div>
-                <div class="wf-card-title">1. Chọn Vị Trí Thiết Bị 4 Tầng</div>
-                <div class="wf-card-meta">Line ➔ Machine ➔ Unit ➔ Assembly. Quy tắc tầng: Left(Line,1)=Floor. Master Template sao chép nhanh giữa các Line.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">SCR-01</span>
-                  <span class="pill">Template Engine</span>
-                </div>
-              </div>
-
-              <!-- GATEWAY 1: KIỂM TRA MÃ QCODE -->
-              <div class="wf-gateway" id="gw-step-2" onclick="selectStep('GW1')">
-                <div class="gateway-diamond"></div>
-                <div class="gateway-content">
-                  <div class="gateway-icon">❓</div>
-                  <div>ĐÃ CÓ MÃ QCODE ERP?</div>
-                </div>
-              </div>
-
-              <!-- STEP 2B: CHƯA CÓ MÃ -->
-              <div class="wf-card" id="card-step-2b" onclick="selectStep('2B')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-req" style="background: rgba(239,68,68,0.2); color: #fca5a5;">WF-STEP-02B</span>
-                  <span class="pill pill-danger">TMP Code</span>
-                </div>
-                <div class="wf-card-title">2B. Chưa Có: Đăng Ký Category & Item</div>
-                <div class="wf-card-meta">ĐK Tên Hạng Mục ➔ Tên Item mới ➔ Kéo thả Folder/Bản vẽ CAD. Cấp mã tạm TMP-HW-xxxx (Khóa costBlocked=true).</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-danger">Chặn duyệt PO</span>
-                  <span class="pill">Upload Folder</span>
-                </div>
-              </div>
-
-              <!-- STEP 2A: ĐÃ CÓ MÃ -->
-              <div class="wf-card" id="card-step-2a" onclick="selectStep('2A')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-req" style="background: rgba(16,185,129,0.2); color: #86efac;">WF-STEP-02A</span>
-                  <span class="pill pill-success">QCode Chuẩn</span>
-                </div>
-                <div class="wf-card-title">2A. Đã Có: Bổ Sung Mã QCode</div>
-                <div class="wf-card-meta">Omni-Search typeahead tra cứu từ catalog procurement-rfq-stock-optimization.yml. Tự động fill Đơn vị, Giá, Tồn kho, CAD link.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">Auto-fill 100%</span>
-                  <span class="pill">QCode ERP</span>
-                </div>
-              </div>
-
-              <!-- STEP 3: NHẬP SỐ LƯỢNG & LÝ DO -->
-              <div class="wf-card" id="card-step-3" onclick="selectStep('3')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-req">WF-STEP-03</span>
-                  <span class="pill pill-warning">Vận Hành</span>
-                </div>
-                <div class="wf-card-title">3. Nhập SL Xin Mua & Lý Do Vận Hành</div>
-                <div class="wf-card-meta">Nhập Request Qty. Dropdown [Setup, CIP, Breakdown, PM, Spare]. Lý do chi tiết, logic kỹ thuật, hiện trạng máy & Cờ khẩn cấp (Urgent).</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-danger">Cờ Khẩn Cấp</span>
-                  <span class="pill">Logic Hỏng Hóc</span>
-                  <span class="pill">Downtime Loss</span>
-                </div>
-              </div>
-
-              <!-- STEP 4: QUÉT INTERLOCK TỰ ĐỘNG -->
-              <div class="wf-card" id="card-step-4" onclick="selectStep('4')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-req" style="background: rgba(14,165,233,0.2); color: #7dd3fc;">WF-STEP-04</span>
-                  <span class="pill pill-purple">Rule Engine</span>
-                </div>
-                <div class="wf-card-title">4. Hiển Thị Thông Tin Trạng Thái Interlock</div>
-                <div class="wf-card-meta">Hệ thống quét tức thì 4 khía cạnh: (1) Giá UP001/UP004, (2) Tồn kho lâu >30/60/90d, (3) Tồn kho pháp nhân khác, (4) Giá cao hơn pháp nhân khác.</div>
-                <div class="wf-card-pills">
-                  <span class="pill">UP001 vs UP004</span>
-                  <span class="pill pill-warning">>30 Ngày Tồn</span>
-                  <span class="pill pill-danger">Lệch Giá</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= LANE 2: LEC ================= -->
-          <div class="swimlane lane-lec" id="lane-lec">
-            <div class="swimlane-header">
-              <div class="lane-label">
-                <div class="lane-icon">2</div>
-                <div>
-                  <div class="lane-title" style="color: #fcd34d;">LÀN 2: CHUYÊN VIÊN ĐIỀU PHỐI (LEC - TRUNG GIAN)</div>
-                  <div class="lane-desc">Cầu nối Requestor & Reviewer • Thẩm tra kỹ thuật • Gom mẻ EM No • Phân loại Target / Over</div>
-                </div>
-              </div>
-              <span class="lane-badge" style="background: rgba(217,119,6,0.2); color: #fcd34d; border: 1px solid rgba(251,191,36,0.4);">
-                Bàn Điều Phối Trung Gian
-              </span>
-            </div>
-
-            <div class="swimlane-nodes-row" style="padding-left: 700px;">
-              <!-- STEP 5: TRAO ĐỔI LEC & REQUESTOR -->
-              <div class="wf-card" id="card-step-5" onclick="selectStep('5')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-lec">WF-STEP-05</span>
-                  <span class="pill pill-warning">Hội Chẩn</span>
-                </div>
-                <div class="wf-card-title">5. Trao Đổi Giữa LEC & Requestor</div>
-                <div class="wf-card-meta">Kênh tương tác trực tiếp: LEC làm rõ lý do sử dụng, hiện trạng máy dừng, kiểm tra tồn kho lâu & chênh lệch giá. Requestor bổ sung ảnh & giải trình.</div>
-                <div class="wf-card-pills">
-                  <span class="pill">Live Chat Thread</span>
-                  <span class="pill">Upload Ảnh Máy</span>
-                  <span class="pill pill-success">Giải Trình Tồn</span>
-                </div>
-              </div>
-
-              <!-- GATEWAY 2: LEC REVIEW OK? -->
-              <div class="wf-gateway" id="gw-step-6" onclick="selectStep('GW2')">
-                <div class="gateway-diamond" style="border-color: #f59e0b;"></div>
-                <div class="gateway-content">
-                  <div class="gateway-icon">⚖️</div>
-                  <div>LEC ĐÁNH GIÁ ĐẠT?</div>
-                </div>
-              </div>
-
-              <!-- STEP 6: LÊN LIST THẨM ĐỊNH & GÁN EM NO -->
-              <div class="wf-card" id="card-step-6" onclick="selectStep('6')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-lec">WF-STEP-06</span>
-                  <span class="pill pill-purple">Gom Mẻ</span>
-                </div>
-                <div class="wf-card-title">6. Gom Mẻ, Gán EM No, Nhãn TARGET / OVER</div>
-                <div class="wf-card-meta">Gom mẻ thẩm định tháng. Gán mã EM No 14 ký tự (HWBMTL21EC0101). Đánh nhãn TARGET (chuẩn EBOM) hoặc OVER (gán 1 trong 6 mã OVR-01..06 & Work Order).</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">EM No 14 ký tự</span>
-                  <span class="pill">TARGET</span>
-                  <span class="pill pill-danger">OVER (OVR-01..06)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= LANE 3: MANAGEMENT ================= -->
-          <div class="swimlane lane-mgr" id="lane-mgr">
-            <div class="swimlane-header">
-              <div class="lane-label">
-                <div class="lane-icon">3</div>
-                <div>
-                  <div class="lane-title" style="color: #c4b5fd;">LÀN 3: BAN QUẢN LÝ CHI PHÍ (MANAGEMENT TEAM / REVIEWER)</div>
-                  <div class="lane-desc">Thẩm định Offline (01-05 hàng tháng) • LEC Trung Gian Chất Vấn • Chốt Danh Sách Mua & Cấp Cost Clearance</div>
-                </div>
-              </div>
-              <span class="lane-badge" style="background: rgba(124,58,237,0.2); color: #c4b5fd; border: 1px solid rgba(192,132,252,0.4);">
-                Cổng Phê Duyệt Ngân Sách
-              </span>
-            </div>
-
-            <div class="swimlane-nodes-row" style="padding-left: 1200px;">
-              <!-- STEP 7: THẨM ĐỊNH OFFLINE QUA LEC TRUNG GIAN -->
-              <div class="wf-card" id="card-step-7" onclick="selectStep('7')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-mgr">WF-STEP-07</span>
-                  <span class="pill pill-danger">Hard Gate</span>
-                </div>
-                <div class="wf-card-title">7. Thẩm Định Offline (Ngày 01-05)</div>
-                <div class="wf-card-meta">Ban Quản Lý Chi Phí thẩm định offline. LEC làm trung gian trao đổi giữa Requestor và Reviewer (Inquiry dispatch). Chặn cứng mã tạm TMP-HW-xxxx.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-danger">Chặn TMP-</span>
-                  <span class="pill pill-warning">LEC Trung Gian</span>
-                  <span class="pill">SCR-05 Audit</span>
-                </div>
-              </div>
-
-              <!-- STEP 8: CHỐT LIST MUA & COST CLEARANCE -->
-              <div class="wf-card" id="card-step-8" onclick="selectStep('8')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-mgr">WF-STEP-08</span>
-                  <span class="pill pill-success">Milestone</span>
-                </div>
-                <div class="wf-card-title">8. Chốt List Mua & Cấp Cost Clearance</div>
-                <div class="wf-card-meta">Ban Quản Lý phê duyệt chính thức. Ký cấp chứng chỉ Cost Clearance (Mã: CC-HW-YYYYMM-PASS). Mở khóa hồ sơ sang cổng Mua Sắm.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">CC-HW-PASS</span>
-                  <span class="pill">Đóng Băng Danh Sách</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= LANE 4: PROCUREMENT & EMS ================= -->
-          <div class="swimlane lane-proc" id="lane-proc">
-            <div class="swimlane-header">
-              <div class="lane-label">
-                <div class="lane-icon">4</div>
-                <div>
-                  <div class="lane-title" style="color: #6ee7b7;">LÀN 4: TIẾN HÀNH MUA & HỆ THỐNG EMS NEXACRO (CƠ CHẾ 3 TẦNG)</div>
-                  <div class="lane-desc">Xử lý từng hạng mục Interlock: Tầng 1 Chuyển Giao ➔ Tầng 2 Internal PO ➔ Tầng 3 Mua Thường Cục Bộ Giá Thấp Nhất</div>
-                </div>
-              </div>
-              <span class="lane-badge" style="background: rgba(5,150,105,0.2); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.4);">
-                Thực Thi & Quyết Toán Chi Phí
-              </span>
-            </div>
-
-            <div class="swimlane-nodes-row" style="padding-left: 1550px;">
-              <!-- STEP 9A: TẦNG 1 CHUYỂN GIAO -->
-              <div class="wf-card" id="card-step-9a" onclick="selectStep('9A')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-proc">WF-STEP-09A</span>
-                  <span class="pill pill-success">Tầng 1: Ưu Tiên</span>
-                </div>
-                <div class="wf-card-title">9A. Chuyển Giao Kho Liên Pháp Nhân</div>
-                <div class="wf-card-meta">Kiểm tra tồn kho pháp nhân khác. Nếu Approve ➔ Xuất chuyển kho nội bộ (Không mua mới). Nếu Reject ➔ Chuyển Tầng 2.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">Approve: Xong</span>
-                  <span class="pill pill-danger">Reject ➔ Tầng 2</span>
-                </div>
-              </div>
-
-              <!-- STEP 9B: TẦNG 2 INTERNAL PO -->
-              <div class="wf-card" id="card-step-9b" onclick="selectStep('9B')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-proc" style="background: rgba(245,158,11,0.2); color: #fde047;">WF-STEP-09B</span>
-                  <span class="pill pill-warning">Tầng 2: Nội Bộ</span>
-                </div>
-                <div class="wf-card-title">9B. Mua Nội Bộ (Internal PO)</div>
-                <div class="wf-card-meta">Lập đơn mua nội bộ giữa hai pháp nhân. Nếu Approve ➔ Xuất hóa đơn nội bộ, vận chuyển. Nếu Reject ➔ Chuyển Tầng 3.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-success">Approve: Xong</span>
-                  <span class="pill pill-danger">Reject ➔ Tầng 3</span>
-                </div>
-              </div>
-
-              <!-- STEP 9C: TẦNG 3 MUA THƯỜNG TRÊN NEXACRO EMS -->
-              <div class="wf-card" id="card-step-9c" onclick="selectStep('9C')">
-                <div class="wf-card-header">
-                  <span class="wf-step-tag tag-proc" style="background: rgba(59,130,246,0.2); color: #93c5fd;">WF-STEP-09C</span>
-                  <span class="pill pill-purple">Tầng 3: External</span>
-                </div>
-                <div class="wf-card-title">9C. Mua Thường Giá Thấp Nhất (EMS PO)</div>
-                <div class="wf-card-meta">Mua thị trường ngoài. Lãnh đạo ký duyệt PRV & PO 100% trên Nexacro EMS Core. Theo dõi Inbound Logistics ➔ Nhập kho xuất dùng ds_Inv.</div>
-                <div class="wf-card-pills">
-                  <span class="pill pill-purple">PO-99xxx Core</span>
-                  <span class="pill">Inbound 3 Mốc</span>
-                  <span class="pill pill-success">ds_Inv Quyết Toán</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div> <!-- End Swimlanes Container -->
-      </div> <!-- End Canvas Scaler -->
-
-      <!-- HUD Controls -->
-      <div class="canvas-hud">
-        <button class="hud-btn" onclick="zoomCanvas(0.1)" title="Phóng to">+</button>
-        <button class="hud-btn" onclick="zoomCanvas(-0.1)" title="Thu nhỏ">-</button>
-        <span class="hud-zoom-text" id="zoomText">100%</span>
-        <div class="hud-divider"></div>
-        <button class="hud-btn" onclick="fitView()" title="Căn chỉnh toàn cảnh">🎯</button>
-        <button class="hud-btn" onclick="toggleInspector()" title="Bật/Tắt chi tiết bước">📋</button>
-      </div>
-    </div>
-
-    <!-- ==================== SIDE INSPECTOR DRAWER ==================== -->
-    <div class="side-inspector" id="sideInspector">
-      <div class="inspector-header">
-        <div>
-          <span class="inspector-badge" id="inspBadge" style="background: #2563eb; color: #fff;">WF-STEP-01</span>
-          <h3 style="font-size: 15px; font-weight: 700; margin-top: 4px;" id="inspTitle">Định Vị Cấu Trúc Thiết Bị 4 Tầng</h3>
-        </div>
-        <button class="inspector-close-btn" onclick="toggleInspector(false)">✕</button>
-      </div>
-
-      <div class="inspector-scroll" id="inspBody">
-        <!-- Rendered by JS based on selection -->
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 2: PIPELINE PROGRESSION VIEW ==================== -->
-    <div class="pipeline-view-wrap" id="pipelineView">
-      <div class="pipeline-stepper" id="pipelineStepperContent">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 3: LIVE SIMULATOR ==================== -->
-    <div class="simulator-view-wrap" id="simulatorView">
-      <div class="sim-layout">
-        
-        <!-- Controls & Input Form -->
-        <div class="sim-control-panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
-            <h3 style="font-size: 14px; font-weight: 700;">⚙️ BÀN ĐIỀU KHIỂN GIẢ LẬP WORKFLOW</h3>
-            <button class="btn-action btn-primary" onclick="runAutoSimulation()">▶️ Tự Động Chạy Demo</button>
-          </div>
-
-          <!-- 1. Vị trí thiết bị -->
-          <div class="sim-form-group">
-            <label class="sim-label">1. Vị Trí Thiết Bị 4 Tầng (Line > Mach > Unit > Asm)</label>
-            <select class="sim-select" id="simLocation" onchange="logSim('Chọn vị trí: ' + this.value)">
-              <option value="Line 1 > Laser Cắt > Cụm Laser Hội Tụ > Đầu Cắt Quang Học">Line 1 (Tầng 1) > Laser Cắt > Cụm Laser > Đầu Cắt Quang</option>
-              <option value="Line 2 > Máy CNC > Trục Chính Spindle > Bạc Đạn Gốm">Line 2 (Tầng 2) > CNC Spindle > Bạc Đạn Gốm Ceramic</option>
-              <option value="Line 3 > Ép Nhiệt Vacuum > Gia Nhiệt Upper > Cảm Biến PT100">Line 3 (Tầng 3) > Ép Vacuum > Upper > PT100 Sensor</option>
-            </select>
-          </div>
-
-          <!-- 2. Nhánh Mã QCode -->
-          <div class="sim-form-group">
-            <label class="sim-label">2. Đã Có Mã QCode Trong Hệ Thống?</label>
-            <div class="sim-switch-group">
-              <div class="sim-switch-btn active" id="simMode-has" onclick="setSimItemMode('has')">✅ Đã Có Mã QCode</div>
-              <div class="sim-switch-btn" id="simMode-none" onclick="setSimItemMode('none')">❌ Chưa Có (Mã Mới TMP)</div>
-            </div>
-          </div>
-
-          <!-- Dynamic item inputs -->
-          <div id="simItemContainer">
-            <div class="sim-form-group">
-              <label class="sim-label">Mã QCode & Tên Phụ Tùng</label>
-              <select class="sim-select" id="simQCodeSelect" onchange="onSimQCodeChange()">
-                <option value="HW-OPT-001">HW-OPT-001: Thấu kính hội tụ Laser F-Theta 1064nm ($350)</option>
-                <option value="HW-MEC-042">HW-MEC-042: Bạc đạn gốm Ceramic Spindle 60000 RPM ($1,200)</option>
-                <option value="HW-ELE-108">HW-ELE-108: Cảm biến nhiệt điện trở PT100 chịu nhiệt 300C ($85)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- 3. Số lượng & Lý do -->
-          <div class="sim-form-group">
-            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 8px;">
-              <div>
-                <label class="sim-label">Số Lượng</label>
-                <input type="number" class="sim-input" id="simQty" value="2" min="1">
-              </div>
-              <div>
-                <label class="sim-label">Lý Do Sử Dụng</label>
-                <select class="sim-select" id="simReason">
-                  <option value="Breakdown">Sự cố hỏng hóc (Breakdown)</option>
-                  <option value="CIP">Cải tiến năng suất (CIP)</option>
-                  <option value="PM">Bảo dưỡng định kỳ (PM)</option>
-                  <option value="Setup">Setup chuyển đổi mã hàng</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="sim-form-group">
-            <label class="sim-label">Hiện Trạng Máy & Logic Kỹ Thuật</label>
-            <textarea class="sim-textarea" id="simLogic">Thấu kính bị ố nhiệt do bụi nano bám dính, suy giảm 35% công suất tia, máy đang dừng line gây giảm 120 sp/ca.</textarea>
-          </div>
-
-          <div class="sim-form-group" style="flex-direction: row; align-items: center; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
-            <span style="font-size: 12px; font-weight: 600; color: #f87171;">🚨 Bật Cờ Khẩn Cấp (Urgent Flag)</span>
-            <input type="checkbox" id="simUrgent" checked style="width: 18px; height: 18px;">
-          </div>
-
-          <!-- Action buttons for simulation -->
-          <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <button class="btn-action btn-primary" style="flex: 1;" onclick="executeSimStep('scan')">🔎 1. Quét Interlock</button>
-            <button class="btn-action" style="flex: 1;" onclick="executeSimStep('lec')">💬 2. LEC Duyệt & Gom Mẻ</button>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn-action" style="flex: 1;" onclick="executeSimStep('offline')">🏛️ 3. Thẩm Định Offline</button>
-            <button class="btn-action" style="flex: 1;" onclick="executeSimStep('purchase')">🛒 4. Xử Lý Mua 3 Tầng</button>
-          </div>
-        </div>
-
-        <!-- Right Side: Terminal Log & Interactive Interlock State -->
-        <div class="sim-results-panel">
-          <!-- 4 Interlock Matrix Cards -->
-          <div class="interlock-cards-grid">
-            <div class="itlock-card" id="cardItPrice">
-              <div class="itlock-card-hdr">
-                <span class="itlock-title">1. Đơn Giá Hợp Đồng</span>
-                <span class="itlock-status pill-success" id="itPriceStatus">UP001 (ĐÃ KÝ)</span>
-              </div>
-              <div class="itlock-val" id="itPriceVal" style="color: #60a5fa;">$350.00 / cái</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;" id="itPriceDesc">Hợp đồng nguyên tắc còn hạn đến 31/12/2026. Sẵn sàng đặt hàng.</div>
-            </div>
-
-            <div class="itlock-card" id="cardItAging">
-              <div class="itlock-card-hdr">
-                <span class="itlock-title">2. Tồn Kho Lâu (>30 Ngày)</span>
-                <span class="itlock-status pill-danger" id="itAgingStatus">CÓ TỒN 72 NGÀY</span>
-              </div>
-              <div class="itlock-val" id="itAgingVal" style="color: #fbbf24;">1 cái (Kho Phụ Tầng 1)</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;" id="itAgingDesc">Yêu cầu Requestor & LEC thẩm tra xuất dùng trước khi mua thêm.</div>
-            </div>
-
-            <div class="itlock-card" id="cardItEntity">
-              <div class="itlock-card-hdr">
-                <span class="itlock-title">3. Tồn Kho Pháp Nhân Khác</span>
-                <span class="itlock-status pill-warning" id="itEntityStatus">CÓ TẠI ENTITY B</span>
-              </div>
-              <div class="itlock-val" id="itEntityVal" style="color: #34d399;">3 cái (Plant 2 - Kho Trung Tâm)</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;" id="itEntityDesc">Khóa mua mới cục bộ, kích hoạt quy trình Điều Chuyển Liên Pháp Nhân.</div>
-            </div>
-
-            <div class="itlock-card" id="cardItDisparity">
-              <div class="itlock-card-hdr">
-                <span class="itlock-title">4. Chênh Lệch Giá Pháp Nhân</span>
-                <span class="itlock-status pill-success" id="itDispStatus">ĐỒNG NHẤT (-2%)</span>
-              </div>
-              <div class="itlock-val" id="itDispVal" style="color: #a78bfa;">Plant 1: $350 vs Plant 2: $358</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;" id="itDispDesc">Giá mua nhà máy này tối ưu hơn pháp nhân bạn. Cho phép tiếp tục.</div>
-            </div>
-          </div>
-
-          <!-- Dynamic 3-Tier Execution Controls -->
-          <div class="block-card" id="tierControlsBox" style="display: none; border-color: #34d399;">
-            <div class="block-card-title" style="color: #34d399;">🛒 XỬ LÝ CƠ CHẾ MUA 3 TẦNG THỰC TẾ</div>
-            <div id="tierContentStep">
-              <!-- Rendered step by step -->
-            </div>
-          </div>
-
-          <!-- Console Terminal -->
-          <div class="sim-log-terminal" id="simTerminal">
-            <div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">[KHỞI TẠO]</span> Hệ thống Workflow sẵn sàng. Đang chờ kích hoạt quy trình từ Kỹ sư hiện trường.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div> <!-- End Workspace Area -->
-
-  <!-- ==================== EXPORT HIGH-RES MODAL ==================== -->
-  <div class="export-modal" id="exportModal">
-    <div class="export-box">
-      <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">📷 XUẤT ĐỒ HỌA WORKFLOW ĐỘ PHÂN GIẢI CAO (4K)</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
-        Hỗ trợ giải quyết triệt để vấn đề "file ảnh lớn bị mờ": Hệ thống trích xuất vector SVG chuẩn hoặc ảnh Ultra-HD để trình chiếu cho ban lãnh đạo.
-      </p>
-
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-        <button class="btn-action btn-primary" onclick="exportWorkflowSVG()" style="padding: 12px; justify-content: center;">
-          <span>📐</span> Xuất File Vector SVG Nguyên Bản (Vô hạn phóng to không vỡ nét)
-        </button>
-        <button class="btn-action" onclick="exportWorkflowPNG(2)" style="padding: 12px; justify-content: center;">
-          <span>🖼️</span> Xuất Ảnh PNG Siêu Nét (Full HD 2000px)
-        </button>
-        <button class="btn-action" onclick="exportWorkflowPNG(4)" style="padding: 12px; justify-content: center; border-color: #38bdf8;">
-          <span>💎</span> Xuất Ảnh PNG Ultra-HD 4K (4000px - Khổ in A0/A1)
-        </button>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end;">
-        <button class="btn-action" onclick="closeExportModal()">Đóng</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== LOGIC & SCRIPTS ==================== -->
-  <script>
-    /* STEP DATABASE & METADATA */
-    const WORKFLOW_STEPS = {
-      '1': {
-        stepCode: 'WF-STEP-01',
-        title: 'Định Vị Cấu Trúc Thiết Bị 4 Tầng',
-        lane: 'REQUESTOR',
-        laneName: 'Kỹ Sư Hiện Trường (Phân xưởng Smart Watch)',
-        screen: 'SCR-01 (Đăng Ký & Định Vị Thiết Bị)',
-        raci: { r: 'Kỹ sư hiện trường', a: 'Quản đốc line', c: 'LEC kỹ thuật', i: 'Quản lý xưởng' },
-        inputs: ['Mã chuyền (Line ID)', 'Tầng nhà máy (Floor = Left(Line, 1))', 'Cơ cấu máy (Machine)', 'Cụm chức năng (Unit)', 'Bộ phận lắp ráp (Assembly)'],
-        logic: [
-          'Bắt buộc tuân thủ cây phân cấp chuẩn 4 tầng: Line ➔ Machine ➔ Unit ➔ Assembly.',
-          'Quy tắc nhận diện tầng nhà máy: Ký tự đầu tiên của Line ID tự động gán tầng sản xuất (Ví dụ: Line 1xx = Tầng 1, Line 3xx = Tầng 3).',
-          'Tích hợp Master Machine Template: Cho phép sao chép nhanh cấu trúc chuẩn từ các máy mẫu sang các Line song song, giảm 80% thời gian nhập liệu ban đầu.'
-        ],
-        outputs: ['Vị trí lắp đặt chuẩn hóa (Equipment Tag ID)', 'Mã liên kết Work Order trên hệ thống bảo trì'],
-        badgeColor: '#2563eb',
-        mockup: `
-          <div style="font-size:11px; display:flex; flex-direction:column; gap:6px;">
-            <div style="color:#60a5fa; font-weight:700;">Giao Diện Chọn Vị Trí Cây Cấu Trúc:</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-              <div style="background:#1e293b; padding:6px; border-radius:4px;">Line: Line 1 (Floor 1 Cleanroom)</div>
-              <div style="background:#1e293b; padding:6px; border-radius:4px;">Machine: Laser Cutting M/C #02</div>
-              <div style="background:#1e293b; padding:6px; border-radius:4px;">Unit: Focus Optics Head Unit</div>
-              <div style="background:#1e293b; padding:6px; border-radius:4px;">Asm: F-Theta Collimator Mount</div>
-            </div>
-          </div>
-        `
-      },
-      'GW1': {
-        stepCode: 'WF-GATEWAY-01',
-        title: 'Cổng Quyết Định: Kiểm Tra Mã QCode ERP',
-        lane: 'REQUESTOR',
-        laneName: 'Bộ lọc tự động hệ thống',
-        screen: 'SCR-01 (Omni-Search Typeahead)',
-        raci: { r: 'Hệ thống tự động', a: 'Kỹ sư', c: 'ERP Team', i: 'LEC' },
-        inputs: ['Từ khóa tra cứu', 'Thông số kỹ thuật linh kiện', 'Model nhà sản xuất'],
-        logic: [
-          'Hệ thống tra cứu thời gian thực vào bảng Master Catalog trong file procurement-rfq-stock-optimization.yml.',
-          'Nếu đã có mã QCode: Rẽ sang nhánh 2A để tự động nạp thông số và đơn giá.',
-          'Nếu chưa có mã (hàng mới/cải tiến): Rẽ sang nhánh 2B để đăng ký Tên hạng mục và Tên item.'
-        ],
-        outputs: ['Nhánh rẽ nghiệp vụ 2A hoặc 2B'],
-        badgeColor: '#f59e0b',
-        mockup: ''
-      },
-      '2A': {
-        stepCode: 'WF-STEP-02A',
-        title: 'Bổ Sung Mã QCode Đã Có Trên Hệ Thống',
-        lane: 'REQUESTOR',
-        laneName: 'Kỹ Sư Hiện Trường',
-        screen: 'SCR-01 & SCR-02 (Tra cứu & Tự động điền)',
-        raci: { r: 'Kỹ sư hiện trường', a: 'Kỹ sư', c: 'LEC', i: 'Thủ kho' },
-        inputs: ['Mã QCode hợp lệ (Ví dụ: HW-OPT-001, HW-MEC-042)'],
-        logic: [
-          'Omni-Search Typeahead phản hồi dưới 50ms.',
-          'Tự động điền 100% dữ liệu gốc: Tên linh kiện chuẩn, Quy cách kỹ thuật, Đơn vị tính (PCS/SET), Đơn giá hợp đồng hiện hành, Tồn kho hiện hữu, Link bản vẽ CAD 2D/3D.',
-          'Khóa trạng thái DRAFT_ACTIVE, sẵn sàng chuyển bước nhập số lượng.'
-        ],
-        outputs: ['Hồ sơ phụ tùng chuẩn hóa với mã QCode ERP chính thức'],
-        badgeColor: '#10b981',
-        mockup: `
-          <div style="font-size:11px; background:#0f172a; padding:8px; border-radius:6px; border:1px solid #10b981;">
-            <div style="color:#34d399; font-weight:700;">✅ Tự Động Điền Dữ Liệu Từ QCode: HW-OPT-001</div>
-            <div>Tên: Thấu kính Laser F-Theta 1064nm | ĐVT: PCS</div>
-            <div>Đơn giá: $350.00 | Tồn kho nhà máy: 1 cái (Kho phụ Tầng 1)</div>
-            <div style="color:#38bdf8;">CAD Link: /vault/drawings/optics/HW-OPT-001.dwg</div>
-          </div>
-        `
-      },
-      '2B': {
-        stepCode: 'WF-STEP-02B',
-        title: 'Chưa Có Mã: Đăng Ký Hạng Mục & Tên Item Mới',
-        lane: 'REQUESTOR',
-        laneName: 'Kỹ Sư Hiện Trường',
-        screen: 'SCR-01B (Đăng Ký Mã Mới Chưa Có Trên ERP)',
-        raci: { r: 'Kỹ sư hiện trường', a: 'Kỹ sư', c: 'LEC', i: 'Procurement' },
-        inputs: ['Tên hạng mục (Category)', 'Tên linh kiện mới (Item Name)', 'Folder chứa bản vẽ CAD / Catalog / Spec sheet'],
-        logic: [
-          'Kỹ sư nhập Tên Hạng Mục (Category) và Tên Item cụ thể.',
-          'Kéo thả thư mục (Folder drag-and-drop) chứa toàn bộ tài liệu kỹ thuật, bản vẽ gia công hoặc catalog nhà sản xuất.',
-          'Hệ thống cấp mã tạm định danh nội bộ dạng: TMP-HW-xxxx.',
-          'CHỐT CHẶN CỨNG: Tự động kích hoạt cờ khóa chi phí costBlocked = true. Mã TMP tuyệt đối không được phát hành PO mua sắm cho tới khi được định danh QCode chính thức trên ERP.'
-        ],
-        outputs: ['Mã tạm TMP-HW-xxxx', 'Cờ khóa chi phí costBlocked=true', 'Gói thư mục CAD lưu trữ'],
-        badgeColor: '#ef4444',
-        mockup: `
-          <div style="font-size:11px; background:#0f172a; padding:8px; border-radius:6px; border:1px solid #ef4444;">
-            <div style="color:#f87171; font-weight:700;">⚠️ Đăng Ký Linh Kiện Mới - Cấp Mã Tạm</div>
-            <div>Category: Cụm Cắt Cơ Khí Chính Xác ➔ Item: Dao Cắt Ultrasonic Titan</div>
-            <div>Tệp đính kèm: [Folder: Drawing_Titan_Blade_v1.zip] (12.4 MB)</div>
-            <div style="color:#fca5a5;">Mã Tạm: TMP-HW-0982 | Cờ: costBlocked=TRUE</div>
-          </div>
-        `
-      },
-      '3': {
-        stepCode: 'WF-STEP-03',
-        title: 'Nhập Số Lượng Xin Mua & Lý Do Vận Hành',
-        lane: 'REQUESTOR',
-        laneName: 'Kỹ Sư Hiện Trường',
-        screen: 'SCR-02 (Khai Báo Nhu Cầu Mua Sắm)',
-        raci: { r: 'Kỹ sư hiện trường', a: 'Trưởng ca/Quản đốc', c: 'LEC', i: 'Kế hoạch vật tư' },
-        inputs: ['Số lượng xin mua (Request Qty)', 'Lý do sử dụng (Dropdown)', 'Lý do chi tiết & Logic kỹ thuật', 'Hiện trạng máy móc', 'Cờ khẩn cấp (Urgent Flag)'],
-        logic: [
-          'Lý do sử dụng: Chọn 1 trong các nhóm chuẩn hóa [Setup, Cải tiến (CIP), Sự cố (Breakdown), Bảo dưỡng định kỳ (PM), Dự phòng tồn kho].',
-          'Lý do chi tiết & Logic kỹ thuật: Bắt buộc mô tả nguyên nhân hỏng hóc, tính quy luật mài mòn, lý do tại sao cần số lượng tương ứng.',
-          'Hiện trạng máy móc: Báo cáo rõ máy đang dừng hoàn toàn (Line stop) hay đang chạy giảm tốc độ/chập chờn, ước lượng sản lượng thiếu hụt trong ca.',
-          'Cờ khẩn cấp (Urgent Flag): Bật cờ đỏ nếu máy dừng gây ách tắc dây chuyền, hệ thống sẽ kích hoạt SLA xử lý ưu tiên 24-48h.'
-        ],
-        outputs: ['Phiếu xin mua DRAFT với đầy đủ bằng chứng kỹ thuật và mức độ ưu tiên'],
-        badgeColor: '#f59e0b',
-        mockup: `
-          <div style="font-size:11px; display:flex; flex-direction:column; gap:4px;">
-            <div><strong>Số lượng:</strong> 2 PCS | <strong>Lý do:</strong> Sự Cố Hỏng Hóc (Breakdown)</div>
-            <div><strong>Hiện trạng:</strong> Máy đang dừng line, giảm 120 sp/ca.</div>
-            <div><strong>Cờ khẩn cấp:</strong> <span style="color:#f87171; font-weight:bold;">[URGENT: YES - SLA 24H]</span></div>
-          </div>
-        `
-      },
-      '4': {
-        stepCode: 'WF-STEP-04',
-        title: 'Hiển Thị Thông Tin Trạng Thái Interlock (4 Khía Cạnh)',
-        lane: 'REQUESTOR',
-        laneName: 'Bộ Máy Kiểm Soát Interlock Tự Động',
-        screen: 'SCR-03 (Bảng Cảnh Báo Interlock Đa Chiều)',
-        raci: { r: 'Hệ thống tự động', a: 'LEC', c: 'Requestor', i: 'Thủ kho' },
-        inputs: ['Dữ liệu xin mua', 'Dữ liệu ERP', 'Báo cáo tồn kho liên pháp nhân', 'Lịch sử giá mua'],
-        logic: [
-          'Hệ thống tự động quét và hiển thị tức thì bảng cảnh báo 4 khía cạnh bắt buộc:',
-          '1. Trạng Thái Giá: Đã có giá hợp đồng UP001 (xanh) hay chưa có giá UP004 (vàng/đỏ - phải chạy RFQ).',
-          '2. Tồn Kho Lâu: Cảnh báo nếu trong nhà máy có linh kiện cùng loại tồn kho >30 ngày, 60 ngày hoặc 90 ngày chưa xuất dùng.',
-          '3. Tồn Kho Pháp Nhân Khác: Quét tồn kho tại Entity B, Plant 2, Kho trung tâm. Nếu có hàng dư thừa, lập tức khóa cờ yêu cầu điều chuyển kho.',
-          '4. Giá Cao Hơn Pháp Nhân Khác: Cảnh báo nếu đơn giá đề xuất mua cao hơn đơn giá các nhà máy/pháp nhân bạn trong tập đoàn từng mua.'
-        ],
-        outputs: ['Ma trận trạng thái Interlock 4 chiều', 'Cờ khóa mua sắm tự động nếu có tồn kho nhàn rỗi'],
-        badgeColor: '#0ea5e9',
-        mockup: `
-          <div style="font-size:11px; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-            <div style="border:1px solid #10b981; padding:4px; border-radius:4px;">1. Giá: UP001 (Hợp Đồng)</div>
-            <div style="border:1px solid #f59e0b; padding:4px; border-radius:4px;">2. Tồn >30d: 1 cái (72 ngày)</div>
-            <div style="border:1px solid #ef4444; padding:4px; border-radius:4px;">3. Tồn Pháp Nhân: 3 cái (Entity B)</div>
-            <div style="border:1px solid #10b981; padding:4px; border-radius:4px;">4. Chênh Lệch Giá: 0% (Tối ưu)</div>
-          </div>
-        `
-      },
-      '5': {
-        stepCode: 'WF-STEP-05',
-        title: 'Trao Đổi Trực Tiếp Giữa LEC & Requestor',
-        lane: 'LEC',
-        laneName: 'Chuyên Viên Điều Phối Kỹ Thuật (LEC - Trung Gian)',
-        screen: 'SCR-04 (Bàn Điều Phối & Collaborative Chat)',
-        raci: { r: 'LEC & Requestor', a: 'LEC', c: 'Trưởng nhóm kỹ thuật', i: 'Quản lý' },
-        inputs: ['Phiếu xin mua', 'Kết quả Interlock 4 khía cạnh', 'Giải trình của Requestor', 'Ảnh hiện trường hỏng hóc'],
-        logic: [
-          'LEC mở kênh đối thoại trực tiếp trên hệ thống với Requestor.',
-          'Làm rõ lý do sử dụng và tính xác thực của hiện trạng máy dừng.',
-          'Chất vấn về tồn kho lâu: Yêu cầu Requestor giải trình lý do không thể dùng 1 cái đang tồn 72 ngày ở Kho phụ Tầng 1.',
-          'Requestor phản hồi, bổ sung ảnh chụp thực tế vi mạch / thấu kính bị rạn nứt không thể tái sử dụng.',
-          'Đạt được sự thống nhất kỹ thuật trước khi chuyển sang bước lập danh mục thẩm định.'
-        ],
-        outputs: ['Biên bản đối thoại kỹ thuật được lưu vết 100% trong Audit Trail', 'Bộ ảnh minh chứng hiện trường'],
-        badgeColor: '#f59e0b',
-        mockup: `
-          <div style="font-size:11px; background:#0f172a; padding:6px; border-radius:4px; border-left:3px solid #f59e0b;">
-            <div style="color:#fbbf24;"><strong>LEC (Nguyễn Văn Nam):</strong> "Kho phụ Tầng 1 còn 1 cái tồn 72 ngày, tại sao không xuất dùng mà xin mua mới?"</div>
-            <div style="color:#93c5fd; margin-top:4px;"><strong>Requestor (Lê Văn Kỹ Sư):</strong> "Dạ cái đó là thấu kính góc rộng f=160mm cho máy đời cũ, máy này dùng f=254mm tia hẹp, đã đính kèm ảnh so sánh."</div>
-          </div>
-        `
-      },
-      'GW2': {
-        stepCode: 'WF-GATEWAY-02',
-        title: 'Cổng Quyết Định: LEC Đánh Giá Đạt?',
-        lane: 'LEC',
-        laneName: 'Đánh giá kỹ thuật của LEC',
-        screen: 'SCR-04 (Phê Duyệt Điều Phối)',
-        raci: { r: 'LEC', a: 'LEC Lead', c: 'Requestor', i: 'Management' },
-        inputs: ['Biên bản trao đổi', 'Hồ sơ kỹ thuật hoàn chỉnh'],
-        logic: [
-          'Nếu hồ sơ chưa rõ ràng hoặc Requestor chưa giải trình thỏa đáng: Trả về Bước 3/5 để bổ sung.',
-          'Nếu giải trình hợp lý và đạt chuẩn kỹ thuật: LEC bấm phê duyệt OK để đưa vào danh mục thẩm định tháng.'
-        ],
-        outputs: ['Trạng thái: LEC_QUALIFIED'],
-        badgeColor: '#f59e0b',
-        mockup: ''
-      },
-      '6': {
-        stepCode: 'WF-STEP-06',
-        title: 'Gom Mẻ, Gán EM No, Đánh Nhãn TARGET / OVER',
-        lane: 'LEC',
-        laneName: 'Chuyên Viên Điều Phối (LEC)',
-        screen: 'SCR-04B (Gom Mẻ & Phân Loại Ngân Sách)',
-        raci: { r: 'LEC', a: 'LEC Lead', c: 'Procurement', i: 'Management Team' },
-        inputs: ['Các dòng phụ tùng đạt chuẩn', 'Kế hoạch ngân sách tháng (SG Budget)', 'Định mức EBOM'],
-        logic: [
-          'Gom mẻ các đề xuất thành danh mục thẩm định tập trung theo kỳ thẩm định hàng tháng.',
-          'Gán mã EM No 14 ký tự chuẩn hóa (Ví dụ: HWBMTL21EC0101).',
-          'Đánh nhãn tài chính thủ công (Tuyệt đối không tự động hóa):',
-          '• Nhãn TARGET: Hạng mục thay thế bảo dưỡng định kỳ nằm trong hạn mức định mức chi phí chuẩn EBOM.',
-          '• Nhãn OVER: Hạng mục phát sinh ngoài kế hoạch / sự cố đột xuất. Bắt buộc chọn đúng 1 trong 6 mã nguyên nhân sự cố (OVR-01 đến OVR-06) và gán mã Work Order (WO-xxx).'
-        ],
-        outputs: ['Hồ sơ thẩm định mẻ kèm mã EM No 14 ký tự', 'Phân loại TARGET hoặc OVER kèm mã OVR chi tiết'],
-        badgeColor: '#8b5cf6',
-        mockup: `
-          <div style="font-size:11px; background:#0f172a; padding:6px; border-radius:4px;">
-            <div><strong>Mã EM No:</strong> <span style="color:#c084fc;">HWBMTL21EC0101</span></div>
-            <div><strong>Phân loại:</strong> <span style="color:#f87171; font-weight:bold;">OVER</span> (Vượt định mức định kỳ)</div>
-            <div><strong>Mã Sự Cố:</strong> OVR-01 (Lỗi cơ học đột xuất) | <strong>Mã WO:</strong> WO-2026-09881</div>
-          </div>
-        `
-      },
-      '7': {
-        stepCode: 'WF-STEP-07',
-        title: 'Thẩm Định Offline Đầu Tháng (Ban Quản Lý Chi Phí)',
-        lane: 'MANAGEMENT',
-        laneName: 'Ban Quản Lý Chi Phí (Reviewer - Management Team)',
-        screen: 'SCR-05 (Cổng Thẩm Định Chi Phí Định Kỳ)',
-        raci: { r: 'Ban Quản Lý (Trần Thị Hường)', a: 'Ban Giám Đốc', c: 'LEC (Trung Gian)', i: 'Requestor' },
-        inputs: ['Danh mục gom mẻ từ LEC', 'Báo cáo ngân sách', 'Chứng từ kỹ thuật'],
-        logic: [
-          'Thời gian thực hiện: Diễn ra định kỳ vào ngày 01 đến ngày 05 hàng tháng.',
-          'CHỐT CHẶN CỨNG 1: Quét toàn bộ danh mục, nếu phát hiện còn tồn tại mã tạm TMP-HW-xxxx ➔ CHẶN CỨNG THẨM ĐỊNH NGAY LẬP TỨC! Bắt buộc LEC và Kỹ sư phải hoàn tất xin cấp QCode ERP.',
-          'CƠ CHẾ TRUNG GIAN: LEC đóng vai trò trung gian trao đổi giữa Requestor và Reviewer (Management Team). Khi Reviewer chất vấn về đơn giá hoặc lý do Over ➔ gửi Inquiry về LEC ➔ LEC điều phối Requestor nộp giải trình ➔ LEC phản hồi Reviewer.',
-          'Rà soát giải trình tồn kho chậm luân chuyển >30 ngày và đối chiếu định mức tổng ngân sách.'
-        ],
-        outputs: ['Biên bản thẩm định chi phí có chữ ký Ban Quản Lý', 'Danh sách hạng mục đạt chuẩn thẩm định'],
-        badgeColor: '#7c3aed',
-        mockup: `
-          <div style="font-size:11px; border:1px solid #7c3aed; padding:6px; border-radius:4px; background:#0f172a;">
-            <div style="color:#c084fc; font-weight:bold;">🏛️ Hội Đồng Thẩm Định Chi Phí (Ngày 01-05)</div>
-            <div>Trạng thái mã: Đã chuẩn hóa QCode ERP (Không còn mã TMP-).</div>
-            <div>Chất vấn Reviewer ➔ LEC trung gian ➔ Requestor giải trình: ĐÃ XÁC NHẬN HỢP LÝ.</div>
-          </div>
-        `
-      },
-      '8': {
-        stepCode: 'WF-STEP-08',
-        title: 'Chốt List Mua & Cấp Chứng Chỉ Cost Clearance',
-        lane: 'MANAGEMENT',
-        laneName: 'Ban Quản Lý Chi Phí & Ban Giám Đốc',
-        screen: 'SCR-06 (Phê Duyệt Ngân Sách & Cấp Clearance)',
-        raci: { r: 'Ban Quản Lý', a: 'Giám Đốc Nhà Máy', c: 'Kế toán trưởng', i: 'Procurement' },
-        inputs: ['Danh mục đã qua thẩm định', 'Hạn mức ngân sách khả dụng'],
-        logic: [
-          'Ban Quản Lý Chi Phí chính thức phê duyệt chốt danh sách mua sắm của tháng.',
-          'Cấp chứng chỉ phê duyệt ngân sách điện tử: Cost Clearance Certificate (Mã: CC-HW-YYYYMM-PASS).',
-          'Đóng băng danh sách (Freeze Data), ngăn chặn mọi hành vi tự ý sửa đổi số lượng hoặc đơn giá.',
-          'Bàn giao hồ sơ chính thức sang Bộ phận Mua Hàng & Kho Vận để tiến hành giải tỏa Interlock và đặt hàng.'
-        ],
-        outputs: ['Chứng chỉ Cost Clearance: CC-HW-YYYYMM-PASS', 'Danh sách mua sắm chính thức được mở khóa sang PO'],
-        badgeColor: '#10b981',
-        mockup: `
-          <div style="font-size:11px; background:#0f172a; padding:8px; border-radius:6px; border:1px solid #10b981;">
-            <div style="color:#34d399; font-weight:bold;">📜 CHỨNG CHỈ COST CLEARANCE HỢP LỆ</div>
-            <div>Mã số: CC-HW-202611-PASS</div>
-            <div>Hạn mức phê duyệt: $4,850.00 | Chữ ký số: Ban Quản Lý Chi Phí HW</div>
-            <div style="color:#60a5fa;">Đã mở khóa dữ liệu chuyển sang Cổng Mua Sắm Nexacro EMS</div>
-          </div>
-        `
-      },
-      '9A': {
-        stepCode: 'WF-STEP-09A',
-        title: 'Tầng 1: Chuyển Giao Kho Liên Pháp Nhân (Inter-Entity Transfer)',
-        lane: 'PROCUREMENT',
-        laneName: 'Mua Hàng & Quản Lý Kho Liên Pháp Nhân',
-        screen: 'SCR-07 (Thủ Tục Chuyển Giao Điều Chuyển Kho)',
-        raci: { r: 'Thủ kho xuất / nhập', a: 'Kế toán liên pháp nhân', c: 'LEC', i: 'Requestor' },
-        inputs: ['Hạng mục có cờ tồn kho pháp nhân khác', 'Lệnh điều chuyển kho'],
-        logic: [
-          'Hệ thống ưu tiên xử lý Tầng 1: Đề nghị điều chuyển hàng nhàn rỗi từ kho của pháp nhân bạn (Entity B / Plant 2) về nhà máy.',
-          '• NẾU PHÊ DUYỆT (APPROVE TRANSFER): Thủ kho xuất mượn/chuyển giao giữa 2 pháp nhân ➔ Hàng về kho ➔ HOÀN TẤT CHU TRÌNH (Tiết kiệm 100% ngân sách mua mới).',
-          '• NẾU TỪ CHỐI (REJECT TRANSFER): Pháp nhân bạn từ chối vì đang cần giữ an toàn dự phòng ➔ Hệ thống tự động chuyển tiếp xuống TẦNG 2.'
-        ],
-        outputs: ['Phiếu điều chuyển kho liên công ty HOẶC Lệnh chuyển tiếp Tầng 2'],
-        badgeColor: '#059669',
-        mockup: `
-          <div style="font-size:11px; padding:6px; border-radius:4px; background:#0f172a; border:1px solid #059669;">
-            <div style="color:#34d399; font-weight:bold;">TẦNG 1: ĐIỀU CHUYỂN LIÊN PHÁP NHÂN</div>
-            <div>Kho nguồn: Entity B (Plant 2) ➔ Kho đích: Org 28753 (Plant 1)</div>
-            <div>Nút hành động: [Phê Duyệt Transfer] HOẶC [Từ Chối ➔ Chuyển Tầng 2]</div>
-          </div>
-        `
-      },
-      '9B': {
-        stepCode: 'WF-STEP-09B',
-        title: 'Tầng 2: Đơn Hàng Mua Nội Bộ (Internal PO)',
-        lane: 'PROCUREMENT',
-        laneName: 'Mua Hàng & Kế Toán Nội Bộ',
-        screen: 'SCR-08 (Quản Lý Đơn Hàng Nội Bộ Internal PO)',
-        raci: { r: 'Purchasing nội bộ', a: 'Giám đốc tài chính', c: 'Thủ kho', i: 'LEC' },
-        inputs: ['Hồ sơ bị từ chối ở Tầng 1', 'Định giá chuyển nhượng nội bộ'],
-        logic: [
-          'Xử lý Tầng 2: Thiết lập đơn mua hàng nội bộ (Internal PO) theo hợp đồng nguyên tắc giữa hai pháp nhân trong tập đoàn.',
-          '• NẾU PHÊ DUYỆT (APPROVE INTERNAL PO): Xuất hóa đơn nội bộ, vận chuyển hàng về kho ➔ HOÀN TẤT CHU TRÌNH.',
-          '• NẾU TỪ CHỐI (REJECT INTERNAL PO): Vướng mắc thủ tục thanh toán hoặc hạn mức nội bộ ➔ Hệ thống tự động chuyển tiếp xuống TẦNG 3.'
-        ],
-        outputs: ['Mã đơn Internal PO HOẶC Lệnh chuyển tiếp Tầng 3 (Mua thường)'],
-        badgeColor: '#d97706',
-        mockup: `
-          <div style="font-size:11px; padding:6px; border-radius:4px; background:#0f172a; border:1px solid #d97706;">
-            <div style="color:#fbbf24; font-weight:bold;">TẦNG 2: MUA NỘI BỘ (INTERNAL PO)</div>
-            <div>Đơn vị bán: Entity B Trading Corp | Đơn vị mua: Org 28753 HW</div>
-            <div>Nút hành động: [Phê Duyệt Internal PO] HOẶC [Từ Chối ➔ Chuyển Tầng 3]</div>
-          </div>
-        `
-      },
-      '9C': {
-        stepCode: 'WF-STEP-09C',
-        title: 'Tầng 3: Mua Thường Cục Bộ Giá Thấp Nhất (External PO trên Nexacro EMS)',
-        lane: 'PROCUREMENT',
-        laneName: 'Phòng Mua Hàng & Cổng Nexacro EMS Core',
-        screen: 'SCR-09 (Ký Duyệt PO Trên Nexacro & Theo Dõi Inbound / ds_Inv)',
-        raci: { r: 'Purchasing chuyên trách', a: 'Tổng Giám Đốc (Ký trên EMS)', c: 'Kế toán', i: 'Kỹ sư & LEC' },
-        inputs: ['Hồ sơ không thể chuyển giao', 'Báo giá RFQ thấp nhất từ nhà cung cấp ngoài', 'Chứng chỉ Cost Clearance'],
-        logic: [
-          'Xử lý Tầng 3 (Biện pháp mua mới cuối cùng): Mua thường từ nhà cung cấp ngoài thị trường với đơn giá đàm phán thấp nhất.',
-          'Đẩy hồ sơ lên hệ thống Nexacro EMS Core ➔ Khởi tạo Purchase Requisition Voucher (PRV).',
-          'Lãnh đạo ký duyệt 100% trên phần mềm Nexacro EMS Core (Tuyệt đối KHÔNG có nút duyệt PO trên giao diện Web).',
-          'Cổng Gateway đồng bộ mã PO chính thức (PO-99xxx).',
-          'Theo dõi Inbound Logistics qua 3 mốc: (1) Vendor Confirm Date, (2) ETA Port/Kho, (3) Thông quan hải quan.',
-          'Hàng về nhà máy ➔ Thủ kho kiểm nhận ➔ Kỹ sư xuất lắp máy ➔ EMS đồng bộ bảng kê xuất kho ds_Inv quyết toán chi phí vào giá thành.'
-        ],
-        outputs: ['Mã PO chính thức PO-99xxx trên EMS Core', 'Bảng kê xuất kho ds_Inv quyết toán chi phí'],
-        badgeColor: '#2563eb',
-        mockup: `
-          <div style="font-size:11px; padding:6px; border-radius:4px; background:#0f172a; border:1px solid #2563eb;">
-            <div style="color:#60a5fa; font-weight:bold;">TẦNG 3: MUA NGOÀI THỊ TRƯỜNG QUA NEXACRO EMS</div>
-            <div>Nhà cung cấp: Kyocera Precision Tools | Đơn giá: $350.00 (Thấp nhất)</div>
-            <div>Ký duyệt điện tử: 100% trên Nexacro Core ➔ Cấp mã PO-99824</div>
-            <div style="color:#34d399;">Quyết toán chi phí: Đồng bộ bảng kê ds_Inv khi xuất lắp máy</div>
-          </div>
-        `
-      }
-    };
-
-    /* STATE VARIABLES */
-    let currentScale = 0.85;
-    let currentX = 40;
-    let currentY = 20;
-    let isDragging = false;
-    let startX, startY;
-    let currentSelectedStep = '1';
-    let currentSimMode = 'has'; // 'has' or 'none'
-
-    /* INIT ON LOAD */
-    window.addEventListener('DOMContentLoaded', () => {
-      renderInspector('1');
-      renderPipelineView();
-      drawWorkflowConnections();
-      applyCanvasTransform();
-      setupPanEvents();
-      logSim('[KHỞI TẠO HOÀN TẤT] Bản đồ BPMN 4 làn đã nạp đầy đủ 9 công đoạn.');
-    });
-
-    /* PAN & ZOOM LOGIC */
-    function setupPanEvents() {
-      const viewport = document.getElementById('viewport');
-      
-      viewport.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.wf-card') || e.target.closest('.wf-gateway') || e.target.closest('.canvas-hud')) return;
-        isDragging = true;
-        startX = e.clientX - currentX;
-        startY = e.clientY - currentY;
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        currentX = e.clientX - startX;
-        currentY = e.clientY - startY;
-        applyCanvasTransform();
-      });
-
-      window.addEventListener('mouseup', () => { isDragging = false; });
-
-      viewport.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.05 : 0.05;
-        zoomCanvas(delta);
-      }, { passive: false });
-    }
-
-    function zoomCanvas(delta) {
-      currentScale = Math.min(Math.max(0.3, currentScale + delta), 2.0);
-      document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
-      applyCanvasTransform();
-    }
-
-    function fitView() {
-      currentScale = 0.65;
-      currentX = 30;
-      currentY = 15;
-      document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
-      applyCanvasTransform();
-    }
-
-    function applyCanvasTransform() {
-      const scaler = document.getElementById('canvasScaler');
-      scaler.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
-    }
-
-    /* DRAW SVG CONNECTION PATHS BETWEEN WORKFLOW NODES */
-    function drawWorkflowConnections() {
-      const pathGroup = document.getElementById('pathGroup');
-      pathGroup.innerHTML = '';
-
-      // Helper to generate smooth orthogonal or curved cubic paths
-      const paths = [
-        // Step 1 to Gateway 1
-        { from: 'card-step-1', to: 'gw-step-2', marker: 'wf-arrow-req', color: '#3b82f6', label: 'Xác định cấu trúc' },
-        // Gateway 1 to 2A (Đã có mã)
-        { from: 'gw-step-2', to: 'card-step-2a', marker: 'wf-arrow-proc', color: '#10b981', label: 'Đã có QCode' },
-        // Gateway 1 to 2B (Chưa có mã)
-        { from: 'gw-step-2', to: 'card-step-2b', marker: 'wf-arrow-danger', color: '#ef4444', label: 'Chưa có (TMP)' },
-        // 2A and 2B to Step 3
-        { from: 'card-step-2a', to: 'card-step-3', marker: 'wf-arrow-req', color: '#3b82f6', label: '' },
-        { from: 'card-step-2b', to: 'card-step-3', marker: 'wf-arrow-danger', color: '#ef4444', label: 'Mã tạm TMP' },
-        // Step 3 to Step 4
-        { from: 'card-step-3', to: 'card-step-4', marker: 'wf-arrow-req', color: '#3b82f6', label: 'Khai báo xong' },
-        // Step 4 to Step 5 (Cross Lane: Requestor -> LEC)
-        { from: 'card-step-4', to: 'card-step-5', marker: 'wf-arrow-lec', color: '#f59e0b', label: 'Chuyển bàn điều phối LEC' },
-        // Step 5 to Gateway 2
-        { from: 'card-step-5', to: 'gw-step-6', marker: 'wf-arrow-lec', color: '#f59e0b', label: 'Hội chẩn kỹ thuật' },
-        // Gateway 2 to Step 6
-        { from: 'gw-step-6', to: 'card-step-6', marker: 'wf-arrow-lec', color: '#f59e0b', label: 'Đánh giá Đạt' },
-        // Step 6 to Step 7 (Cross Lane: LEC -> Management)
-        { from: 'card-step-6', to: 'card-step-7', marker: 'wf-arrow-mgr', color: '#a855f7', label: 'Nộp list thẩm định' },
-        // Step 7 to Step 8
-        { from: 'card-step-7', to: 'card-step-8', marker: 'wf-arrow-mgr', color: '#a855f7', label: 'Thẩm định Đạt' },
-        // Step 8 to Step 9A (Cross Lane: Management -> Procurement Tier 1)
-        { from: 'card-step-8', to: 'card-step-9a', marker: 'wf-arrow-proc', color: '#10b981', label: 'Cấp Cost Clearance' },
-        // Step 9A to 9B (Reject Transfer -> Tier 2)
-        { from: 'card-step-9a', to: 'card-step-9b', marker: 'wf-arrow-danger', color: '#ef4444', label: 'Reject Transfer' },
-        // Step 9B to 9C (Reject Internal PO -> Tier 3)
-        { from: 'card-step-9b', to: 'card-step-9c', marker: 'wf-arrow-danger', color: '#ef4444', label: 'Reject Internal PO' }
-      ];
-
-      setTimeout(() => {
-        const scalerRect = document.getElementById('canvasScaler').getBoundingClientRect();
-        
-        paths.forEach(p => {
-          const elFrom = document.getElementById(p.from);
-          const elTo = document.getElementById(p.to);
-          if (!elFrom || !elTo) return;
-
-          const r1 = elFrom.getBoundingClientRect();
-          const r2 = elTo.getBoundingClientRect();
-
-          // Calculate coordinates relative to unscaled canvas container
-          const x1 = (r1.right - scalerRect.left) / currentScale;
-          const y1 = (r1.top + r1.height / 2 - scalerRect.top) / currentScale;
-          const x2 = (r2.left - scalerRect.left) / currentScale;
-          const y2 = (r2.top + r2.height / 2 - scalerRect.top) / currentScale;
-
-          const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          
-          let d = '';
-          if (Math.abs(y1 - y2) < 20) {
-            // Straight horizontal line
-            d = `M ${x1} ${y1} L ${x2} ${y2}`;
-          } else {
-            // Cubic bezier or stepped curve
-            const midX = (x1 + x2) / 2;
-            d = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
-          }
-
-          pathEl.setAttribute('d', d);
-          pathEl.setAttribute('stroke', p.color);
-          pathEl.setAttribute('stroke-width', '2.5');
-          pathEl.setAttribute('fill', 'none');
-          pathEl.setAttribute('marker-end', `url(#${p.marker})`);
-          pathEl.classList.add('animated-flow');
-          pathGroup.appendChild(pathEl);
-        });
-      }, 100);
-    }
-
-    /* STEP SELECTION & INSPECTOR */
-    function selectStep(stepKey) {
-      currentSelectedStep = stepKey;
-
-      // Update card visual selection
-      document.querySelectorAll('.wf-card').forEach(c => c.classList.remove('selected'));
-      const activeCard = document.getElementById(`card-step-${stepKey.toLowerCase()}`);
-      if (activeCard) activeCard.classList.add('selected');
-
-      renderInspector(stepKey);
-      toggleInspector(true);
-    }
-
-    function renderInspector(stepKey) {
-      const data = WORKFLOW_STEPS[stepKey];
-      if (!data) return;
-
-      document.getElementById('inspBadge').innerText = data.stepCode;
-      document.getElementById('inspBadge').style.background = data.badgeColor || '#2563eb';
-      document.getElementById('inspTitle').innerText = data.title;
-
-      const body = document.getElementById('inspBody');
-      body.innerHTML = `
-        <div class="block-card">
-          <div class="block-card-title">🏢 LÀN VẬN HÀNH & MÀN HÌNH</div>
-          <div style="font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;">${data.laneName}</div>
-          <div style="color:#60a5fa; font-size:12px; font-weight:600;">Giao diện: ${data.screen}</div>
-        </div>
-
-        <div class="block-card">
-          <div class="block-card-title">👥 MA TRẬN TRÁCH NHIỆM RACI</div>
-          <div class="raci-grid">
-            <div class="raci-item"><div class="raci-code" style="color:#60a5fa;">R</div><div class="raci-label">${data.raci.r}</div></div>
-            <div class="raci-item"><div class="raci-code" style="color:#f59e0b;">A</div><div class="raci-label">${data.raci.a}</div></div>
-            <div class="raci-item"><div class="raci-code" style="color:#c084fc;">C</div><div class="raci-label">${data.raci.c}</div></div>
-            <div class="raci-item"><div class="raci-code" style="color:#34d399;">I</div><div class="raci-label">${data.raci.i}</div></div>
-          </div>
-        </div>
-
-        <div class="block-card">
-          <div class="block-card-title">📥 DỮ LIỆU ĐẦU VÀO (INPUT PAYLOAD)</div>
-          ${data.inputs.map(i => `<div class="rule-item"><span class="rule-bullet">▪</span><span>${i}</span></div>`).join('')}
-        </div>
-
-        <div class="block-card">
-          <div class="block-card-title">⚡ HÀNH ĐỘNG & QUY TẮC NGHIỆP VỤ (RULES)</div>
-          ${data.logic.map(r => `<div class="rule-item"><span class="rule-bullet" style="color:#10b981;">✔</span><span>${r}</span></div>`).join('')}
-        </div>
-
-        <div class="block-card">
-          <div class="block-card-title">📤 DỮ LIỆU ĐẦU RA (OUTPUT DELIVERABLES)</div>
-          ${data.outputs.map(o => `<div class="rule-item"><span class="rule-bullet" style="color:#c084fc;">★</span><span>${o}</span></div>`).join('')}
-        </div>
-
-        ${data.mockup ? `
-        <div class="block-card">
-          <div class="block-card-title">🖥️ MÔ PHỎNG GIAO DIỆN MÀN HÌNH</div>
-          <div class="ui-mockup-frame">
-            ${data.mockup}
-          </div>
-        </div>
-        ` : ''}
-      `;
-    }
-
-    function toggleInspector(open) {
-      const insp = document.getElementById('sideInspector');
-      if (open === undefined) {
-        insp.classList.toggle('closed');
-      } else if (open) {
-        insp.classList.remove('closed');
-      } else {
-        insp.classList.add('closed');
-      }
-    }
-
-    /* VIEW SWITCHER */
-    function switchMainView(viewName) {
-      document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`tab-btn-${viewName === 'canvas' ? 'canvas' : (viewName === 'pipeline' ? 'pipe' : 'sim')}`).classList.add('active');
-
-      const vp = document.getElementById('viewport');
-      const pv = document.getElementById('pipelineView');
-      const sv = document.getElementById('simulatorView');
-      const ft = document.getElementById('filterToolbar');
-
-      if (viewName === 'canvas') {
-        vp.style.display = 'block';
-        pv.style.display = 'none';
-        sv.style.display = 'none';
-        ft.style.display = 'flex';
-        drawWorkflowConnections();
-      } else if (viewName === 'pipeline') {
-        vp.style.display = 'none';
-        pv.style.display = 'block';
-        sv.style.display = 'none';
-        ft.style.display = 'none';
-      } else if (viewName === 'simulator') {
-        vp.style.display = 'none';
-        pv.style.display = 'none';
-        sv.style.display = 'block';
-        ft.style.display = 'none';
-      }
-    }
-
-    /* RENDER PIPELINE STEPPER VIEW */
-    function renderPipelineView() {
-      const container = document.getElementById('pipelineStepperContent');
-      const stepKeys = ['1', '2A', '2B', '3', '4', '5', '6', '7', '8', '9A', '9B', '9C'];
-      
-      let html = '';
-      stepKeys.forEach((k, idx) => {
-        const item = WORKFLOW_STEPS[k];
-        if (!item) return;
-
-        html += `
-          <div class="stage-row" onclick="selectStep('${k}'); switchMainView('canvas');">
-            <div class="stage-num-badge" style="border-color:${item.badgeColor}; color:${item.badgeColor};">
-              ${idx + 1}
-            </div>
-            <div class="stage-content">
-              <div class="stage-header-line">
-                <div class="stage-name">${item.title}</div>
-                <span class="stage-role-pill" style="background:${item.badgeColor}22; color:${item.badgeColor}; border:1px solid ${item.badgeColor}66;">
-                  ${item.lane} • ${item.stepCode}
-                </span>
-              </div>
-              <div class="stage-desc">${item.logic[0]}</div>
-              <div class="stage-subgrid">
-                <div class="stage-sub-col">
-                  <h5>Màn Hình Phụ Trách</h5>
-                  <div style="color:#60a5fa; font-weight:600;">${item.screen}</div>
-                </div>
-                <div class="stage-sub-col">
-                  <h5>Người Thực Hiện (R)</h5>
-                  <div style="color:#fcd34d;">${item.raci.r}</div>
-                </div>
-                <div class="stage-sub-col">
-                  <h5>Dữ Liệu Đầu Ra</h5>
-                  <div style="color:#86efac;">${item.outputs[0]}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
-
-    /* SEARCH FUNCTIONALITY */
-    function searchWorkflow(query) {
-      const q = query.trim().toLowerCase();
-      document.querySelectorAll('.wf-card').forEach(card => {
-        card.classList.remove('highlighted');
-        if (!q) return;
-        const text = card.innerText.toLowerCase();
-        if (text.includes(q)) {
-          card.classList.add('highlighted');
-        }
-      });
-    }
-
-    /* LANE FILTERS */
-    function toggleLaneFilter(laneKey) {
-      const btn = document.getElementById(`filter-${laneKey}`);
-      const lane = document.getElementById(`lane-${laneKey}`);
-      if (!lane) return;
-
-      const isHidden = lane.style.display === 'none';
-      if (isHidden) {
-        lane.style.display = 'block';
-        btn.classList.add(`active-${laneKey}`);
-      } else {
-        lane.style.display = 'none';
-        btn.classList.remove(`active-${laneKey}`);
-      }
-      drawWorkflowConnections();
-    }
-
-    /* ======================================================== */
-    /* SIMULATOR LOGIC & EXECUTION                              */
-    /* ======================================================== */
-    function logSim(msg, type = 'info') {
-      const terminal = document.getElementById('simTerminal');
-      const now = new Date().toTimeString().split(' ')[0];
-      const div = document.createElement('div');
-      div.className = 'log-line';
-
-      let typeClass = 'log-info';
-      let tag = '[THÔNG BÁO]';
-      if (type === 'warn') { typeClass = 'log-warn'; tag = '[CẢNH BÁO]'; }
-      if (type === 'err') { typeClass = 'log-err'; tag = '[CHẶN CỨNG]'; }
-      if (type === 'ok') { typeClass = 'log-ok'; tag = '[PHÊ DUYỆT]'; }
-
-      div.innerHTML = `<span class="log-time">[${now}]</span> <span class="${typeClass}">${tag}</span> <span>${msg}</span>`;
-      terminal.appendChild(div);
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-
-    function setSimItemMode(mode) {
-      currentSimMode = mode;
-      document.getElementById('simMode-has').classList.toggle('active', mode === 'has');
-      document.getElementById('simMode-none').classList.toggle('active', mode === 'none');
-
-      const container = document.getElementById('simItemContainer');
-      if (mode === 'has') {
-        container.innerHTML = `
-          <div class="sim-form-group">
-            <label class="sim-label">Mã QCode & Tên Phụ Tùng</label>
-            <select class="sim-select" id="simQCodeSelect" onchange="onSimQCodeChange()">
-              <option value="HW-OPT-001">HW-OPT-001: Thấu kính hội tụ Laser F-Theta 1064nm ($350)</option>
-              <option value="HW-MEC-042">HW-MEC-042: Bạc đạn gốm Ceramic Spindle 60000 RPM ($1,200)</option>
-              <option value="HW-ELE-108">HW-ELE-108: Cảm biến nhiệt điện trở PT100 chịu nhiệt 300C ($85)</option>
-            </select>
-          </div>
-        `;
-        logSim('Đã chọn nhánh ĐÃ CÓ MÃ: QCode hợp lệ trên ERP. Giá và thông số tự động điền.', 'ok');
-      } else {
-        container.innerHTML = `
-          <div class="sim-form-group">
-            <label class="sim-label">Tên Hạng Mục (Category) Mới</label>
-            <input type="text" class="sim-input" id="simCatNew" value="Cụm Quang Học Chùm Tia Đặc Biệt">
-          </div>
-          <div class="sim-form-group">
-            <label class="sim-label">Tên Phụ Tùng (Item Name) & Quy Cách</label>
-            <input type="text" class="sim-input" id="simItemNew" value="Gương phản xạ mạ vàng Gold Mirror 50mm">
-          </div>
-          <div class="sim-form-group">
-            <label class="sim-label">Thư Mục Chứa Bản Vẽ CAD & Catalog</label>
-            <div style="border: 1px dashed #ef4444; padding: 10px; border-radius: 6px; text-align: center; color: #fca5a5; font-size: 11px;">
-              📁 Đã đính kèm: Folder_Gold_Mirror_CAD_Specs.zip (18.6 MB)
-            </div>
-          </div>
-        `;
-        logSim('Đã chọn nhánh CHƯA CÓ MÃ: Cấp mã tạm TMP-HW-0881. CỜ CHẶN costBlocked=TRUE ĐÃ BẬT!', 'warn');
-      }
-    }
-
-    function onSimQCodeChange() {
-      const code = document.getElementById('simQCodeSelect').value;
-      if (code === 'HW-OPT-001') {
-        document.getElementById('itPriceVal').innerText = '$350.00 / cái';
-        document.getElementById('itAgingVal').innerText = '1 cái (Kho Phụ Tầng 1)';
-        document.getElementById('itEntityVal').innerText = '3 cái (Plant 2 - Kho Trung Tâm)';
-      } else if (code === 'HW-MEC-042') {
-        document.getElementById('itPriceVal').innerText = '$1,200.00 / cái';
-        document.getElementById('itAgingVal').innerText = '0 cái (Không tồn kho lâu)';
-        document.getElementById('itEntityVal').innerText = '0 cái (Không có tại pháp nhân bạn)';
-      } else {
-        document.getElementById('itPriceVal').innerText = '$85.00 / cái';
-        document.getElementById('itAgingVal').innerText = '5 cái (>90 ngày)';
-        document.getElementById('itEntityVal').innerText = '10 cái (Entity C)';
-      }
-      logSim('Cập nhật dữ liệu Interlock theo QCode: ' + code);
-    }
-
-    function executeSimStep(stepName) {
-      if (stepName === 'scan') {
-        logSim('Đang quét tự động 4 chiều Interlock...', 'info');
-        setTimeout(() => {
-          if (currentSimMode === 'none') {
-            logSim('CẢNH BÁO: Phụ tùng mang mã tạm TMP-HW-0881. Chưa có giá UP001 hợp đồng!', 'warn');
-            document.getElementById('itPriceStatus').className = 'itlock-status pill-danger';
-            document.getElementById('itPriceStatus').innerText = 'UP004 (CHỜ RFQ)';
-            document.getElementById('itPriceVal').innerText = 'Chưa có giá hợp đồng';
-          } else {
-            logSim('QUÉT XONG: Hợp đồng giá UP001 hợp lệ ($350). Phát hiện tồn kho lâu 72 ngày và tồn kho liên pháp nhân tại Entity B!', 'warn');
-          }
-        }, 500);
-      } else if (stepName === 'lec') {
-        logSim('LEC (Chuyên viên điều phối) tiếp nhận hồ sơ trên SCR-04.', 'info');
-        setTimeout(() => {
-          logSim('LEC: "Đã rà soát logic hiện trạng dừng máy của Requestor. Thống nhất số lượng xin mua 2 PCS. Đạt chuẩn kỹ thuật."', 'ok');
-          logSim('GOM MẺ THÁNG: Gán mã EM No: HWBMTL21EC0101. Đánh nhãn: OVER (Mã OVR-01 - Hỏng hóc đột xuất).', 'ok');
-        }, 600);
-      } else if (stepName === 'offline') {
-        logSim('BẮT ĐẦU HỘI ĐỒNG THẨM ĐỊNH OFFLINE ĐẦU THÁNG (NGÀY 01-05)...', 'info');
-        setTimeout(() => {
-          if (currentSimMode === 'none') {
-            logSim('LỖI CHẶN CỨNG BỞI REVIEWER: Hồ sơ còn mang mã tạm TMP-HW-0881! BAN QUẢN LÝ TỪ CHỐI THẨM ĐỊNH!', 'err');
-            logSim('Yêu cầu LEC làm việc khẩn với ERP Team để cấp mã QCode chính thức trước khi trình lại!', 'err');
-            alert('CHẶN CỨNG: Không thể thẩm định mã tạm TMP-HW-xxxx! Bắt buộc phải có QCode chính thức.');
-          } else {
-            logSim('LEC làm trung gian trả lời Inquiry của Ban Quản Lý về tồn kho 72 ngày: "Không tương thích kích thước thấu kính tia hẹp".', 'ok');
-            logSim('BAN QUẢN LÝ PHÊ DUYỆT: Ký cấp chứng chỉ Cost Clearance mã: CC-HW-202611-PASS!', 'ok');
-            document.getElementById('tierControlsBox').style.display = 'block';
-            renderTier1UI();
-          }
-        }, 700);
-      } else if (stepName === 'purchase') {
-        document.getElementById('tierControlsBox').style.display = 'block';
-        renderTier1UI();
-      }
-    }
-
-    /* RENDER 3-TIER WATERFALL IN SIMULATOR */
-    function renderTier1UI() {
-      const box = document.getElementById('tierContentStep');
-      box.innerHTML = `
-        <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:4px solid #34d399;">
-          <div style="font-weight:700; color:#34d399; font-size:13px; margin-bottom:4px;">TẦNG 1: THỦ TỤC CHUYỂN GIAO KHO LIÊN PHÁP NHÂN (TRANSFER)</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-            Hệ thống phát hiện Entity B (Plant 2) đang có 3 cái phụ tùng nhàn rỗi. Bạn muốn duyệt điều chuyển hay từ chối?
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-primary" onclick="resolveTier(1, 'approve')">✔ Phê Duyệt Transfer (Hoàn tất không mua mới)</button>
-            <button class="btn-action" style="border-color:#ef4444; color:#fca5a5;" onclick="resolveTier(1, 'reject')">✖ Từ Chối Transfer ➔ Chuyển Tầng 2</button>
-          </div>
-        </div>
-      `;
-      logSim('Hệ thống mở cổng Tầng 1: Thủ tục điều chuyển kho liên pháp nhân.', 'info');
-    }
-
-    function renderTier2UI() {
-      const box = document.getElementById('tierContentStep');
-      box.innerHTML = `
-        <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:4px solid #f59e0b;">
-          <div style="font-weight:700; color:#fbbf24; font-size:13px; margin-bottom:4px;">TẦNG 2: MUA HÀNG NỘI BỘ (INTERNAL PO)</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-            Lập đơn mua nội bộ giữa Org 28753 và Entity B. Bạn muốn phê duyệt thanh toán nội bộ hay chuyển mua thị trường ngoài?
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-primary" onclick="resolveTier(2, 'approve')">✔ Phê Duyệt Internal PO (Hoàn tất)</button>
-            <button class="btn-action" style="border-color:#ef4444; color:#fca5a5;" onclick="resolveTier(2, 'reject')">✖ Từ Chối Internal PO ➔ Chuyển Tầng 3 (Mua Thường)</button>
-          </div>
-        </div>
-      `;
-      logSim('Tầng 1 bị từ chối. Chuyển tiếp Tầng 2: Mua hàng nội bộ (Internal PO).', 'warn');
-    }
-
-    function renderTier3UI() {
-      const box = document.getElementById('tierContentStep');
-      box.innerHTML = `
-        <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:4px solid #2563eb;">
-          <div style="font-weight:700; color:#60a5fa; font-size:13px; margin-bottom:4px;">TẦNG 3: MUA THƯỜNG NGOÀI THỊ TRƯỜNG QUA NEXACRO EMS (EXTERNAL PO)</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-            Chào giá nhà cung cấp bên ngoài giá thấp nhất ($350/cái). Hồ sơ được đẩy lên Nexacro EMS Core để lãnh đạo ký duyệt điện tử.
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-primary" onclick="resolveTier(3, 'approve')">✍️ Lãnh Đạo Ký Duyệt PRV & PO Trên Nexacro EMS Core</button>
-          </div>
-        </div>
-      `;
-      logSim('Tầng 2 bị từ chối. Chuyển tiếp Tầng 3: Mua thường ngoài thị trường giá thấp nhất.', 'warn');
-    }
-
-    function resolveTier(tier, action) {
-      if (tier === 1) {
-        if (action === 'approve') {
-          logSim('THÀNH CÔNG: Điều chuyển kho liên pháp nhân được duyệt! Xuất mượn hoàn tất. KHÔNG MUA MỚI CỤC BỘ.', 'ok');
-          document.getElementById('tierContentStep').innerHTML = `<div style="color:#34d399; font-weight:bold; font-size:13px;">🎉 QUY TRÌNH HOÀN TẤT QUA TẦNG 1: ĐIỀU CHUYỂN KHO NỘI BỘ THÀNH CÔNG!</div>`;
-        } else {
-          logSim('TẦNG 1 TỪ CHỐI: Pháp nhân bạn giữ an toàn tồn kho. Tự động chuyển xuống Tầng 2.', 'warn');
-          renderTier2UI();
-        }
-      } else if (tier === 2) {
-        if (action === 'approve') {
-          logSim('THÀNH CÔNG: Đơn hàng Internal PO được duyệt! Xuất hóa đơn nội bộ.', 'ok');
-          document.getElementById('tierContentStep').innerHTML = `<div style="color:#fbbf24; font-weight:bold; font-size:13px;">🎉 QUY TRÌNH HOÀN TẤT QUA TẦNG 2: MUA NỘI BỘ (INTERNAL PO) THÀNH CÔNG!</div>`;
-        } else {
-          logSim('TẦNG 2 TỪ CHỐI: Hạn mức nội bộ không đủ. Tự động chuyển xuống Tầng 3 (Mua thường ngoài).', 'warn');
-          renderTier3UI();
-        }
-      } else if (tier === 3) {
-        logSim('ĐÃ KÝ DUYỆT PO-99824 TRÊN NEXACRO EMS CORE 100%!', 'ok');
-        logSim('Đồng bộ Inbound: Vendor Confirm ➔ ETA Port ➔ Thông quan ➔ Xuất bảng kê ds_Inv vào giá thành.', 'ok');
-        document.getElementById('tierContentStep').innerHTML = `
-          <div style="color:#60a5fa; font-weight:bold; font-size:13px;">
-            🎉 HOÀN TẤT TẦNG 3: MÃ PO-99824 PHÁT HÀNH TRÊN EMS! DS_INV ĐÃ ĐƯỢC ĐỒNG BỘ THÀNH CÔNG!
-          </div>
-        `;
-      }
-    }
-
-    function runAutoSimulation() {
-      logSim('--- BẮT ĐẦU CHẠY DEMO TỰ ĐỘNG TẤT CẢ CÁC BƯỚC ---', 'info');
-      setSimItemMode('has');
-      setTimeout(() => executeSimStep('scan'), 800);
-      setTimeout(() => executeSimStep('lec'), 1800);
-      setTimeout(() => executeSimStep('offline'), 3000);
-      setTimeout(() => {
-        executeSimStep('purchase');
-        setTimeout(() => resolveTier(1, 'reject'), 1200);
-        setTimeout(() => resolveTier(2, 'reject'), 2400);
-        setTimeout(() => resolveTier(3, 'approve'), 3600);
-      }, 4200);
-    }
-
-    /* EXPORT HIGH-RES */
-    function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
-    function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
-
-    function exportWorkflowSVG() {
-      const svg = document.getElementById('connectionsSvg');
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
-      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'BPMN-Procurement-Workflow-HighRes.svg';
-      a.click();
-      URL.revokeObjectURL(url);
-      closeExportModal();
-    }
-
-    function exportWorkflowPNG(scale) {
-      alert(`Đang khởi tạo kết xuất hình ảnh phân giải cao x${scale} (Canvas snapshot). File sẽ được lưu về máy.`);
-      closeExportModal();
-    }
-  </script>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  Detail panel data
+// ═══════════════════════════════════════════════
+const D = {
+  start: {
+    code:'START', color:'#1d4ed8', title:'Khởi Đầu Quy Trình Mua Hàng',
+    lane:'Requestor', raci:{R:'Requestor',A:'LEC',C:'Management',I:'Procurement'},
+    inputs:['Nhu cầu phụ tùng thực tế tại line'],
+    rules:['Yêu cầu phát sinh từ Breakdown, PM, Setup hoặc CIP','Phải có kế hoạch bảo trì hoặc sự cố thực tế'],
+    outputs:['Trigger khởi động quy trình ERP']
+  },
+  act1: {
+    code:'ACT-1', color:'#3b82f6', title:'1. Định Vị Thiết Bị 4 Tầng',
+    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'LEC',I:'Management'},
+    inputs:['Tag thiết bị (QR/barcode)','Sơ đồ Line/Machine'],
+    rules:['Cấu trúc 4 tầng bắt buộc: Line ► Machine ► Unit ► Assembly','Không được bỏ qua tầng nào','Dùng scanner hoặc nhập tay từ tag thiết bị'],
+    outputs:['Asset ID xác định','Vị trí thiết bị trong ERP']
+  },
+  gw1: {
+    code:'GW-1', color:'#38bdf8', title:'Mã QCode đã có trong ERP?',
+    lane:'Requestor', raci:{R:'ERP System',A:'Requestor',C:'LEC',I:''},
+    inputs:['Asset ID từ ACT-1','Database ERP spare parts'],
+    rules:['Query tự động theo Part Number + Asset ID','Kết quả: Đã có (→ ACT-2A) hoặc Chưa có (→ ACT-2B)'],
+    outputs:['Boolean: QCode exists / not exists']
+  },
+  act2a: {
+    code:'ACT-2A', color:'#10b981', title:'2A. Đã Có – Bổ Sung QCode',
+    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'',I:'LEC'},
+    inputs:['QCode từ ERP','Dữ liệu tồn kho hiện tại'],
+    rules:['Auto-fill giá theo bảng UP001/UP004','Auto-fill tồn kho & CAD drawing nếu có','Không được thay đổi QCode đã chuẩn hóa'],
+    outputs:['Item line hoàn chỉnh với QCode','Giá tham chiếu','Tồn kho hiện tại']
+  },
+  act2b: {
+    code:'ACT-2B', color:'#ef4444', title:'2B. Chưa Có – Đăng Ký Hạng Mục',
+    lane:'Requestor', raci:{R:'Requestor',A:'LEC',C:'Management',I:'Procurement'},
+    inputs:['Mô tả kỹ thuật phụ tùng','Catalogue / datasheet'],
+    rules:['Tạo mã tạm TMP-HW-xxxx','Đặt cờ costBlocked=true bắt buộc','LEC phải thẩm định trước khi đặt mua','Hạng mục TMP không được phép lên PO nếu chưa qua ACT-7'],
+    outputs:['Mã TMP-HW-xxxx trong hệ thống','costBlocked flag = true']
+  },
+  act3: {
+    code:'ACT-3', color:'#475569', title:'3. Nhập Số Lượng Xin Mua & Lý Do',
+    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'LEC',I:'Management'},
+    inputs:['QCode hoặc TMP code','Lịch sử sử dụng (MTTR/MTBF)'],
+    rules:['Lý do bắt buộc: Setup / CIP / Breakdown / PM','Cờ Khẩn Cấp kích hoạt SLA < 4h','Số lượng phải hợp lý so với lịch sử dùng','Mô tả kỹ thuật tối thiểu 50 ký tự'],
+    outputs:['Purchase request line','Urgency flag','Reason code']
+  },
+  act4: {
+    code:'ACT-4', color:'#0ea5e9', title:'4. Hệ Thống Quét 4 Chiều Interlock',
+    lane:'Requestor', raci:{R:'ERP System',A:'LEC',C:'Management',I:'Requestor'},
+    inputs:['Purchase request','Bảng giá UP001/UP004','Dữ liệu tồn kho toàn bộ pháp nhân'],
+    rules:['① Giá trong UP001/UP004 (sai → cảnh báo)','② Tồn kho >30 ngày (có → ưu tiên transfer)','③ Tồn tại pháp nhân khác (có → gợi ý transfer)','④ Chênh lệch giá >15% (cảnh báo cứng)','Tất cả 4 chiều phải PASS mới được tiếp tục'],
+    outputs:['Interlock report 4 chiều','Recommendation: Transfer / Internal PO / External PO']
+  },
+  act5: {
+    code:'ACT-5', color:'#f59e0b', title:'5. Trao Đổi LEC ↔ Requestor',
+    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'Requestor',I:'Management'},
+    inputs:['Purchase request từ ACT-3/4','Ảnh hiện trường','Catalogue phụ tùng'],
+    rules:['LEC phải xác nhận technical spec','Ảnh hiện trường bắt buộc nếu Breakdown','Hỏi lại Requestor nếu thông tin chưa đủ','Tối đa 2 vòng trao đổi trước khi leo thang'],
+    outputs:['Biên bản trao đổi kỹ thuật','Technical approval từ LEC']
+  },
+  gw2: {
+    code:'GW-2', color:'#f59e0b', title:'LEC Đánh Giá Đạt?',
+    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'',I:'Requestor'},
+    inputs:['Kết quả trao đổi kỹ thuật ACT-5'],
+    rules:['Đạt → tiến ACT-6','Chưa đạt → quay lại ACT-5 (loop)','Tối đa 3 lần loop, sau đó leo thang Management'],
+    outputs:['Boolean: LEC approved / rejected']
+  },
+  act6: {
+    code:'ACT-6', color:'#f59e0b', title:'6. Gom Mẻ + Gán EM No 14 Ký Tự',
+    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'Management',I:'Procurement'},
+    inputs:['Danh sách PR đã được LEC approve','Lịch mua hàng tháng'],
+    rules:['EM No phải đúng 14 ký tự (format: EMxxxxxxxx-xxxx)','Nhãn TARGET: đúng kế hoạch budget','Nhãn OVER (OVR-01..06): vượt kế hoạch, cần giải trình','WO phải được gắn kết với EM No','Gom theo chu kỳ: 1–5 đầu tháng'],
+    outputs:['EM No 14 ký tự','Batch purchase list','WO linkage']
+  },
+  act7: {
+    code:'ACT-7', color:'#8b5cf6', title:'7. Thẩm Định Offline (Ngày 01-05)',
+    lane:'Management', raci:{R:'Management',A:'Management',C:'LEC',I:'Requestor'},
+    inputs:['Batch list từ ACT-6','EM No','Cost estimate'],
+    rules:['Thực hiện ngày 01-05 hàng tháng','LEC đóng vai trung gian MGR↔LEC↔REQ','Hạng mục TMP- bị chặn cứng: không được approve','Nếu còn TMP- → trả về loop BLOCK → ACT-7'],
+    outputs:['Danh sách phê duyệt offline','Management signature']
+  },
+  gw3: {
+    code:'GW-3', color:'#8b5cf6', title:'Còn Mã TMP- Chưa Giải Quyết?',
+    lane:'Management', raci:{R:'ERP System',A:'Management',C:'LEC',I:''},
+    inputs:['Batch list sau ACT-7'],
+    rules:['Có TMP- → chặn cứng (BLOCK), yêu cầu QCode ERP','Không còn TMP- → tiếp tục ACT-8'],
+    outputs:['Boolean: TMP exists / clear']
+  },
+  block: {
+    code:'BLOCK', color:'#ef4444', title:'⛔ CHẶN CỨNG – Yêu Cầu QCode ERP',
+    lane:'Management', raci:{R:'Management',A:'Management',C:'LEC',I:'Requestor'},
+    inputs:['Mã TMP- chưa chuẩn hóa'],
+    rules:['Hệ thống từ chối tiếp tục cho đến khi QCode được tạo','LEC phải điều phối với Requestor để lấy QCode chính thức','Thời hạn xử lý: 3 ngày làm việc'],
+    outputs:['Yêu cầu tạo QCode chính thức gửi về ACT-7']
+  },
+  act8: {
+    code:'ACT-8', color:'#10b981', title:'8. Chốt List Mua + Cost Clearance',
+    lane:'Management', raci:{R:'Management',A:'Management',C:'Finance',I:'Procurement'},
+    inputs:['Danh sách phê duyệt sạch (không còn TMP-)','Budget allocation'],
+    rules:['Format CC: CC-HW-YYYYMM-PASS','Phải có chữ ký Management + Finance','Cost Clearance hết hạn sau 30 ngày','Procurement không nhận PO nếu thiếu CC'],
+    outputs:['Cost Clearance document CC-HW-YYYYMM-PASS','Final purchase list locked']
+  },
+  act9a: {
+    code:'ACT-9A', color:'#10b981', title:'9A. ⭐ Tầng 1: Điều Chuyển Kho Liên Pháp Nhân',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'LEC',I:'Requestor'},
+    inputs:['Recommendation Transfer từ ACT-4','Cost Clearance','Tồn kho pháp nhân khác'],
+    rules:['Ưu tiên tuyệt đối: thực hiện trước Tầng 2 và 3','Không phát sinh chi phí mua ngoài','SLA Transfer: 3-5 ngày làm việc','Phải có approve từ cả hai pháp nhân'],
+    outputs:['Transfer Order','Stock movement record']
+  },
+  gw4: {
+    code:'GW-4', color:'#10b981', title:'Transfer Approve?',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:''},
+    inputs:['Transfer request','Stock availability confirmation'],
+    rules:['Approve → ✅ HOÀN TẤT Tầng 1','Reject (không đủ tồn hoặc từ chối) → Tầng 2 (ACT-9B)'],
+    outputs:['Boolean: transfer approved / rejected']
+  },
+  ok1: {
+    code:'OK-1', color:'#10b981', title:'✅ HOÀN TẤT – Tầng 1 Transfer',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:'Requestor'},
+    inputs:['Transfer approved'],
+    rules:['Cập nhật ds_Inv cả hai pháp nhân','Gửi thông báo cho Requestor','Đóng PR trong ERP'],
+    outputs:['Goods received','ds_Inv updated','PR closed']
+  },
+  act9b: {
+    code:'ACT-9B', color:'#f59e0b', title:'9B. Tầng 2: Mua Nội Bộ – Internal PO',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
+    inputs:['Reject từ GW-4','Cost Clearance','Inter-company agreement'],
+    rules:['Internal PO giữa hai pháp nhân cùng tập đoàn','Giá nội bộ theo quy định transfer pricing','SLA: 5-7 ngày làm việc','Phải qua Finance approve'],
+    outputs:['Internal PO document','Inter-company invoice']
+  },
+  gw5: {
+    code:'GW-5', color:'#f59e0b', title:'Internal PO Approve?',
+    lane:'Procurement', raci:{R:'Finance',A:'Management',C:'',I:'Procurement'},
+    inputs:['Internal PO request'],
+    rules:['Approve → ✅ HOÀN TẤT Tầng 2','Reject → Tầng 3 External (ACT-9C)'],
+    outputs:['Boolean: internal PO approved / rejected']
+  },
+  ok2: {
+    code:'OK-2', color:'#10b981', title:'✅ HOÀN TẤT – Tầng 2 Internal PO',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:'Requestor'},
+    inputs:['Internal PO approved'],
+    rules:['Cập nhật ds_Inv sau khi nhận hàng','Gửi thông báo Requestor','Reconcile inter-company account'],
+    outputs:['Goods received','ds_Inv updated','Internal invoice settled']
+  },
+  act9c: {
+    code:'ACT-9C', color:'#3b82f6', title:'9C. Tầng 3: Mua Thường – Nexacro EMS',
+    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
+    inputs:['Reject từ GW-5','Cost Clearance','Vendor list approved','Nexacro EMS access'],
+    rules:['PRV (Purchase Request Vendor) tạo trên Nexacro EMS','Ký duyệt 100% qua EMS Core (không ký tay)','PO format: PO-99xxx','Inbound inspection bắt buộc trước khi nhập kho','Nhập kho → cập nhật ds_Inv real-time'],
+    outputs:['PO-99xxx','Vendor delivery note','Inbound inspection record','ds_Inv updated','PR closed']
+  },
+  end: {
+    code:'END', color:'#1d4ed8', title:'Quy Trình Mua Hàng Hoàn Tất',
+    lane:'All', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
+    inputs:['Completed PO (any tier)'],
+    rules:['Lưu trữ toàn bộ hồ sơ 5 năm','Gửi báo cáo tổng hợp cuối tháng','KPI tracking: lead time, cost variance'],
+    outputs:['Closed procurement cycle','Audit trail','Monthly procurement report']
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  Detail panel logic
+// ═══════════════════════════════════════════════
+function show(id) {
+  const d = D[id];
+  if (!d) return;
+  document.getElementById('dp-code').textContent = d.code;
+  document.getElementById('dp-code').style.color = d.color;
+  document.getElementById('dp-title').textContent = d.title;
+  const lb = document.getElementById('dp-lane-badge');
+  lb.textContent = d.lane;
+  lb.style.background = d.color + '33';
+  lb.style.color = d.color;
+  lb.style.border = '1px solid ' + d.color + '55';
+
+  const raci = document.getElementById('dp-raci');
+  raci.innerHTML = ['R','A','C','I'].map(k =>
+    `<div class="raci-cell"><b>${k} – ${k==='R'?'Responsible':k==='A'?'Accountable':k==='C'?'Consulted':'Informed'}</b>${d.raci[k]||'—'}</div>`
+  ).join('');
+
+  ['inputs','rules','outputs'].forEach(key => {
+    const el = document.getElementById('dp-'+key);
+    el.innerHTML = (d[key]||[]).map(s=>`<li>${s}</li>`).join('');
+  });
+  document.getElementById('dp').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('dp').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+//  Pan & Zoom
+// ═══════════════════════════════════════════════
+let scale = 0.52, tx = 10, ty = 10;
+const svg = document.getElementById('diag');
+const vp  = document.getElementById('vp');
+
+function applyTransform() {
+  svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+}
+applyTransform();
+
+function fitView() {
+  scale = 0.52; tx = 10; ty = 10;
+  applyTransform();
+}
+
+function zoom(factor) {
+  const cx = vp.clientWidth / 2;
+  const cy = vp.clientHeight / 2;
+  tx = cx - (cx - tx) * factor;
+  ty = cy - (cy - ty) * factor;
+  scale *= factor;
+  scale = Math.max(0.1, Math.min(5, scale));
+  applyTransform();
+}
+
+// Wheel zoom
+vp.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+  const rect = vp.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  tx = mx - (mx - tx) * factor;
+  ty = my - (my - ty) * factor;
+  scale *= factor;
+  scale = Math.max(0.08, Math.min(6, scale));
+  applyTransform();
+}, {passive: false});
+
+// Pan
+let dragging = false, startX, startY, startTx, startTy;
+vp.addEventListener('mousedown', e => {
+  if (e.target.closest('.n') || e.target.closest('#dp')) return;
+  dragging = true;
+  startX = e.clientX; startY = e.clientY;
+  startTx = tx; startTy = ty;
+  vp.classList.add('panning');
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  tx = startTx + (e.clientX - startX);
+  ty = startTy + (e.clientY - startY);
+  applyTransform();
+});
+window.addEventListener('mouseup', () => {
+  dragging = false;
+  vp.classList.remove('panning');
+});
+
+// Close panel on background click
+vp.addEventListener('click', e => {
+  if (!e.target.closest('.n')) closePanel();
+});
+</script>
 </body>
 </html>
