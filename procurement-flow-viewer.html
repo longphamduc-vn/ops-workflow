@@ -1,50 +1,69 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Procurement Flow – Spare Parts (Factory)</title>
+<title>Procurement Workflow – UML Activity Diagram</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0b1120;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:12px;padding:0 16px;height:56px;background:#0f172a;border-bottom:1px solid #1e3a5f;flex-shrink:0;z-index:30}
-header h1{font-size:14px;font-weight:700;color:#93c5fd;letter-spacing:.4px;white-space:nowrap}
-header span{font-size:11px;color:#64748b;flex:1}
-.btn{padding:5px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;cursor:pointer;transition:background .15s}
-.btn:hover{background:#334155;color:#e2e8f0}
+body{background:#0b1120;color:#e2e8f0;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:0 18px;height:56px;background:#0f172a;border-bottom:1px solid #1e3a5f;flex-shrink:0;z-index:30}
+header h1{font-size:14px;font-weight:700;color:#93c5fd;letter-spacing:.4px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+header span{font-size:11px;color:#94a3b8;flex:1}
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn{padding:5px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn:hover{background:#334155;color:#e2e8f0;border-color:#475569}
+.btn-primary{background:#1d4ed8;color:#fff;border-color:#2563eb}
+.btn-primary:hover{background:#2563eb;color:#fff}
+.badge-legend{display:flex;align-items:center;gap:12px;padding-right:8px;font-size:11px}
+.legend-item{display:flex;align-items:center;gap:5px;color:#94a3b8}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
 #vp{flex:1;overflow:hidden;position:relative;cursor:grab}
 #vp.panning{cursor:grabbing}
 #diag{display:block;transform-origin:0 0}
-/* detail panel */
-#dp{position:fixed;top:56px;right:0;width:400px;height:calc(100vh - 56px);background:#0f172a;border-left:1px solid #1e3a5f;transform:translateX(100%);transition:transform .25s ease;z-index:50;overflow-y:auto;display:flex;flex-direction:column}
+
+/* Detail Panel */
+#dp{position:fixed;top:56px;right:0;width:420px;height:calc(100vh - 56px);background:#0f172a;border-left:1px solid #1e3a5f;transform:translateX(100%);transition:transform .25s cubic-bezier(0.16,1,0.3,1);z-index:50;overflow-y:auto;display:flex;flex-direction:column;box-shadow:-8px 0 24px rgba(0,0,0,0.45)}
 #dp.open{transform:translateX(0)}
-#dp-head{padding:14px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
-#dp-code{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:#1e293b}
-#dp-title{font-size:13px;font-weight:600;color:#e2e8f0;flex:1}
-#dp-close{background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
-#dp-close:hover{color:#e2e8f0}
-#dp-body{padding:14px 16px;flex:1}
-.dp-sec{margin-bottom:14px}
-.dp-sec h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#64748b;margin-bottom:6px}
-.raci-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.raci-cell{background:#1e293b;border-radius:4px;padding:5px 8px;font-size:11px}
-.raci-cell b{color:#93c5fd;display:block;font-size:9px;margin-bottom:1px}
+#dp-head{padding:14px 18px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px;background:#131d35}
+#dp-code{font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1e293b;letter-spacing:.5px}
+#dp-title{font-size:13px;font-weight:600;color:#f8fafc;flex:1;line-height:1.4}
+#dp-close{background:none;border:none;color:#64748b;font-size:20px;cursor:pointer;padding:0 6px;line-height:1;border-radius:4px}
+#dp-close:hover{color:#e2e8f0;background:#1e293b}
+#dp-body{padding:16px 18px;flex:1}
+.dp-sec{margin-bottom:16px}
+.dp-sec h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.raci-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.raci-cell{background:#1e293b;border-radius:5px;padding:6px 10px;font-size:11px;border:1px solid #283548}
+.raci-cell b{color:#93c5fd;display:block;font-size:9px;margin-bottom:2px;letter-spacing:.5px}
 .dp-list{list-style:none;padding:0}
-.dp-list li{font-size:11px;color:#cbd5e1;padding:3px 0 3px 12px;border-bottom:1px solid #1e293b30;position:relative}
-.dp-list li::before{content:'›';position:absolute;left:0;color:#475569}
-.lane-badge{font-size:10px;padding:2px 7px;border-radius:3px;color:#fff}
-/* SVG node styles via CSS */
-.n{cursor:pointer}
-.n:hover rect,.n:hover polygon{filter:brightness(1.18)}
+.dp-list li{font-size:11px;color:#cbd5e1;padding:4px 0 4px 14px;border-bottom:1px solid #1e293b40;position:relative;line-height:1.45}
+.dp-list li::before{content:'›';position:absolute;left:0;color:#60a5fa;font-weight:700}
+.lane-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-block}
+
+/* SVG node styles */
+.n{cursor:pointer;transition:transform .15s}
+.n:hover rect,.n:hover polygon{filter:brightness(1.22);stroke-width:2.2px}
+.n:hover circle{filter:brightness(1.25)}
+.n.active rect,.n.active polygon{stroke:#38bdf8 !important;stroke-width:2.5px !important;filter:drop-shadow(0 0 8px rgba(56,189,248,0.5))}
 </style>
 </head>
 <body>
 <header>
-  <h1>⚙️ Spare Parts Procurement Flow</h1>
-  <span>UML Activity Diagram – 4 Swimlanes</span>
-  <button class="btn" onclick="fitView()">⊡ Fit</button>
-  <button class="btn" onclick="zoom(1.2)">＋</button>
-  <button class="btn" onclick="zoom(0.83)">－</button>
+  <h1>⚙️ Spare Parts Procurement Workflow</h1>
+  <span>UML Activity Diagram – 4 Functional Swimlanes</span>
+  <div class="badge-legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Requestor</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>LEC Review</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Management</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Procurement &amp; EMS</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-primary" onclick="fitView()">⊡ Fit View</button>
+    <button class="btn" onclick="zoom(1.2)">＋ Zoom In</button>
+    <button class="btn" onclick="zoom(0.83)">－ Zoom Out</button>
+  </div>
 </header>
 
 <div id="vp">
@@ -61,36 +80,36 @@ header span{font-size:11px;color:#64748b;flex:1}
 <!-- ══════════════ BACKGROUND & SWIMLANES ══════════════ -->
 <rect width="2100" height="2300" fill="#0b1120"/>
 
-<!-- Lane 0: Requestor -->
+<!-- Lane 0: Requestor (0 to 510, cx = 255) -->
 <rect x="0" y="0" width="510" height="2300" fill="#0d1829" opacity="0.9"/>
-<rect x="0" y="0" width="510" height="68" fill="#1d4ed8" rx="0"/>
-<text x="255" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Requestor</text>
-<text x="255" y="50" text-anchor="middle" fill="#bfdbfe" font-size="11">(Người Yêu Cầu)</text>
+<rect x="0" y="0" width="510" height="68" fill="#1d4ed8"/>
+<text x="255" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing=".5px">Requestor</text>
+<text x="255" y="50" text-anchor="middle" fill="#bfdbfe" font-size="11">Field Engineer / Maintenance Tech</text>
 
-<!-- Lane 1: LEC -->
+<!-- Lane 1: LEC (510 to 970, cx = 740) -->
 <rect x="510" y="0" width="460" height="2300" fill="#12100a" opacity="0.9"/>
-<rect x="510" y="0" width="460" height="68" fill="#b45309" rx="0"/>
-<text x="740" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">LEC</text>
-<text x="740" y="50" text-anchor="middle" fill="#fde68a" font-size="11">(Lead Engineer Coordinator)</text>
+<rect x="510" y="0" width="460" height="68" fill="#b45309"/>
+<text x="740" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing=".5px">LEC (Lead Equipment Coordinator)</text>
+<text x="740" y="50" text-anchor="middle" fill="#fde68a" font-size="11">Technical Reviewer &amp; Operations Coordinator</text>
 
-<!-- Lane 2: Management -->
+<!-- Lane 2: Management (970 to 1450, cx = 1210) -->
 <rect x="970" y="0" width="480" height="2300" fill="#100a1a" opacity="0.9"/>
-<rect x="970" y="0" width="480" height="68" fill="#6d28d9" rx="0"/>
-<text x="1210" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Management</text>
-<text x="1210" y="50" text-anchor="middle" fill="#ddd6fe" font-size="11">(Quản Lý Phê Duyệt)</text>
+<rect x="970" y="0" width="480" height="68" fill="#6d28d9"/>
+<text x="1210" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing=".5px">Management &amp; Cost Control</text>
+<text x="1210" y="50" text-anchor="middle" fill="#ddd6fe" font-size="11">Monthly Audit &amp; Budget Clearance Authority</text>
 
-<!-- Lane 3: Procurement -->
+<!-- Lane 3: Procurement (1450 to 2100, cx = 1750) -->
 <rect x="1450" y="0" width="650" height="2300" fill="#040d08" opacity="0.9"/>
-<rect x="1450" y="0" width="650" height="68" fill="#065f46" rx="0"/>
-<text x="1750" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Procurement</text>
-<text x="1750" y="50" text-anchor="middle" fill="#a7f3d0" font-size="11">(Bộ Phận Mua Hàng)</text>
+<rect x="1450" y="0" width="650" height="68" fill="#065f46"/>
+<text x="1750" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing=".5px">Procurement &amp; EMS</text>
+<text x="1750" y="50" text-anchor="middle" fill="#a7f3d0" font-size="11">3-Tier Execution: Transfer / Internal PO / External EMS</text>
 
-<!-- Lane dividers -->
+<!-- Lane vertical dividers -->
 <line x1="510" y1="68" x2="510" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
 <line x1="970" y1="68" x2="970" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
 <line x1="1450" y1="68" x2="1450" y2="2300" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
 
-<!-- ══════════════ EDGES (drawn before nodes) ══════════════ -->
+<!-- ══════════════ EDGES (Drawn before nodes) ══════════════ -->
 
 <!-- 1. START → ACT1 -->
 <path d="M255,167 L255,208" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
@@ -98,15 +117,15 @@ header span{font-size:11px;color:#64748b;flex:1}
 <!-- 2. ACT1 → GW1 -->
 <path d="M255,268 L255,311" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
 
-<!-- 3. GW1 left "Đã có ✓" → ACT2A -->
+<!-- 3. GW1 left "Exists in ERP ✓" → ACT2A -->
 <path d="M211,353 L110,353 L110,408" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
-<rect x="118" y="336" width="68" height="16" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="152" y="348" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Đã có ✓</text>
+<rect x="100" y="336" width="102" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="151" y="348" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Exists in ERP ✓</text>
 
-<!-- 4. GW1 right "Chưa có" → ACT2B -->
+<!-- 4. GW1 right "Unregistered / New" → ACT2B -->
 <path d="M299,353 L390,353 L390,408" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
-<rect x="300" y="336" width="68" height="16" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="334" y="348" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Chưa có</text>
+<rect x="320" y="336" width="105" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="372" y="348" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Unregistered / New</text>
 
 <!-- 5. ACT2A merge -->
 <path d="M110,476 L110,543 L251,543" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
@@ -114,267 +133,267 @@ header span{font-size:11px;color:#64748b;flex:1}
 <!-- 6. ACT2B merge -->
 <path d="M390,488 L390,543 L259,543" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
 
-<!-- 7. merge to ACT3 -->
+<!-- 7. merge point to ACT3 -->
 <path d="M255,543 L255,548" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
 
 <!-- 8. ACT3 → ACT4 -->
 <path d="M255,628 L255,678" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
 
-<!-- 9. ACT4 right → ACT5 (CROSS LANE) -->
-<path d="M390,715 L510,715 L740,715 L740,763" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="6,3"/>
-<rect x="490" y="699" width="88" height="16" rx="3" fill="#131c31" opacity="0.9"/>
-<text x="534" y="711" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">→ LEC Review</text>
+<!-- 9. ACT4 right → ACT5 (CROSS LANE: Requestor to LEC) -->
+<path d="M400,715 L510,715 L740,715 L740,763" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="6,3"/>
+<rect x="520" y="699" width="140" height="18" rx="3" fill="#131c31" opacity="0.95" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="590" y="712" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">→ Handover to LEC Review</text>
 
 <!-- 10. ACT5 → GW2 -->
 <path d="M740,838 L740,876" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)"/>
 
-<!-- 11. GW2 → ACT6 "Đạt ✓" -->
+<!-- 11. GW2 → ACT6 "Qualified ✓" -->
 <path d="M740,960 L740,966" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
-<rect x="748" y="956" width="46" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="771" y="967" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Đạt ✓</text>
+<rect x="748" y="955" width="70" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="783" y="967" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Qualified ✓</text>
 
-<!-- 12. GW2 loop back "Chưa đạt" -->
-<path d="M696,918 L608,918 L608,800 L618,800" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)" stroke-dasharray="5,3"/>
-<rect x="599" y="850" width="68" height="16" rx="3" fill="#131c31" opacity="0.9"/>
-<text x="633" y="862" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Chưa đạt</text>
+<!-- 12. GW2 loop back "Clarification Required" -->
+<path d="M696,918 L580,918 L580,800 L600,800" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)" stroke-dasharray="5,3"/>
+<rect x="530" y="850" width="105" height="18" rx="3" fill="#131c31" opacity="0.95" stroke="#ef4444" stroke-width="0.8"/>
+<text x="582" y="863" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Clarify / Rework</text>
 
-<!-- 13. ACT6 → ACT7 (CROSS LANE) -->
+<!-- 13. ACT6 → ACT7 (CROSS LANE: LEC to Management) -->
 <path d="M740,1041 L740,1070 L1210,1070 L1210,1116" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ap)" stroke-dasharray="6,3"/>
-<rect x="940" y="1054" width="88" height="16" rx="3" fill="#131c31" opacity="0.9"/>
-<text x="984" y="1066" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="600">→ Mgmt Review</text>
+<rect x="915" y="1054" width="155" height="18" rx="3" fill="#131c31" opacity="0.95" stroke="#8b5cf6" stroke-width="0.8"/>
+<text x="992" y="1067" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="600">→ Submit for Monthly Audit</text>
 
 <!-- 14. ACT7 → GW3 -->
 <path d="M1210,1196 L1210,1230" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ap)"/>
 
-<!-- 15. GW3 right "Có TMP-" → BLOCK -->
-<path d="M1254,1272 L1283,1272" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
-<rect x="1256" y="1256" width="58" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1285" y="1267" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Có TMP-</text>
+<!-- 15. GW3 right "Unresolved TMP-" → BLOCK -->
+<path d="M1254,1272 L1273,1272" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+<rect x="1245" y="1255" width="80" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1285" y="1267" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Has TMP-</text>
 
-<!-- 16. BLOCK loop to ACT7 "Fix xong" -->
-<path d="M1368,1250 L1368,1095 L1440,1095 L1440,1156 L1337,1156" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="5,3"/>
-<rect x="1375" y="1098" width="58" height="15" rx="3" fill="#131c31" opacity="0.9"/>
-<text x="1404" y="1110" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">Fix xong</text>
+<!-- 16. BLOCK loop to ACT7 "Resolved with ERP Code" -->
+<path d="M1368,1250 L1368,1095 L1440,1095 L1440,1156 L1357,1156" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)" stroke-dasharray="5,3"/>
+<rect x="1355" y="1098" width="85" height="16" rx="3" fill="#131c31" opacity="0.95" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="1397" y="1110" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">QCode Synced</text>
 
-<!-- 17. GW3 → ACT8 "Không ✓" -->
+<!-- 17. GW3 → ACT8 "All Clear ✓" -->
 <path d="M1210,1314 L1210,1358" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
-<rect x="1218" y="1314" width="56" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1246" y="1326" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Không ✓</text>
+<rect x="1218" y="1314" width="75" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1255" y="1326" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">All Clear ✓</text>
 
-<!-- 18. ACT8 → ACT9A (CROSS LANE) -->
+<!-- 18. ACT8 → ACT9A (CROSS LANE: Management to Procurement) -->
 <path d="M1210,1438 L1210,1465 L1750,1465 L1750,1498" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)" stroke-dasharray="6,3"/>
-<rect x="1440" y="1449" width="100" height="16" rx="3" fill="#131c31" opacity="0.9"/>
-<text x="1490" y="1461" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">→ Procurement</text>
+<rect x="1410" y="1449" width="165" height="18" rx="3" fill="#131c31" opacity="0.95" stroke="#10b981" stroke-width="0.8"/>
+<text x="1492" y="1462" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">→ Cost Clearance Released</text>
 
 <!-- 19. ACT9A → GW4 -->
 <path d="M1750,1573 L1750,1611" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
 
-<!-- 20. GW4 → OK1 "Approve ✓" -->
-<path d="M1795,1653 L1933,1653" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
-<rect x="1810" y="1637" width="72" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1846" y="1648" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approve ✓</text>
+<!-- 20. GW4 → OK1 "Approved ✓" -->
+<path d="M1795,1653 L1910,1653" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="1810" y="1637" width="85" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1852" y="1649" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approved ✓</text>
 
-<!-- 21. GW4 → ACT9B "Reject" -->
+<!-- 21. GW4 → ACT9B "Reject / No Stock" -->
 <path d="M1750,1695 L1750,1713" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
-<rect x="1758" y="1696" width="42" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1779" y="1708" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject</text>
+<rect x="1758" y="1695" width="105" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1810" y="1707" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject / No Stock</text>
 
 <!-- 22. ACT9B → GW5 -->
 <path d="M1750,1788 L1750,1826" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ay)"/>
 
-<!-- 23. GW5 → OK2 "Approve ✓" -->
-<path d="M1795,1868 L1933,1868" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
-<rect x="1810" y="1852" width="72" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1846" y="1863" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approve ✓</text>
+<!-- 23. GW5 → OK2 "Approved ✓" -->
+<path d="M1795,1868 L1910,1868" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+<rect x="1810" y="1852" width="85" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1852" y="1864" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">Approved ✓</text>
 
-<!-- 24. GW5 → ACT9C "Reject" -->
+<!-- 24. GW5 → ACT9C "Reject / Standard Buy" -->
 <path d="M1750,1910 L1750,1928" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#ar)"/>
-<rect x="1758" y="1911" width="42" height="15" rx="3" fill="#131c31" opacity="0.85"/>
-<text x="1779" y="1923" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject</text>
+<rect x="1758" y="1910" width="120" height="16" rx="3" fill="#131c31" opacity="0.9"/>
+<text x="1818" y="1922" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">Reject / External Buy</text>
 
 <!-- 25. ACT9C → END -->
 <path d="M1750,2038 L1750,2083" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a0)"/>
 
 <!-- ══════════════ NODES ══════════════ -->
 
-<!-- START node -->
-<g class="n" onclick="show('start')">
+<!-- START Node -->
+<g class="n" id="node-start" onclick="show('start')">
   <circle cx="255" cy="147" r="18" fill="#1d4ed8" stroke="#60a5fa" stroke-width="2"/>
   <text x="255" y="151" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">▶</text>
-  <text x="255" y="128" text-anchor="middle" fill="#93c5fd" font-size="10">START</text>
+  <text x="255" y="128" text-anchor="middle" fill="#93c5fd" font-size="10" font-weight="600">START</text>
 </g>
 
 <!-- ACT1 -->
-<g class="n" onclick="show('act1')">
-  <rect x="143" y="208" width="224" height="60" rx="6" fill="#1a3561" stroke="#3b82f6" stroke-width="1.5"/>
+<g class="n" id="node-act1" onclick="show('act1')">
+  <rect x="135" y="208" width="240" height="60" rx="6" fill="#1a3561" stroke="#3b82f6" stroke-width="1.5"/>
   <text x="255" y="224" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">ACT-1</text>
-  <text x="255" y="239" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">1. Định Vị Thiết Bị 4 Tầng</text>
+  <text x="255" y="239" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">1. 4-Tier Equipment Hierarchy</text>
   <text x="255" y="254" text-anchor="middle" fill="#94a3b8" font-size="10">Line ► Machine ► Unit ► Assembly</text>
 </g>
 
 <!-- GW1 -->
-<g class="n" onclick="show('gw1')">
-  <polygon points="255,311 299,353 255,395 211,353" fill="#132030" stroke="#38bdf8" stroke-width="1.5"/>
-  <text x="255" y="348" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Mã QCode</text>
-  <text x="255" y="362" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">trong ERP?</text>
+<g class="n" id="node-gw1" onclick="show('gw1')">
+  <polygon points="255,311 305,353 255,395 205,353" fill="#132030" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="255" y="348" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">QCode exists</text>
+  <text x="255" y="362" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">in ERP?</text>
 </g>
 
 <!-- ACT2A -->
-<g class="n" onclick="show('act2a')">
+<g class="n" id="node-act2a" onclick="show('act2a')">
   <rect x="15" y="408" width="190" height="68" rx="6" fill="#1a3561" stroke="#10b981" stroke-width="1.5"/>
   <text x="110" y="423" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-2A</text>
-  <text x="110" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2A. Đã Có: Bổ Sung QCode</text>
-  <text x="110" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">Auto-fill giá, tồn kho, CAD</text>
-  <text x="110" y="468" text-anchor="middle" fill="#6ee7b7" font-size="10">✓ Mã hợp lệ</text>
+  <text x="110" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2A. Existing QCode Linked</text>
+  <text x="110" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">Auto-fill price, stock &amp; drawing</text>
+  <text x="110" y="468" text-anchor="middle" fill="#6ee7b7" font-size="10">✓ Validated Master Code</text>
 </g>
 
 <!-- ACT2B -->
-<g class="n" onclick="show('act2b')">
-  <rect x="295" y="408" width="190" height="80" rx="6" fill="#1a3561" stroke="#ef4444" stroke-width="1.5"/>
-  <text x="390" y="423" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">ACT-2B</text>
-  <text x="390" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2B. Chưa Có: ĐK Hạng Mục</text>
-  <text x="390" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">TMP-HW-xxxx</text>
-  <text x="390" y="468" text-anchor="middle" fill="#fca5a5" font-size="10">costBlocked=true</text>
+<g class="n" id="node-act2b" onclick="show('act2b')">
+  <rect x="295" y="408" width="195" height="80" rx="6" fill="#1a3561" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="392" y="423" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">ACT-2B</text>
+  <text x="392" y="438" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2B. Unregistered Item Intake</text>
+  <text x="392" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">Temp Code: TMP-HW-xxxx</text>
+  <text x="392" y="468" text-anchor="middle" fill="#fca5a5" font-size="10">costBlocked = true</text>
 </g>
 
 <!-- ACT3 -->
-<g class="n" onclick="show('act3')">
-  <rect x="135" y="548" width="240" height="80" rx="6" fill="#1a3561" stroke="#475569" stroke-width="1.5"/>
+<g class="n" id="node-act3" onclick="show('act3')">
+  <rect x="125" y="548" width="260" height="80" rx="6" fill="#1a3561" stroke="#475569" stroke-width="1.5"/>
   <text x="255" y="563" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">ACT-3</text>
-  <text x="255" y="578" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">3. Nhập SL Xin Mua &amp; Lý Do</text>
-  <text x="255" y="593" text-anchor="middle" fill="#94a3b8" font-size="10">Setup/CIP/Breakdown/PM</text>
-  <text x="255" y="608" text-anchor="middle" fill="#fbbf24" font-size="10">🚨 Cờ Khẩn Cấp</text>
+  <text x="255" y="578" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">3. Request Qty &amp; Justification</text>
+  <text x="255" y="593" text-anchor="middle" fill="#94a3b8" font-size="10">Setup / CIP / Breakdown / PM</text>
+  <text x="255" y="608" text-anchor="middle" fill="#fbbf24" font-size="10">🚨 Urgent Flag (SLA &lt; 4h)</text>
 </g>
 
 <!-- ACT4 -->
-<g class="n" onclick="show('act4')">
-  <rect x="120" y="678" width="270" height="75" rx="6" fill="#1a3561" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="255" y="693" text-anchor="middle" fill="#0ea5e9" font-size="10" font-weight="700">ACT-4</text>
-  <text x="255" y="708" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">4. Hệ Thống Quét 4 Chiều Interlock</text>
-  <text x="255" y="723" text-anchor="middle" fill="#94a3b8" font-size="10">① Giá UP001/UP004  ② Tồn kho &gt;30d</text>
-  <text x="255" y="738" text-anchor="middle" fill="#94a3b8" font-size="10">③ Tồn pháp nhân   ④ Chênh lệch giá</text>
+<g class="n" id="node-act4" onclick="show('act4')">
+  <rect x="110" y="678" width="290" height="75" rx="6" fill="#1a3561" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="255" y="693" text-anchor="middle" fill="#0ea5e9" font-size="10" font-weight="700">ACT-4 [AUTOMATED ENGINE]</text>
+  <text x="255" y="708" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">4. Automated 4-Way Interlock Scan</text>
+  <text x="255" y="723" text-anchor="middle" fill="#94a3b8" font-size="10">① Contract UP001/004  ② Aging Stock &gt;30d</text>
+  <text x="255" y="738" text-anchor="middle" fill="#94a3b8" font-size="10">③ Cross-Entity Stock   ④ Unit Price Variance</text>
 </g>
 
 <!-- ACT5 -->
-<g class="n" onclick="show('act5')">
-  <rect x="618" y="763" width="244" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
+<g class="n" id="node-act5" onclick="show('act5')">
+  <rect x="600" y="763" width="280" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
   <text x="740" y="778" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-5</text>
-  <text x="740" y="793" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">5. Trao Đổi LEC ↔ Requestor</text>
-  <text x="740" y="808" text-anchor="middle" fill="#94a3b8" font-size="10">Thẩm tra kỹ thuật</text>
-  <text x="740" y="823" text-anchor="middle" fill="#94a3b8" font-size="10">&amp; ảnh hiện trường</text>
+  <text x="740" y="793" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">5. LEC ↔ Requestor Clarification</text>
+  <text x="740" y="808" text-anchor="middle" fill="#94a3b8" font-size="10">Technical spec validation</text>
+  <text x="740" y="823" text-anchor="middle" fill="#94a3b8" font-size="10">&amp; On-site photo inspection</text>
 </g>
 
 <!-- GW2 -->
-<g class="n" onclick="show('gw2')">
-  <polygon points="740,876 784,918 740,960 696,918" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
-  <text x="740" y="913" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">LEC đánh</text>
-  <text x="740" y="927" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">giá đạt?</text>
+<g class="n" id="node-gw2" onclick="show('gw2')">
+  <polygon points="740,876 790,918 740,960 690,918" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="740" y="913" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">LEC Review</text>
+  <text x="740" y="927" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Passed?</text>
 </g>
 
 <!-- ACT6 -->
-<g class="n" onclick="show('act6')">
-  <rect x="618" y="966" width="244" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
+<g class="n" id="node-act6" onclick="show('act6')">
+  <rect x="595" y="966" width="290" height="75" rx="6" fill="#2a1a00" stroke="#f59e0b" stroke-width="1.5"/>
   <text x="740" y="981" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-6</text>
-  <text x="740" y="996" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">6. Gom Mẻ + Gán EM No 14 Ký Tự</text>
-  <text x="740" y="1011" text-anchor="middle" fill="#94a3b8" font-size="10">Nhãn TARGET / OVER (OVR-01..06)</text>
-  <text x="740" y="1026" text-anchor="middle" fill="#fbbf24" font-size="10">+ WO gắn kết</text>
+  <text x="740" y="996" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">6. Batch Consolidation &amp; 14-char EM No</text>
+  <text x="740" y="1011" text-anchor="middle" fill="#94a3b8" font-size="10">Tag: TARGET / OVER (OVR-01..06)</text>
+  <text x="740" y="1026" text-anchor="middle" fill="#fbbf24" font-size="10">+ Work Order (WO) Binding</text>
 </g>
 
 <!-- ACT7 -->
-<g class="n" onclick="show('act7')">
-  <rect x="1083" y="1116" width="254" height="80" rx="6" fill="#1f0f40" stroke="#8b5cf6" stroke-width="1.5"/>
+<g class="n" id="node-act7" onclick="show('act7')">
+  <rect x="1065" y="1116" width="290" height="80" rx="6" fill="#1f0f40" stroke="#8b5cf6" stroke-width="1.5"/>
   <text x="1210" y="1131" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700">ACT-7</text>
-  <text x="1210" y="1146" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">7. Thẩm Định Offline (Ngày 01-05)</text>
-  <text x="1210" y="1161" text-anchor="middle" fill="#94a3b8" font-size="10">LEC Trung Gian: MGR↔LEC↔REQ</text>
-  <text x="1210" y="1176" text-anchor="middle" fill="#fca5a5" font-size="10">⛔ Chặn cứng mã TMP-</text>
+  <text x="1210" y="1146" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">7. Monthly Offline Audit (Day 01-05)</text>
+  <text x="1210" y="1161" text-anchor="middle" fill="#94a3b8" font-size="10">LEC Mediation: MGR ↔ LEC ↔ REQ</text>
+  <text x="1210" y="1176" text-anchor="middle" fill="#fca5a5" font-size="10">⛔ Hard Interlock on TMP- codes</text>
 </g>
 
 <!-- GW3 -->
-<g class="n" onclick="show('gw3')">
-  <polygon points="1210,1230 1254,1272 1210,1314 1166,1272" fill="#150828" stroke="#8b5cf6" stroke-width="1.5"/>
-  <text x="1210" y="1267" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Còn mã</text>
-  <text x="1210" y="1281" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">TMP-?</text>
+<g class="n" id="node-gw3" onclick="show('gw3')">
+  <polygon points="1210,1230 1260,1272 1210,1314 1160,1272" fill="#150828" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="1210" y="1267" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Unresolved</text>
+  <text x="1210" y="1281" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">TMP- Code?</text>
 </g>
 
 <!-- BLOCK -->
-<g class="n" onclick="show('block')">
-  <rect x="1283" y="1250" width="170" height="52" rx="6" fill="#300" stroke="#ef4444" stroke-width="2"/>
-  <text x="1368" y="1270" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">⛔ CHẶN CỨNG</text>
-  <text x="1368" y="1288" text-anchor="middle" fill="#fca5a5" font-size="10">Yêu cầu QCode ERP</text>
+<g class="n" id="node-block" onclick="show('block')">
+  <rect x="1275" y="1248" width="180" height="52" rx="6" fill="#300" stroke="#ef4444" stroke-width="2"/>
+  <text x="1365" y="1268" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">⛔ HARD INTERLOCK</text>
+  <text x="1365" y="1286" text-anchor="middle" fill="#fca5a5" font-size="10">Formal ERP QCode Required</text>
 </g>
 
 <!-- ACT8 -->
-<g class="n" onclick="show('act8')">
-  <rect x="1083" y="1358" width="254" height="80" rx="6" fill="#1f0f40" stroke="#10b981" stroke-width="1.5"/>
+<g class="n" id="node-act8" onclick="show('act8')">
+  <rect x="1065" y="1358" width="290" height="80" rx="6" fill="#1f0f40" stroke="#10b981" stroke-width="1.5"/>
   <text x="1210" y="1373" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-8</text>
-  <text x="1210" y="1388" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">8. Chốt List Mua + Cost Clearance</text>
+  <text x="1210" y="1388" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">8. Finalize List &amp; Cost Clearance</text>
   <text x="1210" y="1403" text-anchor="middle" fill="#94a3b8" font-size="10">📜 CC-HW-YYYYMM-PASS</text>
-  <text x="1210" y="1418" text-anchor="middle" fill="#6ee7b7" font-size="10">Budget locked &amp; approved</text>
+  <text x="1210" y="1418" text-anchor="middle" fill="#6ee7b7" font-size="10">Budget Locked &amp; Certified</text>
 </g>
 
 <!-- ACT9A -->
-<g class="n" onclick="show('act9a')">
-  <rect x="1628" y="1498" width="244" height="75" rx="6" fill="#061a10" stroke="#10b981" stroke-width="1.5"/>
+<g class="n" id="node-act9a" onclick="show('act9a')">
+  <rect x="1605" y="1498" width="290" height="75" rx="6" fill="#061a10" stroke="#10b981" stroke-width="1.5"/>
   <text x="1750" y="1513" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">ACT-9A</text>
-  <text x="1750" y="1528" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9A. ⭐ Tầng 1: Điều Chuyển Kho</text>
-  <text x="1750" y="1543" text-anchor="middle" fill="#94a3b8" font-size="10">Liên Pháp Nhân (Transfer)</text>
-  <text x="1750" y="1558" text-anchor="middle" fill="#6ee7b7" font-size="10">Ưu tiên cao nhất</text>
+  <text x="1750" y="1528" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9A. ⭐ Tier 1: Inter-Entity Transfer</text>
+  <text x="1750" y="1543" text-anchor="middle" fill="#94a3b8" font-size="10">Cross-Company Stock Movement</text>
+  <text x="1750" y="1558" text-anchor="middle" fill="#6ee7b7" font-size="10">Highest Priority (Zero Purchase Cost)</text>
 </g>
 
 <!-- GW4 -->
-<g class="n" onclick="show('gw4')">
-  <polygon points="1750,1611 1795,1653 1750,1695 1705,1653" fill="#031008" stroke="#10b981" stroke-width="1.5"/>
+<g class="n" id="node-gw4" onclick="show('gw4')">
+  <polygon points="1750,1611 1800,1653 1750,1695 1700,1653" fill="#031008" stroke="#10b981" stroke-width="1.5"/>
   <text x="1750" y="1648" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Transfer</text>
-  <text x="1750" y="1662" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approve?</text>
+  <text x="1750" y="1662" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approved?</text>
 </g>
 
 <!-- OK1 -->
-<g class="n" onclick="show('ok1')">
-  <rect x="1933" y="1633" width="128" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
-  <text x="1997" y="1648" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ HOÀN TẤT</text>
-  <text x="1997" y="1664" text-anchor="middle" fill="#6ee7b7" font-size="10">Tầng 1 – Transfer</text>
+<g class="n" id="node-ok1" onclick="show('ok1')">
+  <rect x="1910" y="1633" width="160" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="1990" y="1648" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ FULFILLED</text>
+  <text x="1990" y="1664" text-anchor="middle" fill="#6ee7b7" font-size="10">Tier 1 – Warehouse Transfer</text>
 </g>
 
 <!-- ACT9B -->
-<g class="n" onclick="show('act9b')">
-  <rect x="1628" y="1713" width="244" height="75" rx="6" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+<g class="n" id="node-act9b" onclick="show('act9b')">
+  <rect x="1605" y="1713" width="290" height="75" rx="6" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
   <text x="1750" y="1728" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">ACT-9B</text>
-  <text x="1750" y="1743" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9B. Tầng 2: Mua Nội Bộ</text>
-  <text x="1750" y="1758" text-anchor="middle" fill="#94a3b8" font-size="10">Internal PO giữa hai pháp nhân</text>
-  <text x="1750" y="1773" text-anchor="middle" fill="#fde68a" font-size="10">Inter-company transaction</text>
+  <text x="1750" y="1743" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9B. Tier 2: Internal Purchase Order</text>
+  <text x="1750" y="1758" text-anchor="middle" fill="#94a3b8" font-size="10">Inter-Company Purchase Order</text>
+  <text x="1750" y="1773" text-anchor="middle" fill="#fde68a" font-size="10">Internal Group Transfer Pricing</text>
 </g>
 
 <!-- GW5 -->
-<g class="n" onclick="show('gw5')">
-  <polygon points="1750,1826 1795,1868 1750,1910 1705,1868" fill="#0d0a00" stroke="#f59e0b" stroke-width="1.5"/>
+<g class="n" id="node-gw5" onclick="show('gw5')">
+  <polygon points="1750,1826 1800,1868 1750,1910 1700,1868" fill="#0d0a00" stroke="#f59e0b" stroke-width="1.5"/>
   <text x="1750" y="1863" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Internal PO</text>
-  <text x="1750" y="1877" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approve?</text>
+  <text x="1750" y="1877" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Approved?</text>
 </g>
 
 <!-- OK2 -->
-<g class="n" onclick="show('ok2')">
-  <rect x="1933" y="1848" width="128" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
-  <text x="1997" y="1863" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ HOÀN TẤT</text>
-  <text x="1997" y="1879" text-anchor="middle" fill="#6ee7b7" font-size="10">Tầng 2 – Internal PO</text>
+<g class="n" id="node-ok2" onclick="show('ok2')">
+  <rect x="1910" y="1848" width="160" height="40" rx="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="1990" y="1863" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✅ FULFILLED</text>
+  <text x="1990" y="1879" text-anchor="middle" fill="#6ee7b7" font-size="10">Tier 2 – Internal PO</text>
 </g>
 
 <!-- ACT9C -->
-<g class="n" onclick="show('act9c')">
-  <rect x="1618" y="1928" width="264" height="110" rx="6" fill="#061830" stroke="#3b82f6" stroke-width="1.5"/>
+<g class="n" id="node-act9c" onclick="show('act9c')">
+  <rect x="1595" y="1928" width="310" height="110" rx="6" fill="#061830" stroke="#3b82f6" stroke-width="1.5"/>
   <text x="1750" y="1943" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">ACT-9C</text>
-  <text x="1750" y="1958" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9C. Tầng 3: Mua Thường – Nexacro EMS</text>
-  <text x="1750" y="1973" text-anchor="middle" fill="#94a3b8" font-size="10">PRV → Ký 100% trên EMS Core</text>
-  <text x="1750" y="1988" text-anchor="middle" fill="#94a3b8" font-size="10">→ PO-99xxx / Inbound</text>
-  <text x="1750" y="2003" text-anchor="middle" fill="#94a3b8" font-size="10">→ Nhập kho → ds_Inv</text>
-  <text x="1750" y="2018" text-anchor="middle" fill="#bfdbfe" font-size="10">External vendor procurement</text>
+  <text x="1750" y="1958" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">9C. Tier 3: Standard PO – Nexacro EMS</text>
+  <text x="1750" y="1973" text-anchor="middle" fill="#94a3b8" font-size="10">PRV → 100% Digital Sign on EMS Core</text>
+  <text x="1750" y="1988" text-anchor="middle" fill="#94a3b8" font-size="10">→ PO-99xxx / Inbound Delivery</text>
+  <text x="1750" y="2003" text-anchor="middle" fill="#94a3b8" font-size="10">→ Goods Receipt → ds_Inv Synced</text>
+  <text x="1750" y="2018" text-anchor="middle" fill="#bfdbfe" font-size="10">External Commercial Vendor</text>
 </g>
 
-<!-- END node (double circle) -->
-<g class="n" onclick="show('end')">
+<!-- END node -->
+<g class="n" id="node-end" onclick="show('end')">
   <circle cx="1750" cy="2108" r="22" fill="none" stroke="#475569" stroke-width="2.5"/>
   <circle cx="1750" cy="2108" r="14" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1.5"/>
   <text x="1750" y="2112" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">END</text>
-  <text x="1750" y="2088" text-anchor="middle" fill="#94a3b8" font-size="10">Quy Trình Hoàn Tất</text>
+  <text x="1750" y="2086" text-anchor="middle" fill="#94a3b8" font-size="10">Cycle Completed</text>
 </g>
 
 </svg>
@@ -393,19 +412,19 @@ header span{font-size:11px;color:#64748b;flex:1}
       <span class="lane-badge" id="dp-lane-badge"></span>
     </div>
     <div class="dp-sec">
-      <h3>RACI Matrix</h3>
+      <h3>RACI Responsibility Matrix</h3>
       <div class="raci-grid" id="dp-raci"></div>
     </div>
     <div class="dp-sec">
-      <h3>Inputs</h3>
+      <h3>Inputs &amp; Preconditions</h3>
       <ul class="dp-list" id="dp-inputs"></ul>
     </div>
     <div class="dp-sec">
-      <h3>Business Rules</h3>
+      <h3>Business Rules &amp; SLA</h3>
       <ul class="dp-list" id="dp-rules"></ul>
     </div>
     <div class="dp-sec">
-      <h3>Outputs</h3>
+      <h3>Outputs &amp; Deliverables</h3>
       <ul class="dp-list" id="dp-outputs"></ul>
     </div>
   </div>
@@ -413,198 +432,506 @@ header span{font-size:11px;color:#64748b;flex:1}
 
 <script>
 // ═══════════════════════════════════════════════
-//  Detail panel data
+//  Detail Panel Data (English Domain Vocabulary)
 // ═══════════════════════════════════════════════
 const D = {
   start: {
-    code:'START', color:'#1d4ed8', title:'Khởi Đầu Quy Trình Mua Hàng',
-    lane:'Requestor', raci:{R:'Requestor',A:'LEC',C:'Management',I:'Procurement'},
-    inputs:['Nhu cầu phụ tùng thực tế tại line'],
-    rules:['Yêu cầu phát sinh từ Breakdown, PM, Setup hoặc CIP','Phải có kế hoạch bảo trì hoặc sự cố thực tế'],
-    outputs:['Trigger khởi động quy trình ERP']
+    code: 'START',
+    color: '#1d4ed8',
+    title: 'Procurement Cycle Kickoff',
+    lane: 'Requestor',
+    raci: { R: 'Requestor', A: 'LEC', C: 'Management', I: 'Procurement' },
+    inputs: [
+      'Operational spare parts demand on production lines',
+      'Breakdown incident ticket or scheduled PM task'
+    ],
+    rules: [
+      'Triggered strictly by actual line events: Breakdown, PM, Setup, or CIP',
+      'Requires verified equipment location prior to requisition'
+    ],
+    outputs: [
+      'Procurement requisition initiated in system'
+    ]
   },
   act1: {
-    code:'ACT-1', color:'#3b82f6', title:'1. Định Vị Thiết Bị 4 Tầng',
-    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'LEC',I:'Management'},
-    inputs:['Tag thiết bị (QR/barcode)','Sơ đồ Line/Machine'],
-    rules:['Cấu trúc 4 tầng bắt buộc: Line ► Machine ► Unit ► Assembly','Không được bỏ qua tầng nào','Dùng scanner hoặc nhập tay từ tag thiết bị'],
-    outputs:['Asset ID xác định','Vị trí thiết bị trong ERP']
+    code: 'ACT-1',
+    color: '#3b82f6',
+    title: '1. 4-Tier Equipment Hierarchy Positioning',
+    lane: 'Requestor',
+    raci: { R: 'Requestor', A: 'Requestor', C: 'LEC', I: 'Management' },
+    inputs: [
+      'Equipment physical asset tag (Barcode / QR code)',
+      'Factory Line & Machine mapping schema'
+    ],
+    rules: [
+      'Mandatory 4-tier structural mapping: Line ► Machine ► Unit ► Assembly',
+      'No level can be skipped or left blank',
+      'Verified via industrial scanner or validated manual entry'
+    ],
+    outputs: [
+      'Unique Asset ID identified',
+      'Standardized machine node registered in ERP session'
+    ]
   },
   gw1: {
-    code:'GW-1', color:'#38bdf8', title:'Mã QCode đã có trong ERP?',
-    lane:'Requestor', raci:{R:'ERP System',A:'Requestor',C:'LEC',I:''},
-    inputs:['Asset ID từ ACT-1','Database ERP spare parts'],
-    rules:['Query tự động theo Part Number + Asset ID','Kết quả: Đã có (→ ACT-2A) hoặc Chưa có (→ ACT-2B)'],
-    outputs:['Boolean: QCode exists / not exists']
+    code: 'GW-1',
+    color: '#38bdf8',
+    title: 'Standard QCode Exists in ERP?',
+    lane: 'Requestor',
+    raci: { R: 'ERP System', A: 'Requestor', C: 'LEC', I: '' },
+    inputs: [
+      'Target asset hierarchy from ACT-1',
+      'Manufacturer Part Number & ERP Master Catalog'
+    ],
+    rules: [
+      'Automated exact query by Part Number + Asset Node',
+      'Branch: Existing QCode (→ ACT-2A) or Unregistered Part (→ ACT-2B)'
+    ],
+    outputs: [
+      'Boolean: QCode exists in system master catalog'
+    ]
   },
   act2a: {
-    code:'ACT-2A', color:'#10b981', title:'2A. Đã Có – Bổ Sung QCode',
-    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'',I:'LEC'},
-    inputs:['QCode từ ERP','Dữ liệu tồn kho hiện tại'],
-    rules:['Auto-fill giá theo bảng UP001/UP004','Auto-fill tồn kho & CAD drawing nếu có','Không được thay đổi QCode đã chuẩn hóa'],
-    outputs:['Item line hoàn chỉnh với QCode','Giá tham chiếu','Tồn kho hiện tại']
+    code: 'ACT-2A',
+    color: '#10b981',
+    title: '2A. Existing QCode Linked & Master Auto-Fill',
+    lane: 'Requestor',
+    raci: { R: 'Requestor', A: 'Requestor', C: '', I: 'LEC' },
+    inputs: [
+      'Standard QCode from ERP master table',
+      'Real-time central inventory ledger (ds_Inv)'
+    ],
+    rules: [
+      'Auto-populate reference price from approved contracts (UP001 / UP004)',
+      'Auto-fetch current global factory inventory & 2D/3D CAD drawings',
+      'Standardized QCode cannot be overridden manually'
+    ],
+    outputs: [
+      'Item line populated with certified QCode',
+      'Contract benchmark price & current stock level'
+    ]
   },
   act2b: {
-    code:'ACT-2B', color:'#ef4444', title:'2B. Chưa Có – Đăng Ký Hạng Mục',
-    lane:'Requestor', raci:{R:'Requestor',A:'LEC',C:'Management',I:'Procurement'},
-    inputs:['Mô tả kỹ thuật phụ tùng','Catalogue / datasheet'],
-    rules:['Tạo mã tạm TMP-HW-xxxx','Đặt cờ costBlocked=true bắt buộc','LEC phải thẩm định trước khi đặt mua','Hạng mục TMP không được phép lên PO nếu chưa qua ACT-7'],
-    outputs:['Mã TMP-HW-xxxx trong hệ thống','costBlocked flag = true']
+    code: 'ACT-2B',
+    color: '#ef4444',
+    title: '2B. Unregistered Item Intake (Temporary Code)',
+    lane: 'Requestor',
+    raci: { R: 'Requestor', A: 'LEC', C: 'Management', I: 'Procurement' },
+    inputs: [
+      'Engineering part technical specifications',
+      'Datasheet, maker catalogue or 2D dimension sketch'
+    ],
+    rules: [
+      'Generate temporary tracking code: TMP-HW-xxxx',
+      'Mandatory flag set: costBlocked = true',
+      'Must undergo engineering review by LEC before purchasing',
+      'Strict interlock: TMP items cannot be dispatched to PO until formal QCode is issued'
+    ],
+    outputs: [
+      'Temporary record TMP-HW-xxxx registered in system',
+      'costBlocked flag enabled'
+    ]
   },
   act3: {
-    code:'ACT-3', color:'#475569', title:'3. Nhập Số Lượng Xin Mua & Lý Do',
-    lane:'Requestor', raci:{R:'Requestor',A:'Requestor',C:'LEC',I:'Management'},
-    inputs:['QCode hoặc TMP code','Lịch sử sử dụng (MTTR/MTBF)'],
-    rules:['Lý do bắt buộc: Setup / CIP / Breakdown / PM','Cờ Khẩn Cấp kích hoạt SLA < 4h','Số lượng phải hợp lý so với lịch sử dùng','Mô tả kỹ thuật tối thiểu 50 ký tự'],
-    outputs:['Purchase request line','Urgency flag','Reason code']
+    code: 'ACT-3',
+    color: '#475569',
+    title: '3. Enter Request Quantity & Technical Justification',
+    lane: 'Requestor',
+    raci: { R: 'Requestor', A: 'Requestor', C: 'LEC', I: 'Management' },
+    inputs: [
+      'QCode or TMP temporary code',
+      'Equipment consumption history (MTTR / MTBF rates)'
+    ],
+    rules: [
+      'Mandatory reason code selection: Setup / CIP / Breakdown / PM',
+      'Urgent Flag triggers expedited review SLA (< 4 hours)',
+      'Requested quantity must align with historical wear rates and maintenance frequency',
+      'Detailed technical root cause narrative minimum 50 characters'
+    ],
+    outputs: [
+      'Purchase Requisition line item created',
+      'Urgency classification flag',
+      'Technical justification payload'
+    ]
   },
   act4: {
-    code:'ACT-4', color:'#0ea5e9', title:'4. Hệ Thống Quét 4 Chiều Interlock',
-    lane:'Requestor', raci:{R:'ERP System',A:'LEC',C:'Management',I:'Requestor'},
-    inputs:['Purchase request','Bảng giá UP001/UP004','Dữ liệu tồn kho toàn bộ pháp nhân'],
-    rules:['① Giá trong UP001/UP004 (sai → cảnh báo)','② Tồn kho >30 ngày (có → ưu tiên transfer)','③ Tồn tại pháp nhân khác (có → gợi ý transfer)','④ Chênh lệch giá >15% (cảnh báo cứng)','Tất cả 4 chiều phải PASS mới được tiếp tục'],
-    outputs:['Interlock report 4 chiều','Recommendation: Transfer / Internal PO / External PO']
+    code: 'ACT-4',
+    color: '#0ea5e9',
+    title: '4. Automated 4-Way Interlock Scan Engine',
+    lane: 'Requestor',
+    raci: { R: 'ERP System', A: 'LEC', C: 'Management', I: 'Requestor' },
+    inputs: [
+      'Draft Purchase Requisition from ACT-3',
+      'Price lists UP001 / UP004 & cross-entity warehouse balances'
+    ],
+    rules: [
+      '① Contract Price: Validate unit price against UP001 / UP004 catalogs',
+      '② Aging Inventory: Check if identical item is idle >30/60/90 days in local lines',
+      '③ Cross-Entity Stock: Scan availability across sibling corporate entities',
+      '④ Price Variance: Flag items exceeding +15% historical moving average price',
+      'All 4 interlock criteria must be cleared or tagged for LEC intervention'
+    ],
+    outputs: [
+      '4-Dimensional Interlock Diagnostic Report',
+      'Fulfillment recommendation: Warehouse Transfer / Internal PO / Commercial PO'
+    ]
   },
   act5: {
-    code:'ACT-5', color:'#f59e0b', title:'5. Trao Đổi LEC ↔ Requestor',
-    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'Requestor',I:'Management'},
-    inputs:['Purchase request từ ACT-3/4','Ảnh hiện trường','Catalogue phụ tùng'],
-    rules:['LEC phải xác nhận technical spec','Ảnh hiện trường bắt buộc nếu Breakdown','Hỏi lại Requestor nếu thông tin chưa đủ','Tối đa 2 vòng trao đổi trước khi leo thang'],
-    outputs:['Biên bản trao đổi kỹ thuật','Technical approval từ LEC']
+    code: 'ACT-5',
+    color: '#f59e0b',
+    title: '5. LEC ↔ Requestor Technical Clarification',
+    lane: 'LEC',
+    raci: { R: 'LEC', A: 'LEC', C: 'Requestor', I: 'Management' },
+    inputs: [
+      'Requisition package & Interlock report from ACT-4',
+      'On-site photo evidence of defective / worn parts',
+      'Manufacturer technical specs'
+    ],
+    rules: [
+      'LEC validates engineering compatibility and necessity',
+      'On-site photo evidence mandatory for all Breakdown & Urgent requests',
+      'Maximum 2 clarification rounds permitted before escalation'
+    ],
+    outputs: [
+      'Technical validation signoff',
+      'LEC review comments recorded in system audit trail'
+    ]
   },
   gw2: {
-    code:'GW-2', color:'#f59e0b', title:'LEC Đánh Giá Đạt?',
-    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'',I:'Requestor'},
-    inputs:['Kết quả trao đổi kỹ thuật ACT-5'],
-    rules:['Đạt → tiến ACT-6','Chưa đạt → quay lại ACT-5 (loop)','Tối đa 3 lần loop, sau đó leo thang Management'],
-    outputs:['Boolean: LEC approved / rejected']
+    code: 'GW-2',
+    color: '#f59e0b',
+    title: 'LEC Engineering Review Passed?',
+    lane: 'LEC',
+    raci: { R: 'LEC', A: 'LEC', C: '', I: 'Requestor' },
+    inputs: [
+      'Technical clarification results from ACT-5'
+    ],
+    rules: [
+      'Qualified → Proceed to batching (→ ACT-6)',
+      'Unqualified → Loop back to Requestor for specification rework (→ ACT-5)',
+      'Maximum 3 rework iterations before automatic rejection'
+    ],
+    outputs: [
+      'Boolean: Engineering qualification approved'
+    ]
   },
   act6: {
-    code:'ACT-6', color:'#f59e0b', title:'6. Gom Mẻ + Gán EM No 14 Ký Tự',
-    lane:'LEC', raci:{R:'LEC',A:'LEC',C:'Management',I:'Procurement'},
-    inputs:['Danh sách PR đã được LEC approve','Lịch mua hàng tháng'],
-    rules:['EM No phải đúng 14 ký tự (format: EMxxxxxxxx-xxxx)','Nhãn TARGET: đúng kế hoạch budget','Nhãn OVER (OVR-01..06): vượt kế hoạch, cần giải trình','WO phải được gắn kết với EM No','Gom theo chu kỳ: 1–5 đầu tháng'],
-    outputs:['EM No 14 ký tự','Batch purchase list','WO linkage']
+    code: 'ACT-6',
+    color: '#f59e0b',
+    title: '6. Batch Consolidation & 14-char EM No Assignment',
+    lane: 'LEC',
+    raci: { R: 'LEC', A: 'LEC', C: 'Management', I: 'Procurement' },
+    inputs: [
+      'Consolidated list of LEC-approved requisitions',
+      'Monthly procurement window schedule'
+    ],
+    rules: [
+      'EM No format must follow strictly 14 characters: EMxxxxxxxx-xxxx',
+      'Assign TARGET tag if item is within monthly budget ceiling',
+      'Assign OVER tag with category code (OVR-01 to OVR-06) if exceeding budget',
+      'Mandatory linkage with Work Order (WO) in ERP'
+    ],
+    outputs: [
+      'Official 14-character EM Number assigned',
+      'Consolidated monthly batch package',
+      'WO cross-reference linkage established'
+    ]
   },
   act7: {
-    code:'ACT-7', color:'#8b5cf6', title:'7. Thẩm Định Offline (Ngày 01-05)',
-    lane:'Management', raci:{R:'Management',A:'Management',C:'LEC',I:'Requestor'},
-    inputs:['Batch list từ ACT-6','EM No','Cost estimate'],
-    rules:['Thực hiện ngày 01-05 hàng tháng','LEC đóng vai trung gian MGR↔LEC↔REQ','Hạng mục TMP- bị chặn cứng: không được approve','Nếu còn TMP- → trả về loop BLOCK → ACT-7'],
-    outputs:['Danh sách phê duyệt offline','Management signature']
+    code: 'ACT-7',
+    color: '#8b5cf6',
+    title: '7. Monthly Offline Cost Audit (Day 01-05)',
+    lane: 'Management',
+    raci: { R: 'Management', A: 'Management', C: 'LEC', I: 'Requestor' },
+    inputs: [
+      'Consolidated EM batch list from ACT-6',
+      'Interlock status & cost breakdown reports'
+    ],
+    rules: [
+      'Conducted strictly between Day 01 and Day 05 of each month',
+      'LEC acts as operational mediator bridging Management, LEC and Requestors',
+      'HARD INTERLOCK on all TMP- items: Requisitions with temporary codes cannot receive budget approval',
+      'If any TMP- items remain, route to BLOCK loop'
+    ],
+    outputs: [
+      'Monthly offline committee approval protocol',
+      'Management cost audit clearance'
+    ]
   },
   gw3: {
-    code:'GW-3', color:'#8b5cf6', title:'Còn Mã TMP- Chưa Giải Quyết?',
-    lane:'Management', raci:{R:'ERP System',A:'Management',C:'LEC',I:''},
-    inputs:['Batch list sau ACT-7'],
-    rules:['Có TMP- → chặn cứng (BLOCK), yêu cầu QCode ERP','Không còn TMP- → tiếp tục ACT-8'],
-    outputs:['Boolean: TMP exists / clear']
+    code: 'GW-3',
+    color: '#8b5cf6',
+    title: 'Any Unresolved TMP- Codes Remaining?',
+    lane: 'Management',
+    raci: { R: 'ERP System', A: 'Management', C: 'LEC', I: '' },
+    inputs: [
+      'Batch item registry post-audit'
+    ],
+    rules: [
+      'Has TMP- code → Trigger HARD INTERLOCK BLOCK',
+      'No TMP- codes (all standard QCodes) → Proceed to Cost Clearance (→ ACT-8)'
+    ],
+    outputs: [
+      'Boolean: Batch master code compliance check'
+    ]
   },
   block: {
-    code:'BLOCK', color:'#ef4444', title:'⛔ CHẶN CỨNG – Yêu Cầu QCode ERP',
-    lane:'Management', raci:{R:'Management',A:'Management',C:'LEC',I:'Requestor'},
-    inputs:['Mã TMP- chưa chuẩn hóa'],
-    rules:['Hệ thống từ chối tiếp tục cho đến khi QCode được tạo','LEC phải điều phối với Requestor để lấy QCode chính thức','Thời hạn xử lý: 3 ngày làm việc'],
-    outputs:['Yêu cầu tạo QCode chính thức gửi về ACT-7']
+    code: 'BLOCK',
+    color: '#ef4444',
+    title: '⛔ HARD INTERLOCK – Formal ERP QCode Required',
+    lane: 'Management',
+    raci: { R: 'Management', A: 'Management', C: 'LEC', I: 'Requestor' },
+    inputs: [
+      'Items with unstandardized TMP-HW-xxxx codes'
+    ],
+    rules: [
+      'System refuses budget allocation until formal QCode is established in ERP master',
+      'LEC coordinates with Requestor and Master Data team to register part',
+      'Resolution SLA: maximum 3 business days'
+    ],
+    outputs: [
+      'Expedited QCode registration request routed to ACT-7'
+    ]
   },
   act8: {
-    code:'ACT-8', color:'#10b981', title:'8. Chốt List Mua + Cost Clearance',
-    lane:'Management', raci:{R:'Management',A:'Management',C:'Finance',I:'Procurement'},
-    inputs:['Danh sách phê duyệt sạch (không còn TMP-)','Budget allocation'],
-    rules:['Format CC: CC-HW-YYYYMM-PASS','Phải có chữ ký Management + Finance','Cost Clearance hết hạn sau 30 ngày','Procurement không nhận PO nếu thiếu CC'],
-    outputs:['Cost Clearance document CC-HW-YYYYMM-PASS','Final purchase list locked']
+    code: 'ACT-8',
+    color: '#10b981',
+    title: '8. Finalize Approved List & Issue Cost Clearance',
+    lane: 'Management',
+    raci: { R: 'Management', A: 'Management', C: 'Finance', I: 'Procurement' },
+    inputs: [
+      '100% standardized clean requisition list (all formal QCodes)',
+      'Allocated monthly cost-center budget'
+    ],
+    rules: [
+      'Issue standardized Cost Clearance certificate: CC-HW-YYYYMM-PASS',
+      'Joint electronic signoff: Plant Management + Cost Accounting',
+      'Cost Clearance certificate validity: 30 calendar days',
+      'Procurement is prohibited from executing PO without valid Cost Clearance'
+    ],
+    outputs: [
+      'Official Cost Clearance certificate: CC-HW-YYYYMM-PASS',
+      'Locked procurement batch released to Sourcing'
+    ]
   },
   act9a: {
-    code:'ACT-9A', color:'#10b981', title:'9A. ⭐ Tầng 1: Điều Chuyển Kho Liên Pháp Nhân',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'LEC',I:'Requestor'},
-    inputs:['Recommendation Transfer từ ACT-4','Cost Clearance','Tồn kho pháp nhân khác'],
-    rules:['Ưu tiên tuyệt đối: thực hiện trước Tầng 2 và 3','Không phát sinh chi phí mua ngoài','SLA Transfer: 3-5 ngày làm việc','Phải có approve từ cả hai pháp nhân'],
-    outputs:['Transfer Order','Stock movement record']
+    code: 'ACT-9A',
+    color: '#10b981',
+    title: '9A. ⭐ Tier 1: Inter-Entity Warehouse Transfer',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: 'LEC', I: 'Requestor' },
+    inputs: [
+      'Transfer recommendation from ACT-4 Interlock engine',
+      'Certified Cost Clearance certificate',
+      'Available inventory balances in sibling legal entity'
+    ],
+    rules: [
+      'Absolute priority: Must be executed prior to commercial purchase',
+      'Zero new cash outflow for external purchasing',
+      'Transfer fulfillment SLA: 3 to 5 business days',
+      'Requires dual-entity warehouse authorization'
+    ],
+    outputs: [
+      'Inter-entity stock transfer order',
+      'Inventory movement booking ticket'
+    ]
   },
   gw4: {
-    code:'GW-4', color:'#10b981', title:'Transfer Approve?',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:''},
-    inputs:['Transfer request','Stock availability confirmation'],
-    rules:['Approve → ✅ HOÀN TẤT Tầng 1','Reject (không đủ tồn hoặc từ chối) → Tầng 2 (ACT-9B)'],
-    outputs:['Boolean: transfer approved / rejected']
+    code: 'GW-4',
+    color: '#10b981',
+    title: 'Inter-Entity Transfer Approved & Available?',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: '', I: '' },
+    inputs: [
+      'Warehouse transfer request',
+      'Physical stock inspection and entity approval confirmation'
+    ],
+    rules: [
+      'Approved & stock ready → ✅ FULFILLED (Tier 1 completed)',
+      'Rejected or insufficient stock → Escalate to Tier 2 (→ ACT-9B)'
+    ],
+    outputs: [
+      'Boolean: Transfer fulfillment status'
+    ]
   },
   ok1: {
-    code:'OK-1', color:'#10b981', title:'✅ HOÀN TẤT – Tầng 1 Transfer',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:'Requestor'},
-    inputs:['Transfer approved'],
-    rules:['Cập nhật ds_Inv cả hai pháp nhân','Gửi thông báo cho Requestor','Đóng PR trong ERP'],
-    outputs:['Goods received','ds_Inv updated','PR closed']
+    code: 'OK-1',
+    color: '#10b981',
+    title: '✅ FULFILLED – Tier 1 Warehouse Transfer',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: '', I: 'Requestor' },
+    inputs: [
+      'Transfer dispatch note & goods receipt voucher'
+    ],
+    rules: [
+      'Synchronize dual-entity inventory ledger (ds_Inv) real-time',
+      'Automated dispatch notification sent to Requestor',
+      'Close Requisition line in ERP'
+    ],
+    outputs: [
+      'Parts received at requesting line',
+      'ds_Inv balance updated',
+      'Requisition closed with zero purchase cost'
+    ]
   },
   act9b: {
-    code:'ACT-9B', color:'#f59e0b', title:'9B. Tầng 2: Mua Nội Bộ – Internal PO',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
-    inputs:['Reject từ GW-4','Cost Clearance','Inter-company agreement'],
-    rules:['Internal PO giữa hai pháp nhân cùng tập đoàn','Giá nội bộ theo quy định transfer pricing','SLA: 5-7 ngày làm việc','Phải qua Finance approve'],
-    outputs:['Internal PO document','Inter-company invoice']
+    code: 'ACT-9B',
+    color: '#f59e0b',
+    title: '9B. Tier 2: Inter-Company Purchase Order',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: 'Finance', I: 'Requestor' },
+    inputs: [
+      'Rejection ticket from Tier 1 (GW-4)',
+      'Certified Cost Clearance certificate',
+      'Inter-company group pricing agreement'
+    ],
+    rules: [
+      'Generate internal PO between affiliated sister corporations',
+      'Internal pricing complies with corporate transfer pricing guidelines',
+      'Fulfillment SLA: 5 to 7 business days',
+      'Corporate Finance approval required'
+    ],
+    outputs: [
+      'Internal Purchase Order document',
+      'Inter-company debit/credit billing instruction'
+    ]
   },
   gw5: {
-    code:'GW-5', color:'#f59e0b', title:'Internal PO Approve?',
-    lane:'Procurement', raci:{R:'Finance',A:'Management',C:'',I:'Procurement'},
-    inputs:['Internal PO request'],
-    rules:['Approve → ✅ HOÀN TẤT Tầng 2','Reject → Tầng 3 External (ACT-9C)'],
-    outputs:['Boolean: internal PO approved / rejected']
+    code: 'GW-5',
+    color: '#f59e0b',
+    title: 'Internal PO Approved & In Stock?',
+    lane: 'Procurement',
+    raci: { R: 'Finance', A: 'Management', C: '', I: 'Procurement' },
+    inputs: [
+      'Internal PO request & credit allocation'
+    ],
+    rules: [
+      'Approved → ✅ FULFILLED (Tier 2 completed)',
+      'Rejected / stock unavailable → Escalate to Tier 3 External Sourcing (→ ACT-9C)'
+    ],
+    outputs: [
+      'Boolean: Internal PO approval status'
+    ]
   },
   ok2: {
-    code:'OK-2', color:'#10b981', title:'✅ HOÀN TẤT – Tầng 2 Internal PO',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'',I:'Requestor'},
-    inputs:['Internal PO approved'],
-    rules:['Cập nhật ds_Inv sau khi nhận hàng','Gửi thông báo Requestor','Reconcile inter-company account'],
-    outputs:['Goods received','ds_Inv updated','Internal invoice settled']
+    code: 'OK-2',
+    color: '#10b981',
+    title: '✅ FULFILLED – Tier 2 Internal Purchase Order',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: '', I: 'Requestor' },
+    inputs: [
+      'Internal PO confirmation & logistics shipping document'
+    ],
+    rules: [
+      'Update central inventory records upon receipt',
+      'Trigger arrival notification to requesting line engineer',
+      'Settle inter-company accounting clearing ledger'
+    ],
+    outputs: [
+      'Goods received at local warehouse',
+      'ds_Inv inventory updated',
+      'Internal transaction settled'
+    ]
   },
   act9c: {
-    code:'ACT-9C', color:'#3b82f6', title:'9C. Tầng 3: Mua Thường – Nexacro EMS',
-    lane:'Procurement', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
-    inputs:['Reject từ GW-5','Cost Clearance','Vendor list approved','Nexacro EMS access'],
-    rules:['PRV (Purchase Request Vendor) tạo trên Nexacro EMS','Ký duyệt 100% qua EMS Core (không ký tay)','PO format: PO-99xxx','Inbound inspection bắt buộc trước khi nhập kho','Nhập kho → cập nhật ds_Inv real-time'],
-    outputs:['PO-99xxx','Vendor delivery note','Inbound inspection record','ds_Inv updated','PR closed']
+    code: 'ACT-9C',
+    color: '#3b82f6',
+    title: '9C. Tier 3: Standard PO – Nexacro EMS External Sourcing',
+    lane: 'Procurement',
+    raci: { R: 'Procurement', A: 'Management', C: 'Finance', I: 'Requestor' },
+    inputs: [
+      'Rejection ticket from Tier 2 (GW-5)',
+      'Certified Cost Clearance certificate',
+      'Approved commercial vendor catalog & contracts',
+      'Nexacro EMS procurement module credentials'
+    ],
+    rules: [
+      'Issue Purchase Requisition Vendor (PRV) via Nexacro EMS',
+      '100% digital signoff via EMS Core workflow (zero paper circulation)',
+      'PO numbering format standard: PO-99xxx',
+      'Mandatory quality inbound inspection prior to warehouse acceptance',
+      'Real-time automated ERP inventory sync to ds_Inv ledger upon receipt'
+    ],
+    outputs: [
+      'Commercial Purchase Order PO-99xxx',
+      'Vendor dispatch & shipment documentation',
+      'Inbound quality inspection acceptance report',
+      'ds_Inv inventory updated',
+      'Procurement Requisition closed'
+    ]
   },
   end: {
-    code:'END', color:'#1d4ed8', title:'Quy Trình Mua Hàng Hoàn Tất',
-    lane:'All', raci:{R:'Procurement',A:'Management',C:'Finance',I:'Requestor'},
-    inputs:['Completed PO (any tier)'],
-    rules:['Lưu trữ toàn bộ hồ sơ 5 năm','Gửi báo cáo tổng hợp cuối tháng','KPI tracking: lead time, cost variance'],
-    outputs:['Closed procurement cycle','Audit trail','Monthly procurement report']
+    code: 'END',
+    color: '#1d4ed8',
+    title: 'Procurement Lifecycle Completed',
+    lane: 'All Actors',
+    raci: { R: 'Procurement', A: 'Management', C: 'Finance', I: 'Requestor' },
+    inputs: [
+      'Fulfilled procurement order (Tier 1, Tier 2, or Tier 3)'
+    ],
+    rules: [
+      'All documentation preserved in compliant 5-year digital audit archive',
+      'Consolidated monthly procurement intelligence reporting',
+      'KPI evaluation: Lead time, cost variance, and interlock resolution rate'
+    ],
+    outputs: [
+      'Closed procurement lifecycle record',
+      'Traceable audit trail',
+      'Monthly procurement operations summary report'
+    ]
   }
 };
 
 // ═══════════════════════════════════════════════
-//  Detail panel logic
+//  Detail Panel Logic
 // ═══════════════════════════════════════════════
+let activeNodeId = null;
+
 function show(id) {
   const d = D[id];
   if (!d) return;
+
+  // Clear previous active highlights
+  document.querySelectorAll('.n.active').forEach(el => el.classList.remove('active'));
+  const activeEl = document.getElementById('node-' + id);
+  if (activeEl) activeEl.classList.add('active');
+  activeNodeId = id;
+
   document.getElementById('dp-code').textContent = d.code;
   document.getElementById('dp-code').style.color = d.color;
   document.getElementById('dp-title').textContent = d.title;
+  
   const lb = document.getElementById('dp-lane-badge');
   lb.textContent = d.lane;
-  lb.style.background = d.color + '33';
+  lb.style.background = d.color + '26';
   lb.style.color = d.color;
   lb.style.border = '1px solid ' + d.color + '55';
 
   const raci = document.getElementById('dp-raci');
-  raci.innerHTML = ['R','A','C','I'].map(k =>
-    `<div class="raci-cell"><b>${k} – ${k==='R'?'Responsible':k==='A'?'Accountable':k==='C'?'Consulted':'Informed'}</b>${d.raci[k]||'—'}</div>`
-  ).join('');
+  raci.innerHTML = ['R','A','C','I'].map(k => {
+    const full = k === 'R' ? 'Responsible' : k === 'A' ? 'Accountable' : k === 'C' ? 'Consulted' : 'Informed';
+    return `<div class="raci-cell"><b>${k} – ${full}</b>${d.raci[k] || '—'}</div>`;
+  }).join('');
 
-  ['inputs','rules','outputs'].forEach(key => {
-    const el = document.getElementById('dp-'+key);
-    el.innerHTML = (d[key]||[]).map(s=>`<li>${s}</li>`).join('');
+  ['inputs', 'rules', 'outputs'].forEach(key => {
+    const el = document.getElementById('dp-' + key);
+    el.innerHTML = (d[key] || []).map(s => `<li>${s}</li>`).join('');
   });
+
   document.getElementById('dp').classList.add('open');
 }
 
 function closePanel() {
   document.getElementById('dp').classList.remove('open');
+  if (activeNodeId) {
+    const el = document.getElementById('node-' + activeNodeId);
+    if (el) el.classList.remove('active');
+    activeNodeId = null;
+  }
 }
 
 // ═══════════════════════════════════════════════
-//  Pan & Zoom
+//  Pan & Zoom Controls
 // ═══════════════════════════════════════════════
 let scale = 0.52, tx = 10, ty = 10;
 const svg = document.getElementById('diag');
@@ -616,7 +943,14 @@ function applyTransform() {
 applyTransform();
 
 function fitView() {
-  scale = 0.52; tx = 10; ty = 10;
+  const vpw = vp.clientWidth;
+  const vph = vp.clientHeight;
+  const dw = 2100;
+  const dh = 2300;
+  scale = Math.min((vpw - 40) / dw, (vph - 40) / dh);
+  scale = Math.max(0.2, Math.min(1.2, scale));
+  tx = Math.max(10, (vpw - dw * scale) / 2);
+  ty = 20;
   applyTransform();
 }
 
@@ -642,9 +976,9 @@ vp.addEventListener('wheel', e => {
   scale *= factor;
   scale = Math.max(0.08, Math.min(6, scale));
   applyTransform();
-}, {passive: false});
+}, { passive: false });
 
-// Pan
+// Pan interactions
 let dragging = false, startX, startY, startTx, startTy;
 vp.addEventListener('mousedown', e => {
   if (e.target.closest('.n') || e.target.closest('#dp')) return;
@@ -653,21 +987,29 @@ vp.addEventListener('mousedown', e => {
   startTx = tx; startTy = ty;
   vp.classList.add('panning');
 });
+
 window.addEventListener('mousemove', e => {
   if (!dragging) return;
   tx = startTx + (e.clientX - startX);
   ty = startTy + (e.clientY - startY);
   applyTransform();
 });
+
 window.addEventListener('mouseup', () => {
   dragging = false;
   vp.classList.remove('panning');
 });
 
-// Close panel on background click
+// Close panel when clicking empty diagram canvas
 vp.addEventListener('click', e => {
-  if (!e.target.closest('.n')) closePanel();
+  if (!e.target.closest('.n') && !e.target.closest('#dp')) {
+    closePanel();
+  }
 });
+
+// Initial fit on page load
+window.addEventListener('DOMContentLoaded', fitView);
+window.addEventListener('resize', fitView);
 </script>
 </body>
 </html>
