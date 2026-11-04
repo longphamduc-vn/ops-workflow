@@ -1,0 +1,64 @@
+@startuml procurement_item_registration_flow
+title Luồng Đăng Ký Hạng Mục Mua Hàng (Tối Giản & Chuẩn Hóa Theo Thực Tế)
+
+skinparam defaultFontName Arial
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam ArrowColor #2563EB
+skinparam ActivityBorderColor #1E293B
+skinparam ActivityBackgroundColor #F8FAFC
+skinparam NoteBackgroundColor #FEF3C7
+skinparam NoteBorderColor #F59E0B
+
+|Kỹ Sư Hiện Trường|
+start
+:Mở Form Đăng Ký Hạng Mục Mua Hàng;
+
+:1. Chọn Vị Trí Thiết Bị (4 Tầng Thân Thiện):
+* **Line** (Chuyền) -> **Machine** (Tên máy) -> **Unit** (Khối chức năng) -> **Assembly** (Cơ cấu chi tiết);
+
+if (Hạng mục linh kiện ĐÃ CÓ trong hệ thống?) then (Đã có sẵn)
+    partition "NHÁNH ĐÃ CÓ: BỔ SUNG QCODE" {
+        :2A. Nhập / Quét mã **QCode**;
+        :Hệ thống tự động điền (Auto-populate):
+        * Tên Item (Description) & Tên hạng mục
+        * Hãng sản xuất (Maker) & Model
+        * Đơn giá hợp đồng (UP001 / UP004)
+        * Tồn kho hiện có (onhand) & Định mức (target);
+    }
+else (Chưa có trong hệ thống)
+    partition "NHÁNH CHƯA CÓ: ĐĂNG KÝ MỚI" {
+        :2B. Đăng Ký Tên Hạng Mục (Category):
+        * Ví dụ: Khí nén, Cảm biến, Bo mạch, Cơ khí chính xác, Gia nhiệt;
+        
+        :3B. Đăng Ký Tên Item (Tên Linh Kiện Mới):
+        * Tên chi tiết phụ tùng + Maker + Model sơ bộ;
+        
+        :4B. Đính Kèm Hồ Sơ Kỹ Thuật (Nếu có):
+        * Tải folder/tệp CAD, Catalog hoặc ảnh thực tế;
+        * Hệ thống cấp mã tạm **TMP-HW-xxxx**;
+        * Chuyển hồ sơ cho LEC đăng ký cấp QCode ERP;
+    }
+endif
+
+:3. Nhập Số Lượng & Thông Tin Mua:
+* Số lượng xin mua (**Request Qty**)
+* Phân loại nhu cầu (Sự cố Breakdown, Bảo dưỡng PM, Nâng cấp...)
+* Nhập mã **Work Order** (Nếu là sự cố dừng máy);
+
+:4. Quét Interlock & Rẽ Nhánh:
+if (Phát hiện tồn kho liên team?) then (Có tồn kho)
+    :Khóa **CROSS_TEAM_STOCK** -> Sinh task mượn kho;
+    if (Kho bạn không cho mượn & LEC mở khóa?) then (Được mở khóa)
+        if (Thuộc pháp nhân khác?) then (Pháp nhân khác)
+            :Chuyển giao liên pháp nhân (Transfer);
+        else (Nội bộ)
+            :Mua thường cục bộ giá thấp nhất;
+        endif
+    endif
+else (Không có tồn kho)
+    :Đưa vào danh mục mua (PURCHASABLE hoặc Chờ RFQ);
+endif
+
+stop
+@enduml
