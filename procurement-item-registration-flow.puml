@@ -1,152 +1,328 @@
 @startuml procurement_item_registration_flow
-title Quy Trình Đăng Ký, Đánh Giá Interlock & Thẩm Định Mua Sắm Phụ Tùng (Chuẩn Hóa Xưởng)
+title Factory Hardware Spare Parts Procurement Workflow\nItem Registration, Multidimensional Interlock Assessment & 3-Tier Execution Waterfall
 
-skinparam defaultFontName Arial
-skinparam roundcorner 8
+' =========================================================================
+' STYLING & PALETTE (Modern Clean Enterprise Theme)
+' =========================================================================
+skinparam defaultFontName "Segoe UI", Arial, sans-serif
+skinparam roundcorner 10
 skinparam shadowing false
-skinparam ArrowColor #2563EB
-skinparam ActivityBorderColor #1E293B
-skinparam ActivityBackgroundColor #F8FAFC
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.5
+skinparam ArrowFontSize 11
+skinparam ActivityBorderThickness 1.5
+skinparam ActivityBorderColor #334155
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityFontSize 12
+skinparam ActivityFontStyle normal
+skinparam PartitionBorderColor #94A3B8
+skinparam PartitionBorderThickness 1.5
+skinparam PartitionFontSize 13
+skinparam PartitionFontStyle bold
 skinparam NoteBackgroundColor #FEF3C7
 skinparam NoteBorderColor #F59E0B
+skinparam NoteFontSize 11
 
-|Kỹ Sư Hiện Trường (Requestor)|
+' Swimlane partition headers
+|#EFF6FF|Field Engineer (Requestor)|
+|#F0FDF4|System & Automated Interlock Engine|
+|#FEFCE8|Equipment Coordinator (LEC - Technical Mediator)|
+|#FAF5FF|Cost Management Team (Reviewer - Offline Audit)|
+|#ECFDF5|Procurement, Logistics & Nexacro EMS Core|
+
+' =========================================================================
+' PHASE 1: DEMAND INCEPTION & 4-TIER EQUIPMENT HIERARCHY
+' =========================================================================
+|Field Engineer (Requestor)|
 start
-:Mở Form Đăng Ký Hạng Mục Mua Hàng;
+:Open Spare Parts Registration & Requisition Form\n(UI-REQ-01 / SCR-01);
 
-:1. Chọn Vị Trí Thiết Bị (4 Tầng Thân Thiện):
-* **Line** (Chuyền) -> **Machine** (Tên máy) -> **Unit** (Khối chức năng) -> **Assembly** (Cơ cấu chi tiết);
+partition "STEP 1: 4-TIER EQUIPMENT HIERARCHY SELECTION" {
+    :Select 4-Tier Equipment Structure:
+    * **Line** (Production Line ID)
+    * **Machine** (Target Equipment Name)
+    * **Unit** (Functional Module)
+    * **Assembly** (Specific Mechanical / Optical / Electrical Assy);
+    
+    note right
+        **Hierarchy Rules & Automation:**
+        * **Floor Derivation:** Left(Line, 1) = Factory Floor
+          (e.g., Line 102 -> Floor 1; Line 305 -> Floor 3)
+        * **Master Machine Template:** One-click clone of
+          standard BOM structure across parallel lines
+    end note
+}
 
-if (Hạng mục linh kiện ĐÃ CÓ trong hệ thống?) then (Đã có sẵn)
-    partition "NHÁNH ĐÃ CÓ: BỔ SUNG QCODE" {
-        :2A. Nhập / Quét mã **QCode**;
-        :Hệ thống tự động điền (Auto-populate):
-        * Tên Item (Description) & Tên hạng mục
-        * Hãng sản xuất (Maker) & Model
-        * Đơn giá hợp đồng & Tồn kho;
+' =========================================================================
+' PHASE 2: ITEM MASTER EXISTENCE DECISION GATEWAY
+' =========================================================================
+if (Item already registered in ERP Master Catalog?) then (YES - Existing Item)
+    partition "STEP 2A: EXISTING ITEM - QCODE AUTO-POPULATION" {
+        :Input or scan **QCode** via Omni-Search Typeahead
+        (Indexed from Master Catalog YML / ERP DB);
+        :System Auto-Populates 100% of Master Attributes:
+        * Standard Item Description & Category
+        * Manufacturer (Maker) & Part Model Number
+        * Standard Unit of Measure (UoM: PCS / SET / ROLL)
+        * Active Master Contract Unit Price (**UP001**)
+        * Current On-Hand Physical Plant Inventory
+        * CAD 2D/3D Drawing Link & Vault Spec Sheet;
+        
+        note right
+            **Initial Requisition Status:**
+            * Set to **DRAFT_ACTIVE**
+            * Ready for immediate quantity entry
+        end note
     }
-else (Chưa có trong hệ thống)
-    partition "NHÁNH CHƯA CÓ: ĐĂNG KÝ MỚI" {
-        :2B. Đăng Ký Tên Hạng Mục (Category):
-        * Ví dụ: Khí nén, Cảm biến, Bo mạch, Gia nhiệt...;
-        :3B. Đăng Ký Tên Item (Tên Linh Kiện Mới):
-        * Tên chi tiết phụ tùng + Maker + Model sơ bộ;
-        :4B. Đính Kèm Hồ Sơ Kỹ Thuật (Nếu có):
-        * Tải folder/tệp CAD, Catalog hoặc ảnh thực tế (Mã tạm TMP-);
+else (NO - Unregistered / New Part)
+    partition "STEP 2B: NEW ITEM REGISTRATION (TEMPORARY CODE)" {
+        :Register New Item Information:
+        * **Category Name:** Optics, Pneumatics, Sensors, Heating, Precision Tooling, etc.
+        * **New Item Description:** Technical noun + dimension + spec
+        * **Maker & Preliminary Model Number**;
+        
+        :Attach Technical Dossier (Drag-and-Drop Folder):
+        * Upload CAD folder (2D .dwg, 3D .step), Catalog, or Spec sheet;
+        
+        :System Generates Temporary Identifier:
+        * Format: **TMP-HW-xxxx**;
+        
+        :System Locks Hard Gate: **costBlocked = true**; <<#FFE4E6>>
+        note right
+            **HARD GOVERNANCE RULE:**
+            * Requisitions bearing **TMP-HW-xxxx** are
+              strictly blocked from PO release until formal
+              QCode is assigned on ERP master table.
+            * Initial Status: **DRAFT_TMP**
+        end note
     }
 endif
 
 ' =========================================================================
-' BƯỚC 3: NHẬP SỐ LƯỢNG & THÔNG TIN NGHIỆP VỤ ĐẦY ĐỦ
+' PHASE 3: REQUISITION CONTEXT & OPERATIONAL JUSTIFICATION
 ' =========================================================================
-partition "3. NHẬP SỐ LƯỢNG XIN MUA & BỐI CẢNH KỸ THUẬT" {
-    :Nhập các thông tin bắt buộc:
-    * **Số lượng xin mua** (Request Qty)
-    * **Lý do sử dụng**: Setup, Cải tiến (CIP), Sự cố (Breakdown), Bảo dưỡng (PM), Dự phòng
-    * **Lý do chi tiết & Logic**: Phân tích vì sao cần mua, nguyên nhân hỏng hóc
-    * **Vấn đề & Hiện trạng**: Máy đang dừng hay chạy chập chờn, ảnh hưởng bao nhiêu sản lượng
-    * **Cờ khẩn cấp (Urgent Flag)**: Bật cờ ưu tiên cao nếu nguy cơ dừng chuyền;
+partition "STEP 3: QUANTITY ENTRY & OPERATIONAL CONTEXT" {
+    :Enter Requisition Parameters:
+    * **Request Quantity** (UoM validated);
+    
+    :Select **Usage Category** (Dropdown):
+    * [Setup] : New product setup or tooling changeover
+    * [CIP] : Continuous Improvement productivity project
+    * [Breakdown] : Unplanned equipment breakdown
+    * [PM] : Scheduled Preventive Maintenance overhaul
+    * [Spare] : Strategic safety stock buffer;
+    
+    :Provide **Detailed Technical Logic & Root Cause**:
+    * Wear/tear mechanism, thermal fatigue, coil burnout, physical fracture;
+    
+    :Declare **Machine Operational Status & Impact**:
+    * **Machine Down (Line Stop):** Quantify downtime loss (e.g., -150 pcs/shift)
+    * **Abnormal Operation:** Speed reduction / intermittent yield defect;
+    
+    if (Line stop or critical safety risk present?) then (YES - High Severity)
+        :Enable **Urgent Priority Flag** (Urgent = TRUE); <<#FEE2E2>>
+        note right
+            * Activates 24-48h Expedited SLA
+            * Instant alert dispatched to LEC & Management
+        end note
+    else (NO)
+        :Urgent Priority Flag = FALSE (Standard Monthly SLA);
+    endif
 }
 
 ' =========================================================================
-' BƯỚC 4: HIỂN THỊ THÔNG TIN TRẠNG THÁI INTERLOCK
+' PHASE 4: AUTOMATED 4-DIMENSION INTERLOCK STATUS ENGINE
 ' =========================================================================
-|Bộ Máy Interlock & Hệ Thống|
-partition "4. HIỂN THỊ THÔNG TIN TRẠNG THÁI INTERLOCK" {
-    :Hệ thống quét tức thời & hiển thị 4 trạng thái Interlock:
-    1. **Giá**: Đã có giá hợp đồng UP001 hay chưa có UP004 (chờ RFQ)
-    2. **Tồn kho lâu (Aging Stock)**: Cảnh báo linh kiện tồn kho >30, 60, 90 ngày chưa dùng
-    3. **Tồn kho pháp nhân (Entity Stock)**: Có sẵn hàng dư thừa tại pháp nhân/kho bạn
-    4. **Giá cao hơn pháp nhân khác**: Cảnh báo chênh lệch đơn giá giữa các nhà máy;
+|System & Automated Interlock Engine|
+partition "STEP 4: AUTOMATED 4-DIMENSION INTERLOCK SCAN" {
+    :Execute Automated Interlock Rule Engine (<50ms execution);
+    
+    :Evaluate 4 Mandatory Interlock Dimensions:
+    1. **Contract Price Status:**
+       * UP001 (Active master contract price available) OR
+       * UP004 (No active contract -> Sourcing RFQ required)
+    2. **Aging Stock Warning (Idle Inventory):**
+       * Flag if identical/compatible parts exist in plant idle >30, 60, 90 days
+    3. **Inter-Entity / Affiliate Stock:**
+       * Real-time query of idle inventory at Entity B, Plant 2, or Central Hub
+    4. **Cross-Entity Price Disparity:**
+       * Compare proposed unit price against benchmark prices paid by sister entities;
+       
+    :Generate Multidimensional Interlock Dashboard & Audit Flags;
 }
 
 ' =========================================================================
-' BƯỚC 5: TRAO ĐỔI GIỮA LEC VÀ REQUESTOR
+' PHASE 5: COLLABORATIVE CLARIFICATION (LEC <-> REQUESTOR)
 ' =========================================================================
-|Chuyên Viên Điều Phối (LEC)|
-partition "5. TRAO ĐỔI GIỮA LEC VÀ REQUESTOR" {
-    :LEC tiếp nhận đơn đăng ký và thông tin Interlock;
-    :Trao đổi trực tiếp 2 chiều với Requestor:
-    * Yêu cầu làm rõ lý do sử dụng, hiện trạng máy
-    * Hướng dẫn xử lý tồn kho lâu hoặc xác minh chênh lệch giá;
-    |Kỹ Sư Hiện Trường (Requestor)|
-    :Requestor phản hồi, bổ sung bằng chứng kỹ thuật/ảnh hiện trường;
+|Equipment Coordinator (LEC - Technical Mediator)|
+partition "STEP 5: LEC & REQUESTOR COLLABORATIVE DIALOGUE" {
+    :LEC accesses Requisition & Interlock Dashboard (UI-LEC-01);
+    
+    :Open In-Workflow Two-Way Clarification Channel:
+    * Challenge request quantity against historical consumption rate
+    * Verify machine downtime loss veracity
+    * Query why aging inventory (>30d) cannot be repurposed
+    * Demand justification if price exceeds sister plant benchmark;
+    
+    |Field Engineer (Requestor)|
+    :Requestor provides engineering response:
+    * Upload on-site high-resolution failure photos / macro-inspection
+    * Attach Equipment Breakdown Incident Report
+    * Submit technical justification on spec incompatibility of aging stock;
 }
 
 ' =========================================================================
-' BƯỚC 6: ĐÁNH GIÁ OK -> LÊN LIST THẨM ĐỊNH
+' PHASE 6: LEC TECHNICAL EVALUATION & GOVERNANCE TAGGING
 ' =========================================================================
-|Chuyên Viên Điều Phối (LEC)|
-partition "6. ĐÁNH GIÁ OK -> LÊN LIST THẨM ĐỊNH" {
-    if (LEC đánh giá hồ sơ đạt yêu cầu kỹ thuật?) then (Đạt OK)
-        :LEC gom mẻ & gán nhãn Target / Over;
-        :Đưa hạng mục vào **List Thẩm Định Đầu Tháng**;
-    else (Chưa đạt)
-        :Yêu cầu Requestor chỉnh sửa hoặc hủy đơn;
+|Equipment Coordinator (LEC - Technical Mediator)|
+partition "STEP 6: LEC EVALUATION, BATCHING & FINANCIAL TAGGING" {
+    if (Does requisition meet technical compliance?) then (YES - Qualified)
+        :Set Status to **LEC_QUALIFIED**;
+        :Aggregate qualified requests into Monthly Review Batch;
+        :Assign Standardized 14-Character Equipment Code:
+        * **EM No:** e.g., ""HWBMTL21EC0101"";
+        
+        :Perform Financial Governance Tagging (Manual Tagging Only):;
+        if (Requisition matches standard EBOM maintenance quota?) then (EBOM Standard)
+            :Tag as **TARGET** (Within standard budgeted quota); <<#DCFCE7>>
+        else (Unplanned / Emergency Breakdown)
+            :Tag as **OVER** (Budget Overrun / Incident); <<#FEE2E2>>
+            :Mandatory Assignment of 1 of 6 Root Cause Codes:
+            * **OVR-01:** Operational error / mechanical impact fracture
+            * **OVR-02:** Rapid process engineering change / urgent CIP
+            * **OVR-03:** Supplier EOL / obsolete sub-assembly replacement
+            * **OVR-04:** Production forecast surge / overtime load
+            * **OVR-05:** Storage deterioration / humidity contamination
+            * **OVR-06:** Statutory safety / cleanroom quality compliance;
+            :Mandatory Binding to Maintenance **Work Order (WO-xxxx)**;
+        endif
+        
+        :Submit aggregated batch to Monthly Offline Audit Committee;
+    else (NO - Non-Compliant)
+        :Reject Requisition; <<#FEE2E2>>
+        :Return to Requestor with rectification directives or cancel;
         stop
     endif
 }
 
 ' =========================================================================
-' BƯỚC 7: THẨM ĐỊNH OFFLINE & LEC LÀM TRUNG GIAN
+' PHASE 7: MONTHLY OFFLINE AUDIT (MANAGEMENT TEAM GATEWAY)
 ' =========================================================================
-|Quản Lý Chi Phí (Reviewer - Management Team)|
-partition "7. THẨM ĐỊNH OFFLINE (MANAGEMENT TEAM)" {
-    :Ban Quản Lý Chi Phí tiến hành Thẩm Định Offline (Ngày 01-05);
+|Cost Management Team (Reviewer - Offline Audit)|
+partition "STEP 7: MONTHLY OFFLINE AUDIT (DAYS 01-05)" {
+    :Convene Monthly Offline Audit Committee (Conducted Days 01-05);
     
-    if (Reviewer có thắc mắc / nghi vấn chi phí?) then (Có thắc mắc)
-        :Reviewer gửi chất vấn cho LEC;
-        |Chuyên Viên Điều Phối (LEC)|
-        :LEC làm **Trung Gian Trao Đổi**:
-        * Tiếp nhận câu hỏi từ Reviewer
-        * Điều phối, hướng dẫn Requestor giải trình kỹ thuật;
-        |Kỹ Sư Hiện Trường (Requestor)|
-        :Requestor nộp văn bản giải trình + ảnh hiện trường;
-        |Chuyên Viên Điều Phối (LEC)|
-        :LEC tổng hợp và phản hồi chính thức cho Reviewer;
-        |Quản Lý Chi Phí (Reviewer - Management Team)|
+    if (Any item still bears temporary code TMP-HW-xxxx?) then (YES - TMP Exists)
+        :<b>HARD-BLOCK TRIGGERED:</b>\nAudit Committee Rejection!\nStrictly forbidden to approve TMP codes; <<#FEE2E2>>
+        |Equipment Coordinator (LEC - Technical Mediator)|
+        :LEC directs ERP Master Data Team to issue official QCode;
+        |Field Engineer (Requestor)|
+        :Resubmit once formal QCode is established;
+        stop
+    else (NO - 100% Formal QCode)
+        |Cost Management Team (Reviewer - Offline Audit)|
+        :Proceed with Financial & Operational Review;
     endif
     
-    :Reviewer phê duyệt danh mục đạt thẩm định;
-}
-
-' =========================================================================
-' BƯỚC 8: CHỐT LIST MUA
-' =========================================================================
-|Quản Lý Chi Phí (Reviewer - Management Team)|
-partition "8. CHỐT LIST MUA" {
-    :Ký cấp chứng chỉ **Cost Clearance**;
-    :Chốt danh sách mua chính thức của tháng;
-}
-
-' =========================================================================
-' BƯỚC 9: TIẾN HÀNH MUA & XỬ LÝ TỪNG HẠNG MỤC INTERLOCK
-' =========================================================================
-|Hệ Thống Mua Hàng & Cổng EMS|
-partition "9. TIẾN HÀNH MUA & XỬ LÝ TỪNG HẠNG MỤC INTERLOCK" {
-    :Tiến hành xử lý mua theo từng hạng mục Interlock:;
+    if (Reviewer raises cost, necessity, or OVER inquiries?) then (YES - Inquiry Raised)
+        :Reviewer issues formal Inquiry Ticket;
+        |Equipment Coordinator (LEC - Technical Mediator)|
+        :LEC acts as **Exclusive Mediation Bridge**:
+        * Receives inquiry ticket from Management
+        * Coordinates with Requestor to obtain supplemental data
+        * Synthesizes formal technical defense;
+        |Field Engineer (Requestor)|
+        :Provide supplementary technical certificates and test logs;
+        |Equipment Coordinator (LEC - Technical Mediator)|
+        :Submit unified defense report back to Reviewers;
+        |Cost Management Team (Reviewer - Offline Audit)|
+    else (NO - Clear Justification)
+        :All items deemed justified and compliant;
+    endif
     
-    if (Hạng mục có tồn kho liên pháp nhân / liên team?) then (Có tồn kho)
-        :Thực hiện thủ tục **Chuyển Giao (Transfer)**;
-        if (Chuyển giao được Approve?) then (Approve)
-            :Tiến hành xuất kho chuyển giao liên pháp nhân;
-            :Hoàn tất nhận hàng chuyển giao;
-            stop
-        else (Reject chuyển giao)
-            :Chuyển sang làm đơn đặt hàng nội bộ (**Internal PO**);
-            if (Internal PO được duyệt?) then (Duyệt Internal PO)
-                :Tiến hành mua qua kênh Internal PO;
+    :Audit compliance of Aging Stock (>30d) liquidation commitments;
+}
+
+' =========================================================================
+' PHASE 8: FINAL PURCHASE LIST CLEARANCE
+' =========================================================================
+partition "STEP 8: FINAL PURCHASE LIST CLEARANCE" {
+    :Management Team formally approves Requisition Roster;
+    
+    :Sign and issue electronic **Cost Clearance Certificate**:\n* Certificate ID: **CC-HW-YYYYMM-PASS**; <<#DCFCE7>>
+    
+    :Execute Data Freeze on Monthly Requisition List:
+    * Strict **No-Rollover Rule** (surplus balance resets to $0);
+    * Item roster unlocked and transferred to Procurement Execution;
+}
+
+' =========================================================================
+' PHASE 9: EXECUTION VIA 3-TIER WATERFALL RESOLUTION
+' =========================================================================
+|Procurement, Logistics & Nexacro EMS Core|
+partition "STEP 9: 3-TIER INTERLOCK RESOLUTION & PO EXECUTION" {
+    :Iterate through each approved requisition line item;
+    
+    if (Surplus inventory exists at sister entity/plant?) then (YES - Inter-Entity Stock)
+        ' ----------------- TIER 1 -----------------
+        partition "TIER 1: INTER-ENTITY TRANSFER (PRIORITY 1)" {
+            :Submit Inter-Entity Inventory Transfer Request;
+            if (Sister Entity approves inventory transfer?) then (Approved)
+                :Issue Warehouse Inter-Company Transfer Slip; <<#DCFCE7>>
+                :Transfer physical parts to target plant warehouse;
+                :Receive items into local inventory (Zero CAPEX expenditure);
+                :Install on target machine under Work Order;
                 stop
-            else (Reject Internal PO)
-                :Chuyển sang luồng **Mua Thường (External PO)**;
+            else (Rejected by Sister Entity)
+                :Sister entity reserves stock for internal safety buffer; <<#FEF3C7>>
+                :Escalate to Tier 2;
             endif
-        endif
-    else (Không có tồn kho)
-        :Chuyển thẳng sang luồng **Mua Thường (External PO)**;
+        }
+        
+        ' ----------------- TIER 2 -----------------
+        partition "TIER 2: INTER-COMPANY PURCHASE ORDER (PRIORITY 2)" {
+            :Initiate Internal PO Requisition under group pricing agreement;
+            if (Internal PO approved by corporate finance?) then (Approved)
+                :Issue Internal Commercial Invoice & Logistics Transfer; <<#DCFCE7>>
+                :Receive items into plant warehouse;
+                :Install on target machine under Work Order;
+                stop
+            else (Rejected by Corporate Finance)
+                :Internal billing or cross-border tax constraint; <<#FEF3C7>>
+                :Escalate to Tier 3;
+            endif
+        }
+    else (NO - No Group Stock Available)
+        :Proceed directly to Tier 3;
     endif
-
-    :Phát hành PO chính thức với giá thấp nhất;
-    :Nhận hàng, nhập kho và xuất lắp đặt vào máy;
+    
+    ' ----------------- TIER 3 -----------------
+    partition "TIER 3: EXTERNAL PURCHASE ORDER VIA NEXACRO EMS CORE (PRIORITY 3)" {
+        :Procurement negotiates lowest qualified commercial price;
+        :Interface requisition data into **Nexacro EMS Core**;
+        :Generate Purchase Requisition Voucher (**PRV**);
+        
+        :Executive Leadership signs electronic approval **100% on Nexacro EMS Core**; <<#E0E7FF>>
+        note right
+            **SYSTEM ARCHITECTURE RULE:**
+            * Web UI is strictly analytical/read-only for PO approval.
+            * Official electronic signatures execute solely on Nexacro Core.
+        end note
+        
+        :Gateway synchronizes official Purchase Order: **PO-99xxx**;
+        
+        :Track Inbound Logistics across 3 Milestones:
+        1. Vendor Confirmation Date
+        2. Port / Freight Hub ETA
+        3. Customs Clearance & In-Transit Delivery;
+        
+        :Physical parts arrive at Factory HW cleanroom warehouse;
+        :Warehouse Keeper executes receiving inspection on Nexacro EMS;
+        
+        :Field Engineer issues spare parts and installs on machine (WO-xxxx);
+        
+        :Nexacro EMS synchronizes warehouse issue log (**ds_Inv**):\n* Final costs posted into manufacturing product cost accounting; <<#DCFCE7>>
+    }
 }
 
 stop

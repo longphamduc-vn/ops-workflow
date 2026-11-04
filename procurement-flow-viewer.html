@@ -60,11 +60,23 @@ header span{font-size:11px;color:#94a3b8;flex:1}
     <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Procurement &amp; EMS</div>
   </div>
   <div class="header-actions">
+    <button class="btn btn-primary" id="btnViewUml" onclick="switchView('uml')">📊 Interactive UML</button>
+    <button class="btn" id="btnViewPuml" onclick="switchView('puml')">🖼️ PlantUML Output (SVG)</button>
+    <a href="procurement-item-registration-flow.png" download class="btn" style="text-decoration:none;display:inline-flex;align-items:center;">💾 Download PNG</a>
     <button class="btn btn-primary" onclick="fitView()">⊡ Fit View</button>
     <button class="btn" onclick="zoom(1.2)">＋ Zoom In</button>
     <button class="btn" onclick="zoom(0.83)">－ Zoom Out</button>
   </div>
 </header>
+
+<div id="pumlView" style="display:none;flex:1;overflow:auto;background:#0b1120;padding:20px;text-align:center;">
+  <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:12px;color:#94a3b8;">
+    <span>⚡ Rendered live from <code>procurement-item-registration-flow.puml</code></span>
+    <a href="procurement-item-registration-flow.svg" target="_blank" class="btn" style="text-decoration:none;">Open Raw SVG</a>
+    <a href="procurement-item-registration-flow.png" target="_blank" class="btn" style="text-decoration:none;">Open High-Res PNG</a>
+  </div>
+  <img id="pumlImg" src="procurement-item-registration-flow.svg" alt="PlantUML Diagram" style="max-width:100%;height:auto;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);border:1px solid #1e3a5f;background:#fff;"/>
+</div>
 
 <div id="vp">
 <svg id="diag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2100 2300" width="2100" height="2300">
@@ -927,6 +939,28 @@ function closePanel() {
     const el = document.getElementById('node-' + activeNodeId);
     if (el) el.classList.remove('active');
     activeNodeId = null;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  View Switching (Interactive vs PlantUML)
+// ═══════════════════════════════════════════════
+function switchView(mode) {
+  const vp = document.getElementById('vp');
+  const pumlView = document.getElementById('pumlView');
+  const btnUml = document.getElementById('btnViewUml');
+  const btnPuml = document.getElementById('btnViewPuml');
+  if (mode === 'puml') {
+    vp.style.display = 'none';
+    pumlView.style.display = 'block';
+    btnPuml.classList.add('btn-primary');
+    btnUml.classList.remove('btn-primary');
+  } else {
+    vp.style.display = 'block';
+    pumlView.style.display = 'none';
+    btnUml.classList.add('btn-primary');
+    btnPuml.classList.remove('btn-primary');
+    fitView();
   }
 }
 
