@@ -224,3 +224,4 @@ export const CostManagementPortalView: React.FC = () => {
     </div>
   );
 };
+

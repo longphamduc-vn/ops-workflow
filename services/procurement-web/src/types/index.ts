@@ -110,3 +110,4 @@ export interface SgBudgetSummary {
   justificationDeadline: string; // LEC configured e.g. 2026-11-05
   auditLockDeadline: string; // LEC configured e.g. 2026-11-07
 }
+

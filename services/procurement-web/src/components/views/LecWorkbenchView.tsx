@@ -576,3 +576,4 @@ export const LecWorkbenchView: React.FC = () => {
     </div>
   );
 };
+

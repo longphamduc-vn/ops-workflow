@@ -266,3 +266,4 @@ export const UniversalDashboardView: React.FC = () => {
     </div>
   );
 };
+
