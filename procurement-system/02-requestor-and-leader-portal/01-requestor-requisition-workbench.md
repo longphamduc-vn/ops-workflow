@@ -58,17 +58,59 @@ flowchart TD
 
 ---
 
-## 3. Requisition Creation Methods for Engineers
+## 3. Standardized 5-Step Creation & Interlock Workflow for Requestors
 
-### 3.1. Requisition via EBOM Friendly Names
-- Engineer selects: `Line #201` $\rightarrow$ `Die Bonder DB-01` $\rightarrow$ `Bonding Head Unit` $\rightarrow$ checks spare part.
-- If the mechanism is not yet in EBOM: Select `[+] Mechanism not in EBOM (Late Declaration)` to avoid blocking procurement.
+Following the authoritative master workflow [`procurement-item-registration-flow.puml`](file:///home/longp/projects/company/ops-workflow/procurement-item-registration-flow.puml), the requisition creation process consists of the following standardized stages:
 
-### 3.2. Requisition for Emergency Machine Breakdown
-- Select demand type: `Immediate breakdown replacement`.
-- Enter maintenance repair work order (e.g., `WO-248926091`).
-- Upload photographs of damaged components and machine alarm logs.
+### Step 1: 4-Tier Equipment Hierarchy Selection & Master Machine Template
+- **4-Tier Mandatory Equipment Hierarchy**:
+  $$\text{Line (Chuyền)} \longrightarrow \text{Machine (Tên Máy)} \longrightarrow \text{Unit (Khối Chức Năng)} \longrightarrow \text{Assembly (Cụm Cơ Cấu)}$$
+- **Automatic Factory Floor Recognition Rule**:
+  $$\text{Factory Floor} = \text{Left}(\text{Line Number}, 1)$$
+  *(e.g., `Line 101` $\rightarrow$ Floor 1F Cleanroom; `Line 201` $\rightarrow$ Floor 2F Cleanroom; `Line 305` $\rightarrow$ Floor 3F Cleanroom).*
+- **Master Machine Template**: Allows copying standard BOM and sub-unit configurations across identical machines running on parallel lines, drastically accelerating setup time.
 
-### 3.3. Bulk Grid Entry
-- Copy-paste dozens of rows from shift inspection spreadsheets into the grid table.
-- Identify rows flagged with peer team stock warnings to prioritize borrowing before purchasing.
+### Step 2: Item Registration Decision Gateway (Branch 2A vs. Branch 2B)
+- **Branch 2A — Existing ERP QCode (Standard Spares)**:
+  1. Field engineer searches via Omni-Search typeahead (by QCode, Korean name, English description, Maker, or Model).
+  2. System auto-populates 100% of master data: Technical specs, Maker, Model, UOM, Master Contract Price (`UP001`), On-hand Stock, and CAD 2D/3D links.
+  3. Requisition state initialized to `DRAFT_ACTIVE`.
+- **Branch 2B — New Spare Part / CIP Improvement (No ERP QCode yet)**:
+  1. Select Category (Optics, Pneumatics, Sensors, Heating, Motion, Dispensing).
+  2. Register new Item Name, preliminary Maker, and detailed technical specifications.
+  3. Drag and drop the technical dossier folder (CAD drawings `.dwg`, `.step`, specsheet, vendor catalog `.pdf`).
+  4. System issues temporary code: `TMP-HW-xxxx`.
+  5. **MANDATORY HARD LOCK GATE**: Sets `costBlocked = true`. Requisition state initialized to `DRAFT_TMP`.
+  > [!WARNING]
+  > Items bearing `TMP-HW-xxxx` are strictly blocked from external purchase order generation and will be immediately disqualified from the Beginning-of-Month Cost Audit (Days 01–05) until the LEC obtains an official ERP QCode.
+
+### Step 3: Requisition Context, Technical Logic & Operational Impact
+- **Request Quantity**: Enter required quantity based on standardized UOM (EA, SET, ROLL).
+- **Usage Category Selection (5 Core Types)**:
+  1. `Setup`: New line tooling or product model changeover.
+  2. `Continuous Improvement (CIP)`: Equipment efficiency and yield enhancement.
+  3. `Equipment Breakdown`: Urgent unplanned failure replacement.
+  4. `Preventive Maintenance (PM)`: Scheduled cyclical wear replacement.
+  5. `Safety Stock Reserve`: Minimum threshold replenishments for critical long-lead items.
+- **Detailed Technical Logic & Root Cause**: Detail physical degradation mechanics (e.g., thermal fatigue, frictional wear, electrical coil burnout, pneumatic cylinder leakage).
+- **Operational Machine Status & Loss Quantification**:
+  - `Line Stop (Emergency)`: Mandatory quantification of lost production units per shift (e.g., $-250\text{ units/shift}$).
+  - `Degraded Speed / High Scrap Rate`: Machine operating sub-optimally with elevated defect yield.
+- **Urgent Priority Flag**: When toggled, activates 24-48h expedited SLA processing for line-critical emergencies.
+
+### Step 4: Automated 4-Dimension Interlock Scan (<50ms Execution)
+Immediately upon submission, the automated engine executes a four-dimensional background scan:
+1. **Contract Price Status**:
+   - `UP001`: Active master contract price $\rightarrow$ Spend calculated immediately.
+   - `UP004`: No active price $\rightarrow$ Automatically routed to Quotation Tracking queue (`RFQ_WAITING`).
+2. **Aging Stock Warning**:
+   - Flags on-hand stock aging $>30, 60, 90$ days across factory warehouses.
+3. **Inter-Entity Stock Availability**:
+   - Scans idle inventory across peer group entities (Entity B, Plant 2, Central Hub). If available, blocks immediate external purchase and mandates transfer evaluation.
+4. **Cross-Entity Price Disparity**:
+   - Benchmarks unit price against historical peer plant purchase orders to prevent overpaying.
+
+### Step 5: Collaborative Dialogue & Technical Evidence with LEC
+- Dedicated in-workflow bidirectional communication thread between Requestor and LEC.
+- Requestor uploads concrete physical evidence: Photographs of fractured components taken on the line, machine alarm logs, and formal breakdown incident work orders (`WO-xxxx`).
+- LEC reviews technical legitimacy and decides whether to approve for batch inclusion or reject with clarification requests.

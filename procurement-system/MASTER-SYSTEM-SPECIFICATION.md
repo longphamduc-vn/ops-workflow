@@ -15,11 +15,11 @@
 2. [CƠ CẤU TỔ CHỨC & MA TRẬN PHÂN QUYỀN VAI TRÒ (RACI)](#2-cơ-cấu-tổ-chức--ma-trận-phân-quyền-vai-trò-raci)
 3. [KIẾN TRÚC DỮ LIỆU & ĐỊNH DANH MÃ EM 14 KÝ TỰ (EQUIPMENT TREE)](#3-kiến-trúc-dữ-liệu--định-danh-mã-em-14-ký-tự-equipment-tree)
 4. [EBOM TRỰC QUAN HÓA & CƠ CHẾ KHAI BÁO MUỘN (LATE DECLARATION)](#4-ebom-trực-quan-hóa--cơ-chế-khai-báo-muộn-late-declaration)
-5. [QUY TRÌNH ONBOARDING QCODE & TẢI FOLDER BẢN VẼ/CATALOG](#5-quy-trình-onboarding-qcode--tải-folder-bản-vẽcatalog)
-6. [CƠ CHẾ INTERLOCK 4 BƯỚC, TỒN KHO LIÊN PHÁP NHÂN & CẢNH BÁO MƯỢN HÀNG](#6-cơ-chế-interlock-4-bước-tồn-kho-liên-pháp-nhân--cảnh-báo-mượn-hàng)
+5. [QUY TRÌNH ONBOARDING QCODE & TẢI FOLDER BẢN VẼ/CATALOG (THEO WORKFLOW CHUẨN)](#5-quy-trình-onboarding-qcode--tải-folder-bản-vẽcatalog-theo-workflow-chuẩn)
+6. [CƠ CHẾ INTERLOCK 4 CHIỀU, ĐỐI THOẠI TRỰC TIẾP LEC & REQUESTOR](#6-cơ-chế-interlock-4-chiều-đối-thoại-trực-tiếp-lec--requestor)
 7. [QUẢN LÝ NGÂN SÁCH SG (STRICT NO-ROLLOVER), ĐÁNH GIÁ TARGET/OVER & 6 MÃ NGUYÊN NHÂN](#7-quản-lý-ngân-sách-sg-strict-no-rollover-đánh-giá-targetover--6-mã-nguyên-nhân)
-8. [KIỂM THẢO ĐẦU THÁNG (NGÀY 01-05), CẦU NỐI GIẢI TRÌNH 3 BÊN & XUẤT BÁO CÁO EXCEL 4 SHEET](#8-kiểm-thảo-đầu-tháng-ngày-01-05-cầu-nối-giải-trình-3-bên--xuất-báo-cáo-excel-4-sheet)
-9. [ĐẶC TẢ CHI TIẾT 6 GIAO DIỆN CHỨC NĂNG (UNIVERSAL DASHBOARD + 5 ROLE WORKSPACES)](#9-đặc-tả-chi-tiết-6-giao-diện-chức-năng-universal-dashboard--5-role-workspaces)
+8. [KIỂM THẢO ĐẦU THÁNG (NGÀY 01-05), CẦU NỐI GIẢI TRÌNH 3 BÊN, CHỨNG CHỈ COST CLEARANCE & CƠ CHẾ MUA THÁC NƯỚC 3 TẦNG](#8-kiểm-thảo-đầu-tháng-ngày-01-05-cầu-nối-giải-trình-3-bên-chứng-chỉ-cost-clearance--cơ-chế-mua-thác-nước-3-tầng)
+9. [ĐẶC TẢ CHI TIẾT 10 MÀN HÌNH CHỨC NĂNG HỆ THỐNG (V2/2026 STANDARDIZED)](#9-đặc-tả-chi-tiết-10-màn-hình-chức-năng-hệ-thống-v22026-standardized)
 10. [CHIẾN LƯỢC TÍCH HỢP 2 GIAI ĐOẠN VỚI NEXACRO EMS & GIỚI HẠN TẦN SUẤT API](#10-chiến-lược-tích-hợp-2-giai-đoạn-với-nexacro-ems--giới-hạn-tần-suất-api)
 
 ---
@@ -152,55 +152,72 @@ Nhà máy: Factory HW
 
 ---
 
-## 5. QUY TRÌNH ONBOARDING QCODE & TẢI FOLDER BẢN VẼ/CATALOG
+## 5. QUY TRÌNH ONBOARDING QCODE & TẢI FOLDER BẢN VẼ/CATALOG (THEO WORKFLOW CHUẨN)
 
+Quy trình đăng ký hạng mục được chuẩn hóa theo 3 bước khởi đầu từ tài liệu chuẩn [`procurement-item-registration-flow.puml`](file:///home/longp/projects/company/ops-workflow/procurement-item-registration-flow.puml):
+
+### 5.1. Bước 1: Chọn Vị Trí Cấu Trúc Thiết Bị 4 Tầng & Master Machine Template
+- Cấu trúc cây 4 tầng bắt buộc: `Line` (Chuyền) $\rightarrow$ `Machine` (Tên máy) $\rightarrow$ `Unit` (Khối chức năng) $\rightarrow$ `Assembly` (Cơ cấu chi tiết).
+- **Quy tắc nhận diện tầng tự động**: $\text{Floor} = \text{Left}(\text{Line}, 1)$. (Ví dụ: `Line 102` $\rightarrow$ Tầng 1 Cleanroom; `Line 305` $\rightarrow$ Tầng 3 Cleanroom).
+- **Master Machine Template**: Hỗ trợ sao chép nhanh cấu trúc BOM mẫu giữa các máy giống nhau trên các chuyền song song, giảm 80% thời gian nhập liệu ban đầu.
+
+### 5.2. Bước 2: Cổng Rẽ Nhánh Kiểm Tra Mã QCode ERP
 ```
-[Kỹ sư Hiện trường]
-    │  Tải lên toàn bộ Folder (Bản vẽ CAD .dwg, Catalog .pdf, Spec ảnh .png)
-    ▼
-[Hệ thống Ops-Workflow]
-    │  Trích xuất cấu trúc tệp, hiển thị bảng xem trước thuộc tính kỹ thuật
-    │  Sinh mã tạm: TMP-HW-xxxx (CỜ: isTempCode = true)
-    ▼
-[LEC Master Workbench]
-    │  Kiểm tra hồ sơ kỹ thuật, tải tài liệu xuống
-    │  Đăng ký mã QCode chính thức trên hệ thống ngoài (ERP / EMS Core)
-    │  Cập nhật mã QCode chính thức (e.g. Q-009182) vào hệ thống
-    ▼
-[Đủ điều kiện Thẩm định]
-    │  Mã tạm TMP-HW-xxxx được chuyển thành QCode chính thức
-    │  Hạng mục đủ điều kiện để đưa vào danh mục Thẩm định Chi phí Đầu tháng
+[Yêu cầu mua sắm phát sinh]
+    │
+    ├── [Nhánh 2A: Đã có mã QCode ERP]
+    │     ├── Quét/Nhập QCode qua thanh Omni-Search thông minh
+    │     ├── Hệ thống tự động điền 100% dữ liệu gốc: Mô tả, Maker, Model, ĐVT,
+    │     │   Đơn giá hợp đồng UP001, Tồn kho hiện hữu, Link bản vẽ CAD 2D/3D
+    │     └── Trạng thái khởi tạo: DRAFT_ACTIVE
+    │
+    └── [Nhánh 2B: Chưa có mã QCode - Phụ tùng mới / Cải tiến CIP]
+          ├── Đăng ký Tên Hạng Mục (Category: Optics, Pneumatics, Sensors, Heating...)
+          ├── Đăng ký Tên Item mới & Quy cách kỹ thuật, Maker sơ bộ
+          ├── Kéo thả trọn bộ Folder hồ sơ kỹ thuật (CAD .dwg/.step, Catalog .pdf)
+          ├── Hệ thống cấp mã định danh tạm thời: TMP-HW-xxxx
+          ├── CHỐT CHẶN CỨNG: Tự động khóa cờ chi phí costBlocked = true
+          └── Trạng thái khởi tạo: DRAFT_TMP
 ```
 
 > [!WARNING]
-> **Quy định Nghiêm ngặt về Mã Tạm**: Mọi hạng mục còn mang tiền tố `TMP-HW-` sẽ bị bộ lọc của Bộ phận Quản lý Chi phí tự động từ chối đưa vào phiên thẩm định đầu tháng.
+> **Quy định Chặn Cứng về Mã Tạm (Hard Block Gate)**: Mọi hạng mục còn mang tiền tố `TMP-HW-` sẽ bị hệ thống **khóa chặt không cho phát hành PO mua sắm** và bị Hội đồng Thẩm định Chi phí (ngày 01-05) **từ chối thẩm định ngay lập tức**. Bắt buộc LEC và Kỹ sư phải hoàn tất đăng ký QCode ERP chính thức trước khi đưa vào danh mục mua.
+
+### 5.3. Bước 3: Khai Báo Số Lượng Xin Mua & Bối Cảnh Vận Hành
+- Nhập `Request Quantity` (Số lượng xin mua hợp lệ theo ĐVT).
+- Chọn `Usage Category` (Lý do sử dụng): `[Setup, Continuous Improvement (CIP), Equipment Breakdown, Preventive Maintenance (PM), Safety Stock Reserve]`.
+- Phân tích `Technical Logic & Root Cause`: Ghi rõ cơ chế mài mòn, nứt vỡ nhiệt, cháy hỏng cuộn cảm, biến dạng cơ học.
+- Khai báo `Machine Operational Status & Impact`:
+  * Máy dừng hẳn (`Line Stop`): Bắt buộc định lượng sản lượng thiếu hụt trong ca (vd: $-150\text{ sp/ca}$).
+  * Hoạt động bất thường: Giảm tốc độ, chạy chập chờn.
+- Bật `Urgent Priority Flag` (Cờ khẩn cấp): Nếu máy dừng line hoặc có nguy cơ an toàn $\rightarrow$ Kích hoạt SLA xử lý khẩn cấp 24-48h.
 
 ---
 
-## 6. CƠ CHẾ INTERLOCK 4 BƯỚC, TỒN KHO LIÊN PHÁP NHÂN & CẢNH BÁO MƯỢN HÀNG
+## 6. CƠ CHẾ INTERLOCK 4 CHIỀU, ĐỐI THOẠI TRỰC TIẾP LEC & REQUESTOR
 
-Mỗi yêu cầu mua sắm được tạo ra phải trải qua phễu quét Interlock 4 bước tự động:
+Mỗi yêu cầu mua sắm sau khi tạo lập phải trải qua **Bộ máy quét Interlock tự động 4 chiều (<50ms execution)**:
 
 ```mermaid
 flowchart TD
-    Start["Yêu cầu mua sắm được tạo"] --> Step1{"Bước 1: Trùng lặp (Duplicate Check)\nCó PRV/PO tương tự đang mở không?"}
-    Step1 -- Có --> HaltDup["Cảnh báo trùng lặp - Khóa lại xem xét"]
-    Step1 -- Không --> Step2{"Bước 2: Cờ tồn kho chậm luân chuyển\n(agingInterlockFlag == 'Y')?"}
+    Start["Yêu cầu mua sắm được tạo (DRAFT)"] --> Scan4["Bộ Máy Quét Tự Động 4 Chiều Interlock (<50ms)"]
     
-    Step2 -- Có --> AlertBorrow["BẬT CẢNH BÁO MƯỢN TỒN KHO LIÊN TEAM\nTạo tác vụ bắt buộc kỹ sư giải trình/mượn hàng\nKhóa mua mới cục bộ"]
-    AlertBorrow --> ResolveStock{"Giải quyết tồn kho?"}
-    ResolveStock -- Mượn được --> CloseStock["Đồng bộ EMS -> Flag='N' -> Tác vụ tự động đóng"]
-    ResolveStock -- Không thể mượn --> UnlockInterlock["LEC mở khóa Interlock -> Chuyển giao Liên pháp nhân hoặc Mua thường"]
+    Scan4 --> D1["1. Đơn Giá Hợp Đồng:\n• UP001: Đã có giá hợp đồng -> Sẵn sàng mua\n• UP004: Chưa có giá -> Chuyển RFQ_WAITING"]
+    Scan4 --> D2["2. Tồn Kho Lâu (Aging Stock):\n• Cảnh báo nếu có hàng tồn kho >30, 60, 90 ngày chưa xuất dùng"]
+    Scan4 --> D3["3. Tồn Kho Pháp Nhân Khác:\n• Quét tồn kho nhàn rỗi tại Entity B, Plant 2, Kho trung tâm\n• Khóa mua mới cục bộ, yêu cầu điều chuyển kho"]
+    Scan4 --> D4["4. Chênh Lệch Giá Pháp Nhân:\n• So sánh đơn giá đề xuất với benchmark mua của các nhà máy bạn\n• Cảnh báo nếu giá cao hơn để đàm phán lại"]
     
-    Step2 -- Không --> Step3{"Bước 3: Đơn giá hợp đồng\n(unitPriceFlag == 'Y')?"}
-    Step3 -- 'Y' (Có giá) --> AutoPrice["Gán đơn giá hợp đồng UP001\nChuyển sang trạng thái PURCHASABLE"]
-    Step3 -- 'N' (Chưa có giá) --> RequestRFQ["Đánh dấu UP004 - Cần lấy báo giá RFQ\nTheo dõi báo giá qua Email"]
+    D1 --> CollabChat["BƯỚC 5: Kênh Đối Thoại Trực Tiếp Giữa LEC & Requestor"]
+    D2 --> CollabChat
+    D3 --> CollabChat
+    D4 --> CollabChat
     
-    UnlockInterlock --> Step3
-    AutoPrice --> Step4{"Bước 4: Kiểm tra vòng đời\n(Linh kiện còn sản xuất không)?"}
-    RequestRFQ --> Step4
-    Step4 -- Ngừng SX --> MarkEOL["LEC gán cờ EOL - Báo kỹ sư tìm mã thay thế"]
-    Step4 -- Hoạt động --> BatchQueue["Đưa vào Hàng đợi Gom Mẻ của LEC"]
+    CollabChat --> LECAction["LEC thẩm tra tính xác thực dừng máy, chất vấn tồn kho lâu & chênh lệch giá\nRequestor nộp ảnh hiện trường vi mạch nứt vỡ, biên bản sự cố máy dừng"]
+    LECAction --> LECEval{"LEC Đánh Giá Kỹ Thuật Đạt?"}
+    
+    LECEval -- "Không đạt" --> RejectReq["Trả về yêu cầu Requestor bổ sung hoặc hủy"]
+    LECEval -- "Đạt chuẩn" --> BatchEM["Gom mẻ tháng (LEC_QUALIFIED)\nGán mã EM No 14 ký tự (HWBMTL21EC0101)"]
+    BatchEM --> TagTargetOver["Đánh dấu thủ công: TARGET (chuẩn EBOM) HOẶC\nOVER (gán 1 trong 6 mã OVR-01..06 & Work Order)"]
 ```
 
 ---
@@ -230,29 +247,72 @@ Ngân sách vật tư SG (Spare Goods Budget) được LEC nhập thủ công đ
 
 ---
 
-## 8. KIỂM THẢO ĐẦU THÁNG (NGÀY 01-05), CẦU NỐI GIẢI TRÌNH 3 BÊN & XUẤT BÁO CÁO EXCEL 4 SHEET
+## 8. KIỂM THẢO ĐẦU THÁNG (NGÀY 01-05), CẦU NỐI GIẢI TRÌNH 3 BÊN, CHỨNG CHỈ COST CLEARANCE & CƠ CHẾ MUA THÁC NƯỚC 3 TẦNG
 
 ### 8.1. Quy trình Cầu nối Giải trình 3 Bên (3-Party Bridge)
+Reviewer (Cost Management Team - 1 chuyên viên duy nhất kiêm nhiệm Reviewer & Assistant) không làm việc trực tiếp với hàng trăm kỹ sư hiện trường, mà thông qua **Cầu nối Trung gian Độc quyền LEC**:
 ```
-[1. Người Thẩm định Chi phí]
+[1. Người Thẩm định Chi phí (Reviewer)]
     │  Xem xét hồ sơ đầu tháng (ngày 01-05), phát hiện linh kiện giá cao hoặc Over bất thường
     │  Tạo câu hỏi thắc mắc trên hệ thống (Status: PENDING_LEC)
     ▼
-[2. Điều phối Thiết bị LEC]
+[2. Điều phối Thiết bị LEC (Trung gian Điều phối)]
     │  Tiếp nhận câu hỏi, bổ sung ghi chú hướng dẫn kỹ thuật
     │  Chuyển tiếp tác vụ giải trình cho Kỹ sư liên quan (Status: PENDING_ENGINEER)
     ▼
-[3. Kỹ sư Hiện trường]
+[3. Kỹ sư Hiện trường (Requestor)]
     │  Nhận thông báo trong Hộp thư Tác vụ
-    │  Nhập nội dung giải trình lý do kỹ thuật, đính kèm biên bản/hình ảnh
+    │  Nhập nội dung giải trình lý do kỹ thuật, đính kèm biên bản sự cố / hình ảnh hỏng hóc hiện trường
     │  Gửi phản hồi cho LEC (Status: ENGINEER_REPLIED)
     ▼
-[4. LEC Tổng hợp & Đệ trình]
-    │  Kiểm tra nội dung giải trình của kỹ sư, xác nhận tính hợp lý
-    │  Chuyển giao bằng chứng cho Người Thẩm định (Status: RESOLVED)
+[4. LEC Tổng hợp & Đệ trình Bằng chứng]
+    │  Kiểm tra tính hợp lý kỹ thuật, tổng hợp số liệu
+    │  Đệ trình hồ sơ giải trình chuẩn mực cho Người Thẩm định (Status: RESOLVED)
 ```
 
-### 8.2. Cấu trúc Chuẩn hóa File Báo cáo Excel 4 Sheet (Ngày 25 Hàng Tháng)
+### 8.2. Phiên Thẩm định Đầu Tháng (Ngày 01-05) & Chốt Chặn Cứng Mã Tạm (TMP Hard Block)
+- **Thời gian diễn ra**: Cố định từ ngày 01 đến ngày 05 hàng tháng.
+- **Chốt chặn cứng đối với mã tạm (`TMP-HW-xxxx`)**:
+  * Hội đồng Thẩm định kiên quyết **loại bỏ 100% các yêu cầu mua sắm còn mang mã tạm `TMP-`**.
+  * Bắt buộc Kỹ sư và LEC phải hoàn tất chuyển đổi sang mã QCode ERP chính thức trước ngày 01.
+- **Cấp Chứng chỉ Thẩm duyệt Chi phí (`Cost Clearance Certificate`)**:
+  * Sau khi rà soát toàn bộ danh mục, đối soát ngân sách SG và thông qua các giải trình, Reviewer ký cấp chứng chỉ điện tử: `CC-HW-YYYYMM-PASS`.
+  * Danh mục đạt chứng chỉ sẽ được **Khóa cứng (Final Purchase List Lock)** để chuyển sang công đoạn Mua hàng.
+  * **Chính sách Không Cộng Dồn (Strict No-Rollover)**: Bất kỳ số dư ngân sách nào còn thừa của tháng cũ sẽ tự động hết hạn (`surplus = $0`), không bảo lưu sang tháng tiếp theo.
+
+### 8.3. Cơ Chế Thác Nước 3 Tầng Xử Lý Hạng Mục Interlock & Mua Hàng (3-Tier Waterfall Purchase Execution)
+Tại Bước 9, đối với các hạng mục đã được duyệt mua và vượt qua kiểm thảo, hệ thống triển khai cơ chế thác nước 3 tầng nghiêm ngặt nhằm tối ưu hóa chi phí tập đoàn trước khi tiến hành mua mới ra ngoài thị trường:
+
+```mermaid
+flowchart TD
+    Step8Pass["Chốt Danh Mục Mua & Cấp Cost Clearance\n(CC-HW-YYYYMM-PASS)"] --> Tier1{"TIER 1: Điều Chuyển Kho Nội Bộ / Liên Pháp Nhân\n(WH Transfer Slip: WH-TR-xxxx)"}
+    
+    Tier1 -- "Phê Duyệt (Approve)" --> T1_Done["✅ Điều Chuyển Kho Hoàn Tất\n(Xuất kho từ Entity B / Plant 2 sang Kho Factory HW)"]
+    Tier1 -- "Từ Chối (Reject)" --> Tier2{"TIER 2: Đơn Đặt Hàng Nội Bộ\n(Internal Purchase Order: IPO-xxxx)"}
+    
+    Tier2 -- "Phê Duyệt (Approve)" --> T2_Done["✅ Hoàn Tất Mua Nội Bộ Đơn Giá Thấp\n(Mua qua hợp đồng khung của đơn vị bạn)"]
+    Tier2 -- "Từ Chối (Reject)" --> Tier3["TIER 3: Mua Ngoài Độc Quyền (External Procurement)\n(Mua thường qua Nexacro EMS Core)"]
+    
+    Tier3 --> EMS_PO["Ký Duyệt 100% Trên Nexacro EMS Core ERP\nPhát hành mã PO chính thức (PO-99xxx)"]
+    EMS_PO --> InboundTrack["Theo Dõi Tiến Độ Giao Hàng & ETA Thực Tế"]
+    InboundTrack --> WarehouseIn["Nhập Kho Factory HW & Tự Động Đồng Bộ ds_Inv"]
+```
+
+1. **Tier 1 — Inventory Transfer (Điều chuyển Kho)**:
+   - Hệ thống ưu tiên phát hành phiếu điều chuyển kho nội bộ (`WH-TR-xxxx`) để tận dụng tồn kho nhàn rỗi tại Entity B, Plant 2 hoặc Kho Trung tâm.
+   - Nếu thủ kho/pháp nhân xuất kho đồng thuận phê duyệt (`Approve`) $\rightarrow$ Quy trình kết thúc thành công với chi phí mua mới bằng 0.
+   - Nếu bị từ chối (`Reject`) $\rightarrow$ Tự động chuyển xuống Tier 2.
+2. **Tier 2 — Internal Purchase Order (Internal PO)**:
+   - Nếu đơn vị bạn có hợp đồng mua sắm khung với nhà cung cấp có mức giá ưu đãi hơn hẳn hoặc quyền hạn mua độc quyền $\rightarrow$ Phát hành đơn mua hàng nội bộ (`IPO-xxxx`).
+   - Nếu được phê duyệt (`Approve`) $\rightarrow$ Thực hiện mua nội bộ, tiết kiệm chênh lệch giá.
+   - Nếu bị từ chối (`Reject`) $\rightarrow$ Tự động chuyển xuống Tier 3.
+3. **Tier 3 — External Procurement via Nexacro EMS Core (Mua Ngoài Độc Quyền)**:
+   - Áp dụng khi cả Tier 1 và Tier 2 đều bị từ chối hoặc không khả thi.
+   - Chọn nhà cung cấp có đơn giá hợp đồng cạnh tranh nhất.
+   - **Ký duyệt hồ sơ 100% trên Nexacro EMS Core ERP** (tuân thủ Golden Rule 1).
+   - Hệ thống ghi nhận mã PO chính thức (`PO-99xxx`), theo dõi giao nhận Inbound, cập nhật mốc ETA hàng về xưởng và đồng bộ chỉ số xuất kho qua bảng dữ liệu `ds_Inv`.
+
+### 8.4. Cấu trúc Chuẩn hóa File Báo cáo Excel 4 Sheet (Ngày 25 Hàng Tháng)
 Hệ thống kết xuất duy nhất 1 tệp Excel chuẩn mực phục vụ họp ban giám đốc:
 - **Sheet 1: `KPI_Summary`**: Bảng điều khiển tài chính tổng thể (Hạn mức SG, Tỷ lệ PO chi, Chi phí xuất kho EMS, Tỷ lệ giải trình tồn kho hoàn thành).
 - **Sheet 2: `Target_Requisitions`**: Danh sách toàn bộ các hạng mục mua sắm Trong Kế hoạch (`TARGET`) với mã QCode, đơn giá, mã máy thân thiện và mã EM 14 ký tự.
@@ -261,51 +321,49 @@ Hệ thống kết xuất duy nhất 1 tệp Excel chuẩn mực phục vụ h�
 
 ---
 
-## 9. ĐẶC TẢ CHI TIẾT 6 GIAO DIỆN CHỨC NĂNG
+## 9. ĐẶC TẢ CHI TIẾT 10 MÀN HÌNH CHỨC NĂNG HỆ THỐNG (V2/2026 STANDARDIZED)
 
-### 9.1. Giao diện 00: Dashboard Phân tích Tổng quan (`UI-COMMON-00`)
-- **Phễu Tiến độ 7 Giai đoạn**: Tải Folder QCode $\rightarrow$ Phân tích Interlock $\rightarrow$ Chờ Báo giá RFQ $\rightarrow$ Phê duyệt EMS $\rightarrow$ Theo dõi Inbound/ETA $\rightarrow$ Hàng về Kho HW $\rightarrow$ Xuất kho vào Dây chuyền.
-- **Đối soát Ngân sách SG 3 Trục**: Đối chiếu trực quan giữa Hạn mức Ngân sách tháng (\$150k), Thực chi PO cam kết (\$148.2k), và Chi phí xuất kho thực tế từ EMS (\$118.45k).
-- **Phân bổ 6 Mã Over**: Biểu đồ phân tích nguyên nhân phát sinh Over kèm danh sách chi tiết các hạng mục gây Over.
+Hệ thống giao diện được chuẩn hóa thành 10 tài liệu đặc tả màn hình độc lập tại thư mục [`05-ui-ux-screen-specifications/`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/):
 
-### 9.2. Giao diện 01: Cổng Kỹ sư Hiện trường (`UI-ROLE-01`)
-- **Tab 1: Đăng ký Mua sắm Thân thiện**: Bộ chọn Tên Máy, Chuyền, Cụm cơ cấu; tự động sinh mã EM 14 ký tự; kiểm tra tức thời tồn kho và đơn giá. Banner màu hổ phách cảnh báo tồn kho liên team.
-- **Tab 2: Tải Folder Chuẩn bị Dữ liệu QCode**: Kéo thả thư mục bản vẽ/catalog, hiển thị cây tệp, bảng trích xuất thông số, tạo mã tạm `TMP-HW-xxxx` gửi cho LEC.
-- **Tab 3: Hộp thư Tác vụ Bắt buộc**: Quản lý các nhiệm vụ giải trình tồn kho lâu ngày, cảnh báo mượn hàng liên team, và tác vụ khai báo muộn EBOM.
-- **Tab 4: Cầu nối Trao đổi 2 Chiều với LEC**: Khung hội thoại giải trình trực tiếp với LEC theo từng mã yêu cầu.
+### 9.1. Màn hình 00: Tổng Quan Kiến Trúc Hệ Thống Màn Hình (`UI-ARCH-00`)
+- **Tài liệu**: [`00-tong-quan-kien-truc-he-thong-man-hinh.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/00-tong-quan-kien-truc-he-thong-man-hinh.md)
+- **Nội dung**: Ma trận phân quyền 5 vai trò (Requestor, Leader, LEC, Reviewer, Admin), cấu trúc Layout Shell tiêu chuẩn, chuẩn thiết kế Design Tokens, quy tắc trạng thái và phím tắt điều hướng nhanh.
 
-### 9.3. Giao diện 02: Dashboard Giám sát Trưởng nhóm / Part (`UI-ROLE-02`)
-- **Giám sát Phân cấp Team $\rightarrow$ Part $\rightarrow$ Kỹ sư**: Theo dõi tiến độ đăng ký của từng kỹ sư trong Part mà không phân biệt công đoạn sản xuất.
-- **Theo dõi Tác vụ Giải trình Tồn kho**: Kiểm soát tỷ lệ hoàn thành giải trình tồn kho của các kỹ sư trước hạn chót của LEC.
-- **Tuyệt đối Không có Nút Phê duyệt**: Bảng giám sát thuần túy phục vụ đối soát kỹ thuật nội bộ; thông báo nhắc nhở phê duyệt chính thức diễn ra trên EMS.
+### 9.2. Màn hình 01: Đăng Ký Hạng Mục Mua Hàng (`UI-ROLE-01-REQ`)
+- **Tài liệu**: [`01-man-hinh-dang-ky-hang-muc-mua-hang.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/01-man-hinh-dang-ky-hang-muc-mua-hang.md)
+- **Nội dung**: Form đăng ký cho Kỹ sư hiện trường với cấu trúc máy 4 tầng (`Line > Machine > Unit > Assembly`), quy tắc nhận diện tầng `Left(Line, 1)`, Omni-Search QCode, cảnh báo tức thời tồn kho liên team và cờ khẩn cấp dừng máy.
 
-### 9.4. Giao diện 03: Bàn làm việc LEC Master Workbench (`UI-ROLE-03`)
-- **Hỗ trợ Đa LEC**: Chuyển đổi linh hoạt hồ sơ LEC đang trực ban (Phạm Đức Long - 658359 hoặc đồng nghiệp).
-- **Gom Mẻ & Xử lý Đồng loạt**: Gom nhóm các hạng mục có cùng trạng thái (`PURCHASABLE`, `INTERLOCK_CHECK`, `CROSS_TEAM_STOCK`, `EOL`) để mở khóa hoặc gửi sang EMS hàng loạt.
-- **Đánh giá Thủ công Target / Over**: Bảng điều khiển phân loại trực tiếp từng mã kèm gắn mã `OVR-01..06` và mã Work Order.
-- **Quản lý Mốc Inbound & Phân bổ Chi phí**: Nhập ngày Vendor Confirm, ngày ETA hàng về, và ma trận phân bổ ngân sách 3 tháng tới.
-- **Cầu nối Thẩm định 3 Bên**: Tiếp nhận câu hỏi từ Cost Management, chuyển cho kỹ sư, và phản hồi lại kết quả.
-- **Cấu hình Deadline & Ngân sách**: Thiết lập hạn chót giải trình, hạn chót chốt sổ kiểm thảo, và hạn mức ngân sách SG tháng (Strict No-Rollover).
+### 9.3. Màn hình 02: Onboarding QCode & Tải Thư Mục Bản Vẽ (`UI-ROLE-01-QCODE`)
+- **Tài liệu**: [`02-man-hinh-onboarding-qcode-va-tai-folder.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/02-man-hinh-onboarding-qcode-va-tai-folder.md)
+- **Nội dung**: Khu vực kéo-thả trọn bộ thư mục hồ sơ linh kiện mới (CAD 2D/3D, Catalog PDF, Specsheet), cấp mã tạm `TMP-HW-xxxx` với chốt chặn cứng chi phí `costBlocked = true`, bàn giao gói hồ sơ cho LEC đăng ký ERP.
 
-### 9.5. Giao diện 04: Cổng Thẩm định Quản lý Chi phí (`UI-ROLE-06`)
-- **Dành riêng cho 1 Chuyên viên (Reviewer & Assistant)**: Hợp nhất vai trò thẩm tra chi phí và kiểm soát hồ sơ kiểm thảo.
-- **Phiên Thẩm định Đầu Tháng (Ngày 01-05)**: Lọc danh sách các hạng mục đủ điều kiện thẩm định (bắt buộc có QCode chính thức, không duyệt mã tạm `TMP-`).
-- **Phát hành Phiếu Yêu cầu Giải trình**: Tạo câu hỏi thắc mắc trực tiếp gửi cho LEC đối với các hạng mục Over hoặc giá cao.
-- **Kết xuất File Báo cáo Excel 4 Sheet**: Xem trước trực quan và tải xuống tệp Excel chuẩn hóa 4 Sheet phục vụ họp lãnh đạo.
-- **Cấp Chứng chỉ Thẩm duyệt Chi phí (Cost Clearance)**: Ký xác nhận thông qua danh mục sau khi giải trình thành công.
+### 9.4. Màn hình 03: Hộp Thư Tác Vụ & Giải Trình Tồn Kho (`UI-ROLE-01-TASK`)
+- **Tài liệu**: [`03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md)
+- **Nội dung**: Quản lý các tác vụ bắt buộc không thể tự đóng (mượn hàng liên team), tác vụ giải trình tồn kho lâu ngày trước deadline của LEC, và hàng đợi khai báo muộn linh kiện vào EBOM trong 7 ngày.
 
-### 9.6. Giao diện 05: Khám phá Cây EBOM Thiết bị Kéo - Thả (`UI-ROLE-07`)
-- **Cây Thiết bị Trực quan**: Hiển thị phân cấp Nhà máy $\rightarrow$ Chuyền $\rightarrow$ Máy $\rightarrow$ Cụm Cơ cấu $\rightarrow$ Slot linh kiện.
-- **Kéo - Thả Gán Linh Kiện**: Thao tác kéo mã QCode thả vào Slot cơ cấu để thiết lập định mức tiêu chuẩn và chu kỳ thay thế.
-- **Hàng đợi Khai báo Muộn**: Danh sách các linh kiện đã mua phát sinh khẩn cấp cần kỹ sư hoàn thiện gán Slot trong vòng 7 ngày.
+### 9.5. Màn hình 04: EBOM Kéo-Thả Cơ Cấu Thiết Bị (`UI-ROLE-04-EBOM`)
+- **Tài liệu**: [`04-man-hinh-ebom-keo-tha-co-cau.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/04-man-hinh-ebom-keo-tha-co-cau.md)
+- **Nội dung**: Cây thiết bị trực quan 4 tầng song song với bảng linh kiện đã đăng ký. Hỗ trợ thao tác kéo-thả gán slot phụ tùng, thiết lập số lượng định mức tiêu chuẩn và sao chép cấu trúc qua Master Machine Template.
 
-### 9.7. Giao diện 06: Cài đặt Hệ thống Quản trị (`UI-ROLE-05`)
-- **Tab 1: Cấu trúc Nhà máy & Tầng**: Định nghĩa quy tắc `Left(Line, 1) = Tầng (Floor)` cho Factory HW, TV, Auto Display.
-- **Tab 2: Cây Tổ chức Multi-Team**: Cấu hình các Team và Part với các kỹ sư đồng nghiệp ngang hàng (triệt tiêu phân cấp công đoạn).
-- **Tab 3: Công thức Tính Nhu cầu 5 Loại**: Công thức định mức Setup, Cải tiến (Improve), Sự cố (Breakdown), Bảo dưỡng (PM), và Dự phòng an toàn (Safety Stock).
-- **Tab 4: Chính sách Ngân sách & Deadline**: Khóa chính sách Không cộng dồn (No-Rollover) và thời gian đóng băng dữ liệu.
-- **Tab 5: Cổng Tích hợp Nexacro EMS**: Quản trị giới hạn tần suất Token Bucket (5 req/s), giám sát độ trễ API và trạng thái kết nối.
-- **Tab 6: Danh mục Mã Chuẩn**: Quản lý 6 mã Over `OVR-01..06`, các loại nhu cầu và đơn vị đo lường.
+### 9.6. Màn hình 05: Điều Phối LEC Master Workbench (`UI-ROLE-03-LEC`)
+- **Tài liệu**: [`05-man-hinh-dieu-phoi-lec-master-workbench.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/05-man-hinh-dieu-phoi-lec-master-workbench.md)
+- **Nội dung**: Bàn làm việc trung tâm cho Điều phối thiết bị: Gom mẻ xử lý hàng loạt theo trạng thái, trực tiếp đánh giá thủ công `TARGET` vs. `OVER` (gán mã `OVR-01..06` & Work Order), quản lý mốc Vendor Confirm / ETA, điều phối cầu nối 3 bên và cài đặt hạn chót/ngân sách.
+
+### 9.7. Màn hình 06: Giám Sát Leader và Work Order (`UI-ROLE-02-LEAD`)
+- **Tài liệu**: [`06-man-hinh-giam-sat-leader-va-work-order.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/06-man-hinh-giam-sat-leader-va-work-order.md)
+- **Nội dung**: Bảng giám sát tiến độ mua sắm theo Team và Part, theo dõi tỷ lệ hoàn thành giải trình tồn kho của các kỹ sư đồng nghiệp. Tuyệt đối không chứa nút phê duyệt hệ thống (phê duyệt trên EMS).
+
+### 9.8. Màn hình 07: Thẩm Định Chi Phí Đầu Tháng (`UI-ROLE-06-AUDIT`)
+- **Tài liệu**: [`07-man-hinh-tham-dinh-chi-phi-dau-thang.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/07-man-hinh-tham-dinh-chi-phi-dau-thang.md)
+- **Nội dung**: Không gian làm việc cho 1 Chuyên viên Thẩm định (Reviewer & Assistant) từ ngày 01 đến 05 hàng tháng: Lọc danh sách đủ điều kiện (chặn cứng `TMP-`), phát hành phiếu chất vấn gửi LEC, xuất file Excel 4 sheet chuẩn mực và cấp chứng chỉ `CC-HW-YYYYMM-PASS`.
+
+### 9.9. Màn hình 08: Dashboard Tổng Quan Toàn Xưởng (`UI-COMMON-08-DASH`)
+- **Tài liệu**: [`08-man-hinh-dashboard-tong-quan-toan-xuan.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/08-man-hinh-dashboard-tong-quan-toan-xuan.md)
+- **Nội dung**: Bảng điều khiển phân tích tổng quan xưởng HW: Phễu tiến độ mua sắm 7 chặng, biểu đồ đối soát 3 trục ngân sách SG (Budget - PO Commit - Issue Expense), phân bổ 6 mã Over và danh sách cảnh báo tồn kho liên team.
+
+### 9.10. Màn hình 09: Cài Đặt Hệ Thống & Gateway EMS (`UI-ADMIN-09-SYS`)
+- **Tài liệu**: [`09-man-hinh-cai-dat-he-thong-va-gateway-ems.md`](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications/09-man-hinh-cai-dat-he-thong-va-gateway-ems.md)
+- **Nội dung**: Cấu hình quy tắc nhà máy & tầng `Left(Line, 1) = Floor`, cây tổ chức kỹ sư đồng nghiệp, công thức định mức 5 loại nhu cầu, chính sách khóa ngân sách No-Rollover, quản trị bộ đệm Token Bucket (5 req/s) và danh mục mã chuẩn.
 
 ---
 
@@ -313,9 +371,9 @@ Hệ thống kết xuất duy nhất 1 tệp Excel chuẩn mực phục vụ h�
 
 ### 10.1. Chiến lược 2 Giai đoạn (2-Phase Integration Strategy)
 1. **Giai đoạn 1 (Hiện tại - Vận hành Song song)**:
-   - Hệ thống chuẩn bị dữ liệu kỹ thuật, gom mẻ, giải trình tồn kho và đối soát mốc giao hàng.
-   - Kỹ sư/LEC thao tác tạo PRV/PO trên Nexacro EMS bên ngoài.
-   - LEC nhập mã PRV No / PO No lên hệ thống để theo dõi.
+   - Hệ thống chuẩn bị dữ liệu kỹ thuật, gom mẻ, giải trình tồn kho, thẩm định chi phí và đối soát mốc giao hàng.
+   - Kỹ sư/LEC thao tác tạo PRV/PO trên Nexacro EMS bên ngoài sau khi hồ sơ đạt chứng chỉ Cost Clearance.
+   - LEC nhập mã PRV No / PO No lên hệ thống để gắn kết và theo dõi.
    - Hệ thống quét API từ EMS để đồng bộ trạng thái `ds_Inv` (tồn kho, xuất kho) và trạng thái đơn giá `unitPriceFlag`.
 2. **Giai đoạn 2 (Tương lai - Tự động hóa Toàn diện)**:
    - Tích hợp cổng REST/SOAP trực tiếp với Nexacro X-Platform Gateway.

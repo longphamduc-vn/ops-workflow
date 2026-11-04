@@ -18,20 +18,21 @@ The Interlock resolution process is standardized around actual shop-floor operat
 3. **Nature of `unitPriceFlag` — Pricing Availability**:
    - `unitPriceFlag == 'Y'`: A valid contract unit price negotiated by the Purchase Department is already active (`unitPriceStatusCode == 'UP001'`).
    - `unitPriceFlag == 'N'`: No price is available (`UP004: None Price`), pending RFQ negotiations between the Purchase Department and vendors. The LEC tracks quotation progress.
-4. **Two Branches of Inter-Entity Transactions**:
-   - When cross-checks indicate that another corporate entity within the group (LGD Korea, Nanjing, Guangzhou, etc.) can fulfill the need:
-     - **Branch 1: Inventory Transfer**: Transfer idle spare parts from the peer entity to the HW factory.
-     - **Branch 2: Lowest-Cost Purchase via Peer Entity**: If the peer entity holds a framework contract with lower unit pricing than Vietnam $\rightarrow$ issue an entrusted purchase order via that entity.
-   - If the purchasing route via the peer entity is also blocked: transition status to `Awaiting Peer Entity Confirmation` (48-hour SLA).
+4. **3-Tier Waterfall Interlock Resolution Mechanism**:
+   - When interlock checks detect idle stock across other group entities or benchmark price disparities:
+     - **Tier 1: Inventory Transfer (`WH-TR-xxxx`)**: Request transfer of idle inventory from peer entities (Korea, Nanjing, Guangzhou, Plant 2) or Central Hub. If approved, order completes at zero procurement cost; if rejected, drops to Tier 2.
+     - **Tier 2: Internal Purchase Order (`IPO-xxxx`)**: Purchase through peer entity holding lower contract prices or master framework agreements. If approved, order executes internally; if rejected, drops to Tier 3.
+     - **Tier 3: External Procurement (`PO-99xxx`)**: Direct external purchase order issued strictly on Nexacro EMS Core at best negotiated vendor price.
 5. **Reclassification of Discontinued / End-of-Life (EOL) Items**:
    - When legacy EMS data still displays `ACTIVE` but the manufacturer has actually discontinued production or the lead time is excessively long (>6 months), the LEC possesses the technical authority to **manually reclassify the item into the `Discontinued (EOL)` category**, assign alternative replacement part codes, or guide the engineer on mechanical structural retrofit, while the system automatically dispatches notifications to the engineer.
 6. **Authority to Classify In-Target vs. Unplanned Over-Budget**:
    - The engineer provides machine status and breakdown causes (e.g., breakdown work order, throughput spike).
-   - **The LEC serves as the sole official authority to manually tag items as `🟢 IN TARGET` or `🔴 UNPLANNED OVER`** based on comparison against the actual monthly budget allocation. Strictly NO auto-classification by the system.
-7. **Beginning-of-Month Cost Audit & Aging Review with Cost Management**:
-   - Items eligible for procurement (`PURCHASABLE`, strictly requiring an official QCode) are consolidated into the **Beginning-of-Month Audit session** (Days 01–05) with the Reviewer (Cost Management — 1 single person acting as Reviewer & Assistant).
+   - **The LEC serves as the sole official authority to manually tag items as `🟢 IN TARGET` or `🔴 UNPLANNED OVER`** (gated with one of 6 mandatory codes `OVR-01..06` and Work Order binding `WO-xxxx`) + 14-char EM No (`HWBMTL21EC0101`). Strictly NO auto-classification by the system.
+7. **Beginning-of-Month Cost Audit (Days 01–05) & 3-Party Clarification Bridge**:
+   - Items eligible for procurement (`PURCHASABLE`, strictly requiring an official QCode; temporary `TMP-HW-` codes hard-blocked) are consolidated into the **Beginning-of-Month Audit session** (Days 01–05) with the Reviewer (Cost Management — 1 single person acting as Reviewer & Assistant).
    - If the Reviewer requires further clarification $\rightarrow$ Reviewer notifies LEC $\rightarrow$ **LEC enters inquiry into the system for the Requestor Engineer** $\rightarrow$ **Engineer responds to LEC** $\rightarrow$ **LEC submits consolidated clarification back to Reviewer** (3-party clarification loop).
-   - After the Reviewer confirms cost clearance, **formal approval takes place exclusively on EMS** (the new system contains no approval buttons; it strictly tracks milestones and progress).
+   - Upon successful review, Reviewer issues Cost Clearance certificate `CC-HW-YYYYMM-PASS`. All approved lines are locked with strict No-Rollover (surplus = $0).
+   - **Formal PO approval and issuance take place 100% on Nexacro EMS Core** (the new system contains no approval buttons; it strictly tracks milestones and progress).
 
 ---
 
@@ -73,13 +74,20 @@ flowchart TD
     CheckRepair -->|"No ('N')"| UnlockInterlock
     UnlockInterlock --> ClearStep
     
-    ClearStep --> LEC_TargetEval["LEC Manually Tags: 🟢 IN TARGET vs 🔴 UNPLANNED OVER\n(Based on engineer justification & monthly budget balance)"]
-    LEC_TargetEval --> ConsolidateAudit["CONSOLIDATE ALL PURCHASABLE CODES\nSUBMIT TO BEGINNING-OF-MONTH AUDIT (Days 01-05)"]
+    ClearStep --> LEC_TargetEval["LEC Manually Tags: 🟢 IN TARGET vs 🔴 OVER (OVR-01..06 & WO)\n+ Assigns EM No 14 chars (HWBMTL21EC0101)"]
+    LEC_TargetEval --> ConsolidateAudit["CONSOLIDATE PURCHASABLE CODES (HARD BLOCK ON TMP-)\nSUBMIT TO BEGINNING-OF-MONTH AUDIT (Days 01-05)"]
     
     ConsolidateAudit --> AuditPass{"Cost Management Reviewer Audit"}
     AuditPass -->|"Clarification Needed"| InquiryLoop["3-Party Loop: Reviewer -> LEC -> Requestor Engineer -> LEC -> Reviewer"]
     InquiryLoop --> AuditPass
-    AuditPass -->|"Cost Cleared"| EMS_Approve["SUBMIT FOR FORMAL APPROVAL ON EMS\n(No approval buttons on new system)"]
+    AuditPass -->|"Cost Cleared"| IssueCert["Issue Cost Clearance Certificate CC-HW-YYYYMM-PASS\nLock Final Purchase List (Strict No-Rollover)"]
+    
+    IssueCert --> Waterfall3{"3-Tier Waterfall Interlock Resolution"}
+    Waterfall3 -->|"Tier 1: Approve"| DoneT1["✅ Intra/Inter-Entity WH Transfer Complete (WH-TR-xxxx)"]
+    Waterfall3 -->|"Tier 1: Reject"| Tier2{"Tier 2: Internal PO (IPO-xxxx)"}
+    Tier2 -->|"Tier 2: Approve"| DoneT2["✅ Internal Entrusted PO Complete"]
+    Tier2 -->|"Tier 2: Reject"| Tier3["Tier 3: External Procurement (PO-99xxx)\nSigned 100% on Nexacro EMS Core"]
+    Tier3 --> Inbound["Track Inbound / Real ETA & Sync ds_Inv"]
 ```
 
 ---
@@ -105,3 +113,15 @@ flowchart TD
   - The item lacks contract pricing (`unitPriceStatusCode == 'UP004: None Price'`).
   - The item is routed to the **Quotation Tracking (RFQ Tracking)** queue for the Purchase Department to negotiate commercial terms with vendors.
   - It can still undergo technical necessity review in the Beginning-of-Month Audit, but formal PO generation on EMS remains blocked until Purchase concludes price registration.
+
+---
+
+## 4. 3-Tier Waterfall Interlock Resolution & Purchase Execution Mechanism
+
+Following Cost Clearance approval (`CC-HW-YYYYMM-PASS`) in Step 8, Step 9 executes a 3-tier waterfall resolution:
+
+| Waterfall Tier | Execution Channel & Mechanism | Approval Action | Next Step / Escalation |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: Inventory Transfer** | Intra-Plant or Inter-Entity Transfer Slip (`WH-TR-xxxx`) from peer factory/warehouse | **Approve** $\rightarrow$ Dispatch inventory to HW warehouse; Requisition completed at zero purchase cost | **Reject** $\rightarrow$ Automatically escalates to Tier 2 |
+| **Tier 2: Internal Purchase Order** | Internal PO (`IPO-xxxx`) placed via sister entity with favorable framework contract prices | **Approve** $\rightarrow$ Execute internal entrusted order; Requisition completed with cost savings | **Reject** $\rightarrow$ Automatically escalates to Tier 3 |
+| **Tier 3: External Procurement** | Standard external PO issuance (`PO-99xxx`) via Corporate Procurement | **Executed 100% on Nexacro EMS Core ERP**; System records PO No, monitors Inbound milestones & real ETA | Requisition transitions to `INBOUND_TRACKING` until physical receipt and `ds_Inv` sync |

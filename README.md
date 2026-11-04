@@ -40,29 +40,28 @@ graph TD
 
 ```
 ops-platform/
-├── README.md                      # Platform overview (this file)
-├── AGENTS.md                      # AI agent guide for the monorepo
-├── docker-compose.yml             # Local orchestration for platform services
-├── .github/
-│   └── workflows/
-│       └── ci.yml                 # Automated CI pipelines
+├── README.md                                  # Platform overview (this file)
+├── docker-compose.yml                         # Local orchestration for platform services
+├── procurement-item-registration-flow.puml    # Master 9-step procurement activity diagram (PlantUML)
+├── procurement-item-registration-flow.svg     # Scalable vector graphic of the 9-step workflow
+├── procurement-item-registration-flow.png     # High-resolution raster rendering
+├── procurement-flow-viewer.html               # Real-time interactive web viewer with SVG switcher
+├── scripts/
+│   └── generate_puml.py                       # Python CLI tool for instant PlantUML image rendering
+├── procurement-system/                        # Complete System Architecture & Specifications
+│   ├── MASTER-SYSTEM-SPECIFICATION.md         # Single Source of Truth enterprise architecture
+│   ├── README.md                              # 10 Golden Rules & Documentation Navigation
+│   ├── 01-master-data-and-ebom/               # Organization, EBOM Tree & QCode Preparation
+│   ├── 02-requestor-and-leader-portal/        # Requestor Workbench & Leader Monitoring
+│   ├── 03-lec-workbench-and-interlock/        # LEC Workbench, Quotation & 3-Tier Waterfall Interlock
+│   ├── 04-budget-cost-and-over-management/    # SG Budget, 6 Over Codes & Monthly Offline Audit
+│   ├── 05-ui-ux-screen-specifications/        # V2 Standardized 10 UI/UX Screen Specifications
+│   ├── 06-process-workflows-and-diagrams/     # End-to-end Sequence Diagrams & 9-Step Progress Detail
+│   └── 07-integration-and-api-specs/          # Nexacro EMS Protocol, Token Bucket & REST Contracts
 └── services/
-    ├── ops-workflow/              # [Component 1] Core Workflow & Integration Engine
-    │   ├── Dockerfile
-    │   ├── pyproject.toml
-    │   ├── README.md
-    │   ├── AGENTS.md
-    │   ├── config/
-    │   ├── openapi/
-    │   ├── src/opsflow/
-    │   ├── tests/
-    │   └── workflows/
-    ├── ops-portal/                # [Component 2] Operations Web Portal (Planned)
-    │   └── README.md
-    ├── ops-incident/              # [Component 3] Incident Management (Planned)
-    │   └── README.md
-    └── ops-analytics/             # [Component 4] Analytics & Reporting (Planned)
-        └── README.md
+    ├── ops-workflow/                          # Core Workflow Engine & Legacy Connector
+    ├── ems-simulation/                        # Nexacro EMS Simulation Mock Server
+    └── procurement-web/                       # Procurement Web Frontend UI
 ```
 
 ---

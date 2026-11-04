@@ -1,116 +1,157 @@
 # 01. End-to-End Procurement Progress Workflow
 > *Procurement progress tracking architecture for Factory HW (Smart Watch) spare parts*  
-> *Core Principles: The new system tracks progress ONLY (NO APPROVALS); All financial budget sign-offs occur exclusively on EMS; No Warehouse Portal (issuance synced from EMS); Peer engineers in Part/Team; BEGINNING-OF-MONTH audit with Cost Management (1 single person); 3-party clarification loop; Mandatory official QCode for audit; Manual entry for Vendor Confirm Date / ETA tracking.*
+> *Core Principles: The new system tracks progress ONLY (NO APPROVALS); All financial budget sign-offs occur exclusively on Nexacro EMS Core; No Warehouse Portal (issuance synced from EMS); Peer engineers in Part/Team; BEGINNING-OF-MONTH audit with Cost Management (1 single person); 3-party clarification loop; Mandatory official QCode for audit; 3-Tier waterfall execution (Transfer -> Internal PO -> External PO).*
 
 ---
 
-## 1. Swimlane Sequence Diagram
+## 1. Swimlane Sequence Diagram (9-Step Lifecycle)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor REQ as 1. Field Engineers (Peers)
-    actor LDR as 2. Part / Team Leader
-    actor LEC as 3. Spare Parts LEC (Pham Duc Long)
-    actor PUR as 4. Purchase Specialist
-    actor CST as 5. Cost Management (Single Reviewer)
-    participant SYS as New Progress Tracking System
-    participant EMS as 6. Core LG Display EMS
+    actor REQ as 1. Field Engineer (Requestor)
+    actor LEC as 2. Equipment Coordinator (LEC - Mediator)
+    actor PUR as 3. Procurement Dept (Purchase)
+    actor CST as 4. Cost Management (Single Reviewer)
+    participant SYS as Operational Tracking Platform
+    participant EMS as 5. Core LG Display Nexacro EMS
+    actor SISTER as 6. Sister Entity / Peer Plant Warehouse
 
-    %% Phase 1: Data Preparation & Requisition Creation
-    opt New spare part registration without QCode
-        REQ->>SYS: Drag & drop CAD/Doc/Image folder -> Enter preliminary specs (Temporary code TMP-HW-xxxx)
-        SYS-->>LEC: Forward technical data for LEC to register QCode on ERP/EMS
-        LEC->>EMS: Register official QCode externally on ERP/EMS
-        LEC->>SYS: Update official QCode replacing temporary TMP code
+    %% Step 1: Equipment Hierarchy & Template
+    REQ->>SYS: Step 1: Select 4-tier hierarchy (Line > Machine > Unit > Assembly)
+    Note over REQ,SYS: Left(Line,1)=Floor • Master Machine Template clone
+
+    %% Step 2: Item Registration (Existing vs New TMP)
+    alt Step 2A: Existing Item in Master Catalog
+        REQ->>SYS: Scan/Search QCode via Omni-Search typeahead
+        SYS-->>REQ: Auto-populate Description, Maker, Model, Contract Price UP001, Stock, CAD link
+    else Step 2B: New Item Registration (No QCode)
+        REQ->>SYS: Enter Category & Item Description + Drag-and-drop CAD/Spec folder
+        SYS-->>REQ: Issue temporary code TMP-HW-xxxx (LOCK: costBlocked = true)
+        SYS-->>LEC: Transmit data package for LEC to register official QCode on ERP
     end
 
-    REQ->>SYS: Create purchase request (Friendly machine name, standard QCode, quantity, Work Order)
-    alt Cross-team aging stock detected (agingInterlockFlag == 'Y')
-        SYS-->>REQ: ⚠️ Trigger INSTANT WARNING Banner & Open Mandatory Task to borrow/use existing stock
-        Note over REQ,SYS: Stock borrow task PERSISTS MANDATORILY until EMS re-sync confirms 'N'
+    %% Step 3 & 4: Requisition Context & Automated 4-Dimension Interlock Scan
+    REQ->>SYS: Step 3: Enter Request Qty, Usage Reason (Setup/CIP/Breakdown/PM), Logic & Urgent Flag
+    SYS->>SYS: Step 4: Automated 4-Dimension Interlock Scan (<50ms)
+    Note over SYS: 1. Price UP001/UP004 | 2. Aging Stock >30d | 3. Sister Entity Stock | 4. Price Disparity
+
+    %% Step 5: Collaborative Dialogue (LEC <-> Requestor)
+    SYS-->>LEC: Step 5: Route Requisition & Interlock Dashboard (UI-LEC-01)
+    LEC->>REQ: Open 2-way dialogue: question quantity, downtime severity, aging stock
+    REQ-->>LEC: Provide failure photos, incident report, spec incompatibility justification
+
+    %% Step 6: Technical Evaluation, Batching & Financial Tagging
+    alt Meets technical compliance?
+        LEC->>SYS: Step 6: Qualify request (LEC_QUALIFIED) & Batch for monthly review
+        LEC->>SYS: Assign 14-char EM No (HWBMTL21EC0101)
+        LEC->>SYS: Manual Financial Tagging: [TARGET] vs. [OVER] (Mandatory OVR-01..06 & Work Order)
+    else Non-compliant
+        LEC->>REQ: Reject & return for revision or cancel
     end
 
-    %% Phase 2: Leader Monitoring & LEC Requisition Consolidation
-    SYS-->>LDR: Display internal Part/Team procurement progress (Monitoring only, no approval buttons)
-    SYS-->>LEC: Team-wide consolidation queue & 4-step Interlock scan
-    LEC->>SYS: Set justification deadlines & manually flag [IN TARGET] or [OVER UNPLANNED]
-
-    %% Phase 3: RFQ Coordination with Purchase
-    alt unitPriceFlag == 'N' (No contract price available)
-        LEC->>PUR: Send technical specs requesting RFQ
-        PUR-->>LEC: Negotiate with vendor, return quotation
-        LEC->>SYS: Update preliminary unit price & RFQ progress
+    %% Step 7: Monthly Offline Audit & LEC Mediation (Days 01-05)
+    Note over LEC,CST: BEGINNING OF MONTH (DAYS 01-05): OFFLINE COST AUDIT
+    CST->>SYS: Step 7: Convene Offline Audit (UI-CST-01)
+    alt Item bears temporary code TMP-HW-xxxx?
+        SYS-->>CST: 🛑 HARD-BLOCK GATE TRIGGERED: Audit Rejection!
+        CST-->>LEC: Reject audit until official ERP QCode is assigned
+    else Formal QCode verified
+        opt Reviewer raises cost or OVER inquiries
+            CST->>LEC: Dispatch inquiry ticket via 3-party mediation bridge
+            LEC->>REQ: Coordinate supplemental engineering justification & test logs
+            REQ-->>LEC: Submit evidence
+            LEC-->>CST: Submit synthesized technical defense report
+        end
+        CST->>SYS: Confirm offline audit completion
     end
 
-    %% Phase 4: Beginning-of-Month Audit & 3-Party Clarification Loop
-    Note over LEC,CST: BEGINNING OF MONTH (DAYS 01-05): COST MANAGEMENT AUDIT
-    LEC->>SYS: Close beginning-of-month audit dossier (Consolidate ONLY items with OFFICIAL QCODE)
-    LEC->>CST: Offline cost audit review (Review SG budget No-Rollover & Over list)
-    opt Cost Management Reviewer requires clarification
-        CST->>SYS: Enter clarification request on Audit interface
-        SYS-->>LEC: Notify clarification request from Reviewer
-        LEC->>SYS: Assign & coordinate task to machine-responsible Engineer
-        SYS-->>REQ: Receive clarification query on Tab 4
-        REQ->>SYS: Update technical evidence (photos, incident reports)
-        SYS-->>LEC: Engineer responded
-        LEC->>SYS: Consolidate documentation & Resubmit to Cost Management Reviewer
-        CST->>SYS: Reviewer confirms offline audit completion
+    %% Step 8: Purchase List Clearance & Cost Clearance Certificate
+    CST->>SYS: Step 8: Finalize procurement roster & issue Cost Clearance (CC-HW-YYYYMM-PASS)
+    Note over SYS: Freeze monthly list • Strict No-Rollover Policy (surplus resets to $0)
+
+    %% Step 9: 3-Tier Waterfall Interlock Resolution
+    rect rgb(240, 253, 244)
+        Note over LEC,EMS: STEP 9: 3-TIER WATERFALL INTERLOCK RESOLUTION
+        alt TIER 1: Inter-Entity Transfer (Priority 1)
+            SYS->>SISTER: Request idle inventory transfer
+            alt Sister Entity Approves
+                SISTER-->>SYS: Issue warehouse transfer voucher
+                SYS-->>REQ: Physical parts received at plant (Zero CAPEX) -> COMPLETED
+            else Sister Entity Rejects (Stock reserved)
+                SYS->>SYS: Fall through to Tier 2
+            end
+        end
+        
+        alt TIER 2: Inter-Company Purchase Order (Internal PO - Priority 2)
+            SYS->>SISTER: Issue Internal PO under group framework contract
+            alt Corporate Finance Approves
+                SISTER-->>SYS: Issue internal invoice & freight shipment -> COMPLETED
+            else Corporate Finance Rejects
+                SYS->>SYS: Fall through to Tier 3
+            end
+        end
+
+        alt TIER 3: External Purchase Order via Nexacro EMS Core (Priority 3)
+            PUR->>SYS: Negotiate lowest qualified market quotation
+            SYS->>EMS: Interface requisition data -> Create PRV on EMS Core
+            Note over EMS: Leadership signs electronic approval 100% ON NEXACRO EMS CORE
+            EMS-->>SYS: Synchronize official Purchase Order (PO-99xxx)
+            LEC->>SYS: Track 3 Inbound Milestones: Vendor Confirm Date, Port ETA, Customs Clearance
+            EMS-->>SYS: Warehouse receives goods on EMS
+            REQ->>EMS: Draw parts and install on machine under Work Order (WO-xxxx)
+            EMS-->>SYS: Synchronize warehouse issue log (ds_Inv) -> Cost posted to manufacturing accounting
+        end
     end
-
-    %% Phase 5: Official Approval & PO Issuance on EMS
-    LEC->>EMS: Create PRV No on EMS (Attach audit minutes)
-    Note over EMS: Cost Management (Reviewer - 1 single person) signs off official approval ON EMS
-    LEC->>SYS: Enter PRV No into system to begin progress synchronization
-    EMS-->>SYS: Synchronize issued PO No status
-
-    %% Phase 6: Delivery Tracking & Warehouse Issuance
-    LEC->>SYS: Manually enter tracking milestones: Vendor Confirm delivery date, Factory ETA, Expense allocation plan
-    EMS-->>SYS: Read actual goods receipt data (Goods Receipt completed on EMS)
-    REQ->>EMS: Engineer completes warehouse issuance procedure on EMS to draw parts for machine installation
-    EMS-->>SYS: Automatically synchronize warehouse issuance data (Issue Expense) & Record actual costs
 ```
 
 ---
 
 ## 2. Requisition Lifecycle State Machine
 
-The system tracks progress across 8 transparent states:
+The system tracks progress across transparent operational states:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT_DATA_PREPARATION: Engineer submits CAD/Doc/Image folder (Temporary code TMP-HW-xxxx)
-    DRAFT_DATA_PREPARATION --> QCODE_REGISTERED: LEC registers official QCode on ERP/EMS
+    [*] --> DRAFT_TMP : New part without QCode (costBlocked = true)
+    [*] --> DRAFT_ACTIVE : Existing part with QCode
     
-    QCODE_REGISTERED --> INTERLOCK_SCANNING: Run Interlock scan, evaluate agingInterlock & unitPrice flags
+    DRAFT_TMP --> DRAFT_ACTIVE : LEC registers official QCode on ERP
+    DRAFT_ACTIVE --> CROSS_TEAM_STOCK : Aging / Peer Stock Interlock triggered
+    DRAFT_ACTIVE --> RFQ_WAITING : No contract price (UP004)
+    DRAFT_ACTIVE --> LEC_QUALIFIED : Scan passed & technical review qualified
     
-    state INTERLOCK_SCANNING {
-        [*] --> HAS_OTHER_TEAM_STOCK: agingInterlockFlag = Y
-        HAS_OTHER_TEAM_STOCK --> PERSISTENT_TASK_BORROW: Open mandatory stock borrow task (Blocked until EMS = 'N')
-        PERSISTENT_TASK_BORROW --> READY_FOR_AUDIT: EMS updates to 'N'
-        [*] --> READY_FOR_AUDIT: agingInterlockFlag = N
-    }
+    CROSS_TEAM_STOCK --> LEC_QUALIFIED : Borrow task completed or unlocked
+    RFQ_WAITING --> LEC_QUALIFIED : Quoted & price confirmed
     
-    READY_FOR_AUDIT --> MONTHLY_AUDIT_PENDING: LEC consolidates list & manually classifies Target/Over
-    MONTHLY_AUDIT_PENDING --> THREE_WAY_CLARIFICATION: Cost Management Reviewer requests clarification
-    THREE_WAY_CLARIFICATION --> MONTHLY_AUDIT_PENDING: Engineer responds via LEC
+    LEC_QUALIFIED --> COST_AUDIT : Batched into Monthly Audit (Days 01-05)
+    COST_AUDIT --> CLEARED : Passed Audit & Cost Clearance Certificate issued (CC-HW-PASS)
+    COST_AUDIT --> DRAFT_ACTIVE : Inquiry clarification required / rejected
     
-    MONTHLY_AUDIT_PENDING --> EMS_PRV_PROCESSING: Beginning-of-month audit completed -> LEC creates PRV on EMS
-    EMS_PRV_PROCESSING --> PO_TRACKING_PROGRESS: PRV/PO approved on EMS -> LEC enters Vendor Confirm & ETA
-    PO_TRACKING_PROGRESS --> RECEIVED_IN_EMS: Goods received (Synced from EMS)
-    RECEIVED_IN_EMS --> ISSUED_FROM_EMS: Engineer issues parts from warehouse (Issue synced from EMS)
-    ISSUED_FROM_EMS --> [*]
+    CLEARED --> TRANSFER_PENDING : Tier 1: Inter-Entity Transfer
+    TRANSFER_PENDING --> ISSUED : Transfer approved & parts installed
+    TRANSFER_PENDING --> INTERNAL_PO_PENDING : Transfer rejected -> Tier 2
+    
+    INTERNAL_PO_PENDING --> ISSUED : Internal PO approved & parts installed
+    INTERNAL_PO_PENDING --> EMS_APPROVED : Internal PO rejected -> Tier 3 External PO
+    
+    EMS_APPROVED --> INBOUND_TRACKING : PO-99xxx issued on Nexacro EMS
+    INBOUND_TRACKING --> ISSUED : Goods received & ds_Inv synchronized
+    
+    ISSUED --> FREEZE_CLOSED : Month-end close (Surplus = $0, No-Rollover)
+    FREEZE_CLOSED --> [*]
 ```
 
 ---
 
-## 3. Immutable Operational Principles
+## 3. Sequential Architectural Rules
 
-1. **Strictly No Approvals on the New System**:
-   - The new system serves solely as a "Progress Tracking & Technical Data Control Dashboard". All legal, administrative, and financial approvals must take place on **LG Display Nexacro EMS**.
-2. **Complete Elimination of Warehouse Portal**:
-   - Warehouse personnel do not use this application. Inventory movements, physical receipts, and material issuance are read automatically through EMS integration APIs.
-3. **Mandatory Prerequisite for Cost Audit**:
-   - Requisitions strictly require an **Official QCode**. Any new spare parts retaining temporary codes (`TMP-HW-xxxx`) remain in the data preparation stage and are strictly excluded from the beginning-of-month audit.
-4. **Cross-Team Aging Stock Warning is a Mandatory Task**:
-   - While engineers do not need to submit delayed issuance justifications, they are mandated to prioritize borrowing and utilizing stock available in peer teams. This task cannot be closed manually; it automatically resolves only when the system re-syncs with EMS and confirms the flag is `'N'`.
+1. **No PO Release for Temporary Codes (`TMP-HW-xxxx`)**:
+   - Requisitions bearing temporary codes remain strictly in `DRAFT_TMP` with `costBlocked = true`.
+   - Cannot enter Step 7 Cost Audit nor generate EMS PRVs.
+2. **Dedicated LEC Mediation Bridge**:
+   - Reviewer never interacts directly with field engineers during the audit. All inquiry dispatches route through LEC.
+3. **Execution strictly follows the 3-Tier Waterfall**:
+   - $\text{Tier 1: Transfer} \xrightarrow{\text{Reject}} \text{Tier 2: Internal PO} \xrightarrow{\text{Reject}} \text{Tier 3: External PO on Nexacro Core}$.
+4. **All Financial Approvals 100% on Nexacro EMS Core**:
+   - The web platform provides intelligence, progress tracking, and audit collaboration, but PRV/PO approvals take place exclusively within the Nexacro EMS Core binary.
