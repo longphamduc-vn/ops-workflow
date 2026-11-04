@@ -93,3 +93,4 @@ flowchart TD
 | `syncIntervalDsInv` | `300 seconds (5 phút)` | Chu kỳ tự động kéo dữ liệu xuất kho thực tế từ bảng `ds_Inv`. |
 | `syncIntervalDsPo` | `600 seconds (10 phút)` | Chu kỳ tự động kiểm tra số PO được ký duyệt chính thức. |
 | `fallbackMode` | `CIRCUIT_BREAKER_ENABLED` | Nếu EMS mất kết nối quá 3 lần, tự động chuyển sang chế độ hàng đợi offline. |
+

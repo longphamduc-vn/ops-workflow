@@ -14,7 +14,8 @@
 Phiên bản V2 được xây dựng nhằm giải quyết triệt để sự "phân hóa" dữ liệu và tình trạng thiếu các màn hình trọng yếu (đặc biệt là màn hình Đăng ký hạng mục mua hàng) theo yêu cầu phản biện hiện trường:
 
 1. **Bổ Sung Màn Hình Đăng Ký Hạng Mục Mua Hàng Chuyên Dụng (`UI-REG-01`)**:
-   - Kỹ sư làm việc trực tiếp với **Tên Thân Thiện** (`Machine`, `Line`, `Assembly`).
+   - **Bộ máy tìm kiếm QCode thông minh (Omni-Search Typeahead / Modal thay vì dropdown)**: Ánh xạ chuẩn từ workflow `procurement-rfq-stock-optimization.yml` với đầy đủ thông số: QCode, Tên phụ tùng, Maker, Model, Đơn giá hợp đồng, ĐVT, Tồn kho thực tế, Định mức tồn, PO chờ duyệt, PO đang về, Tồn chuyển giao và Link CAD FDM.
+   - Cấu trúc thiết bị 4 tầng chuẩn xưởng: `Line` $\rightarrow$ `Machine` $\rightarrow$ `Unit` $\rightarrow$ `Assembly`.
    - Kiểm tra tức thời cờ tồn kho/đơn giá (<50ms).
    - Tự động khóa trạng thái `CROSS_TEAM_STOCK` khi có tồn kho liên team; khi mở khóa, hệ thống kích hoạt **2 nhánh tiếp theo**: Chuyển giao liên pháp nhân (Inter-entity transfer) HOẶC Mua thường cục bộ với giá thấp nhất.
 2. **Onboarding QCode & Tải Trọn Gói Thư Mục CAD/Catalog (`UI-QCODE-01`)**:
@@ -25,9 +26,11 @@ Phiên bản V2 được xây dựng nhằm giải quyết triệt để sự "p
    - Buộc kỹ sư phải giải trình tại sao tồn kho không sử dụng trước ngày 05 đầu tháng.
    - Không cho phép đóng tác vụ bằng một checkbox đơn giản; phải có lý do kỹ thuật, kế hoạch đưa vào máy, ngày cam kết và ảnh chụp hiện trường.
    - Cầu nối trao đổi 3 bên trực tiếp: Kỹ sư $\leftrightarrow$ LEC $\leftrightarrow$ Quản lý Chi phí.
-4. **Cây Thiết Bị EBOM Kéo Thả Trực Quan & Matching Cơ Cấu (`UI-EBOM-01`)**:
+4. **Cây Thiết Bị EBOM Kéo Thả Trực Quan, Ma Trận Số Lượng & Máy Dùng Chung Đa Chuyền (`UI-EBOM-01`)**:
    - Giảm độ phức tạp của hệ thống EBOM truyền thống thông qua bàn kéo - thả 3 khung trực quan.
-   - Bắt buộc matching linh kiện mua với cụm cơ cấu hỏng hóc thực tế.
+   - Cấu trúc 4 tầng: `Line` $\rightarrow$ `Machine` $\rightarrow$ `Unit` $\rightarrow$ `Assembly` $\rightarrow$ `Slot`.
+   - Quản lý toàn diện các chỉ số số lượng: Số lượng lắp trên máy (`Installed Qty`), Định mức tồn an toàn (`Target Stock Qty`), Tồn kho thực tế (`Onhand Qty`), Giới hạn mua bảo dưỡng.
+   - **Tối ưu cho các máy giống nhau giữa các line**: Khái niệm Master Machine Template (`TEMPLATE-DB-800`), kế thừa cấu trúc 1-click và đồng bộ hóa đa chuyền (Multi-Line Sync).
    - Hàng đợi khai báo muộn (Late Declaration Queue) 7 ngày cho các sự cố dừng máy khẩn cấp.
 5. **Bàn Điều Phối LEC Master Đa Năng (`UI-LEC-01`)**:
    - Hỗ trợ đa LEC và chuyển đổi linh hoạt giữa các Phân xưởng / Team khác nhau.

@@ -116,3 +116,4 @@ flowchart TD
 | **Mã Sự Cố Over** | `overReasonCode` | Enum | 1 trong 6 mã chuẩn `OVR-01` đến `OVR-06`. |
 | **Mã Work Order** | `workOrderNo` | String | Phiếu bảo trì sự cố liên kết để đối soát hiện trường. |
 | **Phễu 7 Giai Đoạn** | `stageCounts` | Array[Object]| Số lượng và số tiền ở từng giai đoạn trong 7 bước. |
+

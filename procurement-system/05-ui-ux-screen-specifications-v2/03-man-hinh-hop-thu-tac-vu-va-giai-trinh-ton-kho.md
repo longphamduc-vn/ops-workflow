@@ -130,3 +130,4 @@ Toàn bộ các tác vụ giải trình tồn kho chậm luân chuyển (`TASK-A
 - Hiển thị danh sách từng kỹ sư phụ trách, từng mã QCode tồn đọng.
 - Xuất nguyên văn lý do chưa sử dụng, ngày cam kết và đánh giá của LEC.
 - Báo cáo này là cơ sở duy nhất để Quản lý Chi phí và Giám Đốc Phân Xưởng phê chuẩn kế hoạch ngân sách phụ tùng tháng tiếp theo.
+

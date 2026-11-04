@@ -29,10 +29,10 @@ Sơ đồ kết nối liền mạch toàn bộ 10 màn hình chức năng từ l
 ```mermaid
 flowchart TD
     subgraph Cluster1["CỤM 1: NGHIỆP VỤ HIỆN TRƯỜNG & KỸ SƯ"]
-        REG["01. Đăng Ký Mua Hàng\n(UI-REG-01)\n• Nhập theo tên thân thiện\n• Quét Interlock <50ms\n• Khóa CROSS_TEAM_STOCK"]
+        REG["01. Đăng Ký Mua Hàng\n(UI-REG-01)\n• Omni-Search QCode (Không Dropdown)\n• Cấu trúc 4 tầng: Line>Mach>Unit>Asm\n• Quét Interlock <50ms\n• Khóa CROSS_TEAM_STOCK"]
         QCODE["02. Onboarding QCode\n(UI-QCODE-01)\n• Tải folder CAD/Catalog\n• Sinh mã TMP-HW-xxxx\n• Nộp LEC hoàn thiện ERP"]
         TASK["03. Hộp Thư Tác Vụ\n(UI-TASK-01)\n• Giải trình tồn kho đầu tháng\n• Tác vụ mượn kho liên team\n• Cầu nối 3 bên trao đổi"]
-        EBOM["04. Cây EBOM & Cơ Cấu\n(UI-EBOM-01)\n• Kéo thả linh kiện vào slot\n• Hàng đợi khai báo muộn 7d\n• Sao chép cấu trúc máy"]
+        EBOM["04. Cây EBOM & Cơ Cấu\n(UI-EBOM-01)\n• Cấu trúc 4 tầng Line>Mach>Unit>Asm\n• Quản lý 4 loại số lượng\n• Master Template đa chuyền\n• Hàng đợi khai báo muộn 7d"]
     end
 
     subgraph Cluster2["CỤM 2: ĐIỀU PHỐI & GIÁM SÁT"]
@@ -165,12 +165,13 @@ Hệ thống quản lý dữ liệu theo ngữ cảnh phân quyền phân tầng
 | STT | Tên Tài Liệu Đặc Tả | Mã Màn Hình | Vai Trò Chính | Mục Tiêu Nghiệp Vụ Cốt Lõi |
 | :---: | :--- | :---: | :---: | :--- |
 | **00** | [**`00-tong-quan-kien-truc-he-thong-man-hinh.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/00-tong-quan-kien-truc-he-thong-man-hinh.md) | `SYS-ARCH` | Toàn bộ | Kiến trúc tổng thể, Sidebar 4 cụm, ma trận phân quyền và luồng dữ liệu Master. |
-| **01** | [**`01-man-hinh-dang-ky-hang-muc-mua-hang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/01-man-hinh-dang-ky-hang-muc-mua-hang.md) | `UI-REG-01` | Kỹ sư / LEC | Đăng ký mua đơn lẻ & Excel, tên thân thiện, quét Interlock, 2 nhánh sau mở khóa. |
+| **01** | [**`01-man-hinh-dang-ky-hang-muc-mua-hang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/01-man-hinh-dang-ky-hang-muc-mua-hang.md) | `UI-REG-01` | Kỹ sư / LEC | Đăng ký mua đơn lẻ & Excel, Omni-Search QCode theo yml, 4 tầng Line>Mach>Unit>Asm, 2 nhánh sau mở khóa. |
 | **02** | [**`02-man-hinh-onboarding-qcode-va-tai-folder.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/02-man-hinh-onboarding-qcode-va-tai-folder.md) | `UI-QCODE-01` | Kỹ sư / LEC | Tải trọn vẹn folder CAD/Catalog, trích xuất bảng thông số, nộp LEC cấp QCode ERP. |
 | **03** | [**`03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md) | `UI-TASK-01` | Kỹ sư / LEC / Chi phí | Hộp thư tác vụ bắt buộc, giải trình tồn kho chậm luân chuyển, trao đổi 3 bên. |
-| **04** | [**`04-man-hinh-ebom-keo-tha-co-cau.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/04-man-hinh-ebom-keo-tha-co-cau.md) | `UI-EBOM-01` | Kỹ sư / LEC | Cây phân cấp thiết bị trực quan, kéo thả matching slot cơ cấu, giải tỏa khai báo muộn. |
+| **04** | [**`04-man-hinh-ebom-keo-tha-co-cau.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/04-man-hinh-ebom-keo-tha-co-cau.md) | `UI-EBOM-01` | Kỹ sư / LEC | Cây 4 tầng Line>Mach>Unit>Asm, ma trận số lượng định mức/tồn kho, Master Template máy dùng chung đa line. |
 | **05** | [**`05-man-hinh-dieu-phoi-lec-master-workbench.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/05-man-hinh-dieu-phoi-lec-master-workbench.md) | `UI-LEC-01` | Chuyên viên LEC | Bàn điều phối gom mẻ, cấp EM No 14 ký tự, đánh dấu Target/Over, theo dõi RFQ email. |
 | **06** | [**`06-man-hinh-giam-sat-leader-va-work-order.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/06-man-hinh-giam-sat-leader-va-work-order.md) | `UI-LEAD-01` | Trưởng nhóm Part | Giám sát tiến độ mua sắm theo Part, đối soát Work Order, tuân thủ 100% không nút duyệt. |
 | **07** | [**`07-man-hinh-tham-dinh-chi-phi-dau-thang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/07-man-hinh-tham-dinh-chi-phi-dau-thang.md) | `UI-CST-01` | Quản lý Chi phí | Thẩm định chi phí ngày 01-05, chặn mã TMP, cấp Cost Clearance, xuất Báo Cáo 4 Sheet. |
 | **08** | [**`08-man-hinh-dashboard-tong-quan-toan-xuan.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/08-man-hinh-dashboard-tong-quan-toan-xuan.md) | `UI-DASH-01` | Ban Giám Đốc / Toàn bộ | Phễu 7 giai đoạn, 3 trục ngân sách SG (mua sắm & xuất kho ds_Inv), truy vấn mã gây Over. |
 | **09** | [**`09-man-hinh-cai-dat-he-thong-va-gateway-ems.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/09-man-hinh-cai-dat-he-thong-va-gateway-ems.md) | `UI-ADM-01` | Quản trị Hệ thống | Cấu hình Topology đa nhà máy, quy tắc tầng Left(Line,1)=Floor, giám sát Token Bucket. |
+

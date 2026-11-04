@@ -139,3 +139,4 @@ export type QCodeOnboardingStatus =
 2. **Nút kích hoạt tự động (Future Auto-Registration Toggle)**:
    - Trên giao diện của LEC, khi hệ thống kích hoạt Module tích hợp ERP API trong cài đặt hệ thống (`UI-ADM-01`), nút `[Nhập QCode Thủ Công]` sẽ được thay thế bằng nút `[⚡ Đăng Ký Tự Động Lên ERP]`.
    - Hệ thống tự động đóng gói folder thành tệp ZIP nén và đẩy payload JSON sang endpoint của ERP Master Data.
+

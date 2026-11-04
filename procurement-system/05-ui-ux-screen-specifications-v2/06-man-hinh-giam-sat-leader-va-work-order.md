@@ -104,3 +104,4 @@ Khi Leader nhấn nút `[Soát WO 🔍]` trên một hạng mục mua ngoài k�
 | `overWorkOrderNo` | Mã Work Order | String | Số phiếu bảo trì sự cố (e.g. `WO-248926091`). |
 | `downtimeMinutes` | Thời gian dừng máy | Number | Số phút dừng chuyền ghi nhận từ hệ thống MES/EMS. |
 | `agingTaskComplianceRate`| Tỷ lệ nộp giải trình | Percentage | Phần trăm tác vụ giải trình tồn kho đã nộp trước hạn ngày 05. |
+

@@ -136,3 +136,4 @@ flowchart TD
 | `sgMonthlyCapUsd` | Trần ngân sách SG tháng | Decimal | Ngân sách tháng do LEC nhập tay (Số dư chuyển sang = 0). |
 | `inboundMilestones`| Mốc giao hàng Inbound | Object | Gồm `vendorConfirmDate`, `etaPortDate`, `actualReceiveDate`. |
 | `amortizationRatio`| Tỷ lệ rải chi phí 3 tháng| Array[Number]| Tỷ lệ phần trăm phân bổ (e.g. `[0.50, 0.25, 0.25]`). |
+
