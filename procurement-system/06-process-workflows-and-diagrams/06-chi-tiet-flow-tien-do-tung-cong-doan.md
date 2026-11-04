@@ -253,3 +253,4 @@ flowchart TD
 | `INBOUND_TRACKING` | Đang Vận Chuyển Inbound| CĐ 7 | PO đã phát hành cho NCC | LEC theo dõi mốc ETA cảng và rải chi phí |
 | `ISSUED` | Đã Xuất Lắp Đặt Máy | CĐ 8 | Thủ kho xuất vật tư lên chuyền, đồng bộ `ds_Inv` | Ghi nhận chi phí thực tế $\rightarrow$ Kết xuất Sheet 1/2 |
 | `FREEZE_CLOSED` | Khóa Sổ Chu Kỳ Tháng | CĐ 10 | 23:59 ngày cuối tháng | Reset thặng dư về $0 \rightarrow$ Bắt đầu chu kỳ mới |
+
