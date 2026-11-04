@@ -11,225 +11,348 @@ import {
   ShieldCheck,
   Download,
   Upload,
-  FileText
+  FileText,
+  AlertTriangle,
+  Flame,
+  CheckCircle2,
+  Clock,
+  X,
+  UserCheck
 } from 'lucide-react';
+import { RequisitionItem } from '../../types';
 
 export const CostManagementPortalView: React.FC = () => {
-  const { requisitions, budget, createClarificationInquiry } = useProcurement();
+  const { 
+    requisitions, 
+    budget, 
+    clarifications, 
+    agingJustifications,
+    costClearance,
+    createClarificationInquiry,
+    issueCostClearance 
+  } = useProcurement();
 
-  const [inquiryModalItem, setInquiryModalItem] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<'AUDIT_QUEUE' | 'AGING_REVIEW' | 'CLEARANCE_EXCEL'>('AUDIT_QUEUE');
+  const [inquiryModalItem, setInquiryModalItem] = useState<RequisitionItem | null>(null);
   const [questionInput, setQuestionInput] = useState('');
-  const [clearanceIssued, setClearanceIssued] = useState(false);
-  const [excelExportNotice, setExcelExportNotice] = useState(false);
-  const [scanUploaded, setScanUploaded] = useState(false);
+  const [inquirySuccess, setInquirySuccess] = useState(false);
+  const [clearanceNotice, setClearanceNotice] = useState(false);
 
-  const overItems = requisitions.filter(r => r.planClassification === 'OVER');
+  // Filter items eligible for Beginning-of-Month audit:
+  // MANDATORY: Must have official QCode (no TMP codes allowed as per Golden Rule #5!)
+  const auditEligibleItems = requisitions.filter(r => !r.isTempCode && r.planClassification !== 'UNCLASSIFIED');
+  const blockedTempItems = requisitions.filter(r => r.isTempCode);
 
-  const handleSendInquiry = () => {
+  const handleSendInquiry = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!inquiryModalItem || !questionInput) return;
-    createClarificationInquiry(inquiryModalItem.id, questionInput);
+    createClarificationInquiry(
+      inquiryModalItem.id,
+      inquiryModalItem.qCode,
+      inquiryModalItem.partName,
+      questionInput,
+      inquiryModalItem.quantity * inquiryModalItem.estimatedUnitPrice
+    );
+    setInquirySuccess(true);
     setQuestionInput('');
-    setInquiryModalItem(null);
+    setTimeout(() => {
+      setInquirySuccess(false);
+      setInquiryModalItem(null);
+    }, 2000);
   };
 
-  const handleSimulateExcelExport = () => {
-    setExcelExportNotice(true);
-    setTimeout(() => setExcelExportNotice(false), 4000);
+  const handleIssueClearance = () => {
+    issueCostClearance('Tran Thi Huong (Cost Mgmt Reviewer)');
+    setClearanceNotice(true);
+    setTimeout(() => setClearanceNotice(false), 5000);
   };
 
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              UI-ROLE-06: Cổng Thẩm Định Ban Quản Lý (Management Audit Portal)
-            </h2>
-            <Badge variant="purple">Reviewer & Assistant (Thẩm Định Ngày 25)</Badge>
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shrink-0">
+            <ShieldCheck className="w-6 h-6" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Thẩm tra tính hợp lý của các hạng mục Mua ngoài kế hoạch (Over), kiểm thảo tồn kho chưa dùng và ký duyệt hồ sơ Offline ngày 25.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            onClick={handleSimulateExcelExport}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Xuất File Excel (4 Sheet Mẫu)
-          </button>
-          <button
-            onClick={() => setClearanceIssued(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all"
-          >
-            <FileCheck2 className="w-4 h-4" />
-            Cấp Phê Chuẩn Thẩm Định
-          </button>
-        </div>
-      </div>
-
-      {excelExportNotice && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2 animate-fadeIn">
-          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Đã tạo file <strong>COST_AUDIT_202611_HW.xlsx</strong> gồm Sheet 1 (Kiểm kê tồn kho), Sheet 2 (Ngân sách SG No-Rollover), Sheet 3 (Danh sách Over), và Sheet 4 (Tiết kiệm Interlock).</span>
-        </div>
-      )}
-
-      {clearanceIssued && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-xs space-y-2">
-          <div className="font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
-            ĐÃ CẤP CHỨNG NHẬN THẨM ĐỊNH KỲ THÁNG 11/2026 CHO TOÀN BỘ TEAM 2!
-          </div>
-          <p className="text-emerald-800 dark:text-emerald-300 leading-relaxed">
-            Hồ sơ đã được phê duyệt. Hệ thống mở khóa toàn diện để LEC thao tác tạo mã đơn PRV/PO trên EMS và kích hoạt xuất kho chuyển giao. Mua bán và chuyển giao chính thức bắt đầu!
-          </p>
-        </div>
-      )}
-
-      {/* 4-Sheet Fixed Template KPI Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sheet 1: Giải Trình Tồn Kho</div>
-          <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1">14/16 Hoàn Tất</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Tồn kho &gt;30 ngày đã giải trình</div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sheet 2: Ngân Sách SG (No Rollover)</div>
-          <div className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">${budget.monthlyAllocationBudget.toLocaleString()} USD</div>
-          <div className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5 font-semibold">Khóa sổ tháng 11: 0% dồn số dư</div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sheet 3: Hạng Mục Over Ngoài Kế Hoạch</div>
-          <div className="text-xl font-bold font-mono text-rose-600 dark:text-rose-400 mt-1">{overItems.length} Dòng Phiếu</div>
-          <div className="text-[11px] text-rose-600 dark:text-rose-400 mt-0.5 font-medium">${budget.unplannedOverSpend.toLocaleString()} USD tổng chi</div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sheet 4: Tiết Kiệm Qua Interlock</div>
-          <div className="text-xl font-bold font-mono text-cyan-600 dark:text-cyan-400 mt-1">$1,320 USD</div>
-          <div className="text-[11px] text-cyan-600 dark:text-cyan-400 mt-0.5 font-medium">Tái sử dụng tồn kho Team 1</div>
-        </div>
-      </div>
-
-      {/* Unplanned Over Review Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 transition-colors">
-        <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Scale className="w-4 h-4 text-rose-500" />
-              Thẩm Định Chi Tiết Danh Sách Hạng Mục Gây Over (Chuẩn Bị Phê Duyệt)
-            </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              100% các dòng Over bắt buộc phải có giải trình kỹ thuật và mã Work Order sự cố hợp lệ.
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                UI-ROLE-06: Cổng Thẩm Định Ban Quản Lý Chi Phí (Cost Management Portal)
+              </h2>
+              <Badge variant="purple">Reviewer & Assistant (1 Người Duy Nhất)</Badge>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Thẩm tra chi phí đầu tháng (Ngày 01-05), kiểm thảo lý do Over, duyệt hồ sơ giải trình tồn kho và cấp chứng chỉ Clearance phục vụ họp Ban Giám Đốc.
             </p>
           </div>
-          <span className="text-xs text-slate-500 font-mono">Phiên Thẩm Định: 2026-11-25</span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 uppercase">
-                <th className="py-2.5 px-3">Mã Phiếu / QCode</th>
-                <th className="py-2.5 px-3">Tên Phụ Tùng & Model</th>
-                <th className="py-2.5 px-3">Vị Trí Máy</th>
-                <th className="py-2.5 px-3">Giá Trị Over</th>
-                <th className="py-2.5 px-3">Mã Lý Do & Căn Cứ</th>
-                <th className="py-2.5 px-3">Mã Lệnh Sửa Chữa</th>
-                <th className="py-2.5 px-3 text-right">Thao Tác Thẩm Định</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 font-mono">
-              {overItems.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                  <td className="py-3 px-3">
-                    <span className="font-bold text-slate-900 dark:text-white">{item.id}</span>
-                    <div className="text-[11px] text-cyan-600 dark:text-cyan-400">{item.qCode}</div>
-                  </td>
-                  <td className="py-3 px-3 font-sans">
-                    <div className="font-medium text-slate-900 dark:text-slate-100">{item.partName}</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{item.maker} {item.model}</div>
-                  </td>
-                  <td className="py-3 px-3 font-sans">
-                    <div className="text-slate-800 dark:text-slate-200 font-medium">{item.machineFriendlyName}</div>
-                    <div className="text-[11px] text-slate-400">{item.lineName}</div>
-                  </td>
-                  <td className="py-3 px-3 font-bold text-rose-600 dark:text-rose-400">
-                    ${(item.quantity * item.estimatedUnitPrice).toLocaleString()} USD
-                  </td>
-                  <td className="py-3 px-3 font-sans">
-                    <Badge variant="danger">{item.overReasonCode || 'OVR-01'}</Badge>
-                  </td>
-                  <td className="py-3 px-3 text-cyan-600 dark:text-cyan-400 font-medium">
-                    {item.workOrderNo || 'WO-248926091'}
-                  </td>
-                  <td className="py-3 px-3 text-right font-sans">
-                    <button
-                      onClick={() => setInquiryModalItem(item)}
-                      className="px-2.5 py-1 bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-950 dark:hover:bg-cyan-900 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 rounded-lg text-xs font-semibold flex items-center gap-1 ml-auto transition-colors"
-                    >
-                      <HelpCircle className="w-3.5 h-3.5" />
-                      Yêu Cầu Giải Trình
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <span className="text-slate-400">Chuyên viên Thẩm định:</span>
+          <strong className="text-indigo-600 dark:text-indigo-400">Trần Thị Hường</strong>
+          <span className="text-slate-400">• Bộ phận Quản Lý Chi Phí</span>
         </div>
       </div>
 
-      {/* Inquiry Modal */}
-      {inquiryModalItem && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs animate-fadeIn">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                Gửi Câu Hỏi Thẩm Định Cho LEC: {inquiryModalItem.id} ({inquiryModalItem.qCode})
-              </h4>
-              <button 
-                onClick={() => setInquiryModalItem(null)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                ✕
-              </button>
+      {/* 2. Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 flex-wrap">
+        {[
+          { id: 'AUDIT_QUEUE', label: '1. Danh Mục Thẩm Định Đầu Tháng', count: auditEligibleItems.length },
+          { id: 'AGING_REVIEW', label: '2. Kiểm Thảo Tồn Kho Chậm Luân Chuyển', count: agingJustifications.length },
+          { id: 'CLEARANCE_EXCEL', label: '3. Cấp Phê Chuẩn & Báo Cáo 4 Sheet', count: null },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === tab.id
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <span>{tab.label}</span>
+            {tab.count !== null && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                activeTab === tab.id ? 'bg-white text-indigo-600' : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold'
+              }`}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* 3. TAB 1: Audit Queue with Strict Official QCode Requirement */}
+      {activeTab === 'AUDIT_QUEUE' && (
+        <div className="space-y-4">
+          {/* Warning Banner on Blocked Temporary Codes */}
+          {blockedTempItems.length > 0 && (
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                <div>
+                  <span className="font-bold block">
+                    QUY ĐỊNH BẮT BUỘC (NGUYÊN TẮC VÀNG #5): ĐÃ CHẶN {blockedTempItems.length} HẠNG MỤC MÃ TẠM (TMP-HW-xxxx)
+                  </span>
+                  <span>
+                    Các hạng mục chưa được LEC cấp mã QCode chính thức trên hệ thống ERP/EMS sẽ bị khóa khỏi phiên thẩm định chi phí đầu tháng.
+                  </span>
+                </div>
+              </div>
             </div>
+          )}
+
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Hồ Sơ Đủ Điều Kiện Thẩm Định ({auditEligibleItems.length} Hạng Mục Chính Thức)
+              </h3>
+              <span className="text-xs text-slate-400">
+                Thẩm tra định kỳ: Ngày 01-05 hàng tháng
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="p-3">Mã PR / QCode</th>
+                    <th className="p-3">Tên Linh Kiện</th>
+                    <th className="p-3">Phân Loại LEC</th>
+                    <th className="p-3">Mã Work Order</th>
+                    <th className="p-3">Số Lượng & Đơn Giá</th>
+                    <th className="p-3">Thành Tiền (USD)</th>
+                    <th className="p-3 text-right">Phát Hành Thắc Mắc</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {auditEligibleItems.map(item => (
+                    <tr key={item.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                      <td className="p-3">
+                        <div className="font-bold text-slate-900 dark:text-white font-mono">{item.id}</div>
+                        <div className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 font-bold">{item.qCode}</div>
+                      </td>
+                      <td className="p-3">
+                        <div className="font-semibold text-slate-800 dark:text-slate-200 max-w-xs truncate">{item.partName}</div>
+                        <div className="text-[10px] text-slate-400">{item.machineFriendlyName} • {item.requestorName}</div>
+                      </td>
+                      <td className="p-3">
+                        {item.planClassification === 'TARGET' ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                            TARGET
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                            OVER • {item.overReasonCode}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3 font-mono font-bold text-blue-600">
+                        {item.workOrderNo || <span className="text-slate-400 font-normal italic">Không có</span>}
+                      </td>
+                      <td className="p-3 font-mono">
+                        <div>{item.quantity} {item.unit}</div>
+                        <div className="text-[10px] text-slate-400">${item.estimatedUnitPrice}</div>
+                      </td>
+                      <td className="p-3 font-mono font-bold text-slate-900 dark:text-white">
+                        ${(item.quantity * item.estimatedUnitPrice).toLocaleString()}
+                      </td>
+                      <td className="p-3 text-right">
+                        <button
+                          onClick={() => setInquiryModalItem(item)}
+                          className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-semibold text-xs border border-indigo-200 dark:border-indigo-800 cursor-pointer"
+                        >
+                          Gửi Thắc Mắc Cho LEC
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. TAB 2: Aging Stock Review */}
+      {activeTab === 'AGING_REVIEW' && (
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              Kiểm Thảo Giải Trình Tồn Kho Chậm Luân Chuyển (&gt;30 Ngày)
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Theo dõi văn bản giải trình và cam kết ngày sử dụng hết của các kỹ sư hiện trường phục vụ kiểm soát chi phí ứ đọng.
+            </p>
 
             <div className="space-y-3">
-              <p className="text-slate-600 dark:text-slate-300">
-                Nhập câu hỏi chất vấn kỹ thuật hoặc yêu cầu tài liệu bổ sung. Câu hỏi sẽ được gửi đến <strong>LEC</strong> để điều phối với kỹ sư phụ trách.
-              </p>
+              {agingJustifications.map(j => (
+                <div key={j.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs space-y-2">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="font-mono text-slate-900 dark:text-white">
+                      {j.qCode} — {j.partName}
+                    </span>
+                    <span className="text-amber-600 font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-[10px]">
+                      Tuổi tồn: {j.inventoryAgeDays} ngày • Số lượng tồn: {j.stockQty} {j.unit}
+                    </span>
+                  </div>
 
-              <textarea
-                placeholder="Ví dụ: Đề nghị cung cấp biên bản sự cố dừng máy ca đêm, ảnh chụp board nguồn chập cháy và giải trình lý do tại sao không thể dùng phụ tùng của Team 1..."
-                value={questionInput}
-                onChange={e => setQuestionInput(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                rows={4}
-              />
+                  <div className="text-slate-700 dark:text-slate-300">
+                    <strong className="text-slate-900 dark:text-white">Lý do kỹ thuật:</strong> {j.justificationReason}
+                  </div>
+
+                  <div className="text-slate-700 dark:text-slate-300">
+                    <strong className="text-slate-900 dark:text-white">Kế hoạch sử dụng:</strong> {j.actionPlan}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-[11px] text-slate-400 font-mono">
+                    <span>Kỹ sư: <strong>{j.engineerName}</strong> ({j.partGroup})</span>
+                    <span>Cam kết sử dụng trước: <strong className="text-emerald-600">{j.targetUsageDate}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. TAB 3: Cost Clearance & 4-Sheet Summary */}
+      {activeTab === 'CLEARANCE_EXCEL' && (
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs max-w-2xl">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-emerald-500" />
+              Cấp Chứng Chỉ Thẩm Duyệt Chi Phí (Cost Clearance)
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
+              Sau khi kiểm thảo thỏa đáng danh mục Target/Over và giải trình tồn kho, Chuyên viên Quản lý Chi phí phát hành Cost Clearance để kích hoạt phê duyệt PRV/PO trên EMS và cho phép xuất kho.
+            </p>
+
+            {clearanceNotice && (
+              <div className="p-3 mb-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Đã phát hành thành công Chứng chỉ Thẩm duyệt Chi phí kỳ Tháng {budget.periodMonth}!</span>
+              </div>
+            )}
+
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2 text-xs mb-5">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Trạng thái thẩm duyệt:</span>
+                <strong className={`font-mono font-bold ${costClearance.status === 'CLEARED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  {costClearance.status === 'CLEARED' ? 'ĐÃ PHÊ CHUẨN (CLEARED)' : 'ĐANG THẨM TRA'}
+                </strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Mã chứng thực số:</span>
+                <strong className="font-mono text-slate-900 dark:text-white">{costClearance.stampCode}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Tổng số hạng mục đã thẩm định:</span>
+                <strong className="font-mono">{costClearance.totalItemsAudited} Hạng mục</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Thời điểm cấp duyệt:</span>
+                <strong className="font-mono">{costClearance.clearedAt}</strong>
+              </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() => setInquiryModalItem(null)}
-                className="px-4 py-2 text-slate-500 hover:text-slate-700 text-xs"
+                onClick={handleIssueClearance}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer"
               >
-                Hủy Bỏ
-              </button>
-              <button
-                onClick={handleSendInquiry}
-                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md shadow-rose-600/20 flex items-center gap-1.5 text-xs transition-all"
-              >
-                <Send className="w-3.5 h-3.5" />
-                Gửi Cho LEC
+                <FileCheck2 className="w-4 h-4" />
+                <span>Ký Phát Hành Cost Clearance</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inquiry Creation Modal */}
+      {inquiryModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 max-w-lg w-full shadow-2xl">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">
+              Phát Hành Thắc Mắc Thẩm Tra Cho LEC
+            </h4>
+            <p className="text-xs text-slate-500 mb-4">
+              Mã: <strong>{inquiryModalItem.qCode}</strong> — {inquiryModalItem.partName} (${(inquiryModalItem.quantity * inquiryModalItem.estimatedUnitPrice).toLocaleString()})
+            </p>
+
+            <form onSubmit={handleSendInquiry} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Nội dung câu hỏi yêu cầu giải trình
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={questionInput}
+                  onChange={(e) => setQuestionInput(e.target.value)}
+                  placeholder="Yêu cầu làm rõ lý do tại sao mua Over, yêu cầu bổ sung hình ảnh giám định sự cố hoặc giải trình đơn giá..."
+                  className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setInquiryModalItem(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300"
+                >
+                  Đóng
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                >
+                  Gửi Cho LEC Điều Phối
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

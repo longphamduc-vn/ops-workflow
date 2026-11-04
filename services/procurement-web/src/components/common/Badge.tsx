@@ -1,8 +1,10 @@
 import React from 'react';
 
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'purple' | 'error' | 'default';
+
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'purple';
+  variant?: BadgeVariant;
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -13,6 +15,8 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'sm',
   className = '' 
 }) => {
+  const normalizedVariant = variant === 'error' ? 'danger' : variant === 'default' ? 'neutral' : variant;
+
   const variantStyles = {
     success: 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
     warning: 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
@@ -28,7 +32,7 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   return (
-    <span className={`inline-flex items-center gap-1 font-medium rounded-full border ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}>
+    <span className={`inline-flex items-center gap-1 font-medium rounded-full border ${variantStyles[normalizedVariant]} ${sizeStyles[size]} ${className}`}>
       {children}
     </span>
   );

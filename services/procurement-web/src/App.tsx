@@ -7,7 +7,6 @@ import { UniversalDashboardView } from './components/views/UniversalDashboardVie
 import { RequestorPortalView } from './components/views/RequestorPortalView';
 import { LeaderDashboardView } from './components/views/LeaderDashboardView';
 import { LecWorkbenchView } from './components/views/LecWorkbenchView';
-import { WarehousePortalView } from './components/views/WarehousePortalView';
 import { CostManagementPortalView } from './components/views/CostManagementPortalView';
 import { EbomExplorerView } from './components/views/EbomExplorerView';
 import { AdminSettingsView } from './components/views/AdminSettingsView';
@@ -24,8 +23,6 @@ const MainViewContent: React.FC = () => {
       return <LeaderDashboardView />;
     case 'LEC':
       return <LecWorkbenchView />;
-    case 'WAREHOUSE':
-      return <WarehousePortalView />;
     case 'COST_MGMT':
       return <CostManagementPortalView />;
     case 'EBOM':
@@ -75,12 +72,12 @@ const AppShell: React.FC = () => {
           <div className="flex items-center gap-3 text-[11px]">
             <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              EMS REST Gateway Sync Active
+              Đồng Bộ Trực Tiếp EMS
             </span>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span>10 Core Rules Enforced</span>
+            <span>Tuân Thủ 10 Nguyên Tắc Vàng</span>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="text-slate-700 dark:text-slate-300 font-mono font-medium">No-Rollover SG Budget</span>
+            <span className="text-slate-700 dark:text-slate-300 font-mono font-medium">Ngân Sách SG Không Lũy Kế</span>
           </div>
         </footer>
       </div>
@@ -99,3 +96,4 @@ export function App() {
 }
 
 export default App;
+

@@ -15,86 +15,137 @@ import {
   FileCode,
   Image as ImageIcon,
   MessageSquare,
-  AlertCircle
+  AlertCircle,
+  Building2,
+  Cpu,
+  Layers,
+  ChevronRight,
+  ArrowRight,
+  Sparkles,
+  Paperclip,
+  Calendar
 } from 'lucide-react';
 
 export const RequestorPortalView: React.FC = () => {
   const { 
     tasks, 
     clarifications, 
+    qcodeSubmissions,
     addRequisition, 
     submitEngineerResponse, 
-    submitAgingJustification 
+    submitAgingJustification,
+    acceptInterTeamBorrow,
+    submitQCodeFolder,
+    budget
   } = useProcurement();
 
-  const [activeTab, setActiveTab] = useState<'NEW_REQ' | 'FOLDER_UPLOAD' | 'CLARIFICATIONS' | 'AGING_TASKS'>('NEW_REQ');
+  const [activeTab, setActiveTab] = useState<'NEW_REQ' | 'FOLDER_UPLOAD' | 'AGING_TASKS' | 'CLARIFICATIONS'>('NEW_REQ');
 
-  // Form state
-  const [selectedPart, setSelectedPart] = useState<'QDAB03583' | 'QDAD12236' | 'QCAD38190'>('QCAD38190');
+  // Friendly Machine Selection State
+  const [line, setLine] = useState<'201' | '202' | '301'>('201');
+  const [machineType, setMachineType] = useState('DB-01');
+  const [mechanism, setMechanism] = useState('MECH-01');
+  const [selectedPart, setSelectedPart] = useState<'QDAB03583' | 'QDAD12236' | 'QCAD38190' | 'QCAD88102'>('QCAD38190');
   const [quantity, setQuantity] = useState(2);
-  const [demandType, setDemandType] = useState<'SETUP' | 'IMPROVE' | 'BREAKDOWN' | 'PM'>('BREAKDOWN');
-  const [machine, setMachine] = useState('Die Bonder 01 (DB-01)');
-  const [mechanismOption, setMechanismOption] = useState<'EXISTING' | 'LATE_DECLARATION'>('EXISTING');
-  const [mechanism, setMechanism] = useState('Cụm Đầu Gắp Bonding Head (Mech 01)');
-  const [lateMechanismName, setLateMechanismName] = useState('');
-  const [workOrderNo, setWorkOrderNo] = useState('WO-248926091');
-  const [breakdownReasonNote, setBreakdownReasonNote] = useState('Cụm xylanh trượt bị rơ lắc khi vận hành tốc độ cao ca đêm, nguy cơ dừng máy.');
+  const [demandType, setDemandType] = useState<'SETUP' | 'IMPROVE' | 'BREAKDOWN' | 'PM' | 'SAFETY_STOCK'>('BREAKDOWN');
+  const [workOrderNo, setWorkOrderNo] = useState('WO-248926095');
+  const [isLateDeclaration, setIsLateDeclaration] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
 
-  // Folder upload simulation
-  const [uploadedFolder, setUploadedFolder] = useState<string | null>(null);
-  const [parsedFiles, setParsedFiles] = useState<{ name: string; type: string; size: string }[]>([]);
-  const [tempCodeGenerated, setTempCodeGenerated] = useState<string | null>(null);
+  // Folder Upload Simulation State
+  const [folderName, setFolderName] = useState('');
+  const [partNameInput, setPartNameInput] = useState('');
+  const [makerInput, setMakerInput] = useState('');
+  const [modelInput, setModelInput] = useState('');
+  const [specInput, setSpecInput] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string; type: string }[]>([]);
   const [folderSubmitSuccess, setFolderSubmitSuccess] = useState(false);
 
   // Clarification reply state
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [replySuccess, setReplySuccess] = useState(false);
 
-  // Aging reply state
+  // Aging justification state
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [justificationNote, setJustificationNote] = useState('');
+  const [justificationReason, setJustificationReason] = useState('');
+  const [actionPlan, setActionPlan] = useState('');
+  const [targetUsageDate, setTargetUsageDate] = useState('2026-11-20');
+  const [taskSubmitSuccess, setTaskSubmitSuccess] = useState(false);
 
+  // Preset parts database for instant lookup
   const partPresets: Record<string, {
     name: string;
     maker: string;
     model: string;
     price: number;
-    agingInterlock: string;
+    unitPriceFlag: 'Y' | 'N';
+    agingInterlock: 'Y' | 'N';
     crossTeamQty: number;
-    owner?: string;
+    peerOwner?: string;
   }> = {
     QDAB03583: {
       name: 'Cảm biến quang vuông Panasonic CN-73-C2',
       maker: 'Panasonic',
       model: 'CN-73-C2',
       price: 45,
+      unitPriceFlag: 'Y',
       agingInterlock: 'N',
       crossTeamQty: 0
     },
     QDAD12236: {
-      name: 'Board nguồn CPX V4 Trumpf 2912146',
+      name: 'Bo mạch nguồn cao tần CPX V4 Trumpf',
       maker: 'Trumpf',
       model: '2912146',
       price: 3150,
+      unitPriceFlag: 'Y',
       agingInterlock: 'N',
       crossTeamQty: 0
     },
     QCAD38190: {
-      name: 'Xylanh dẫn hướng đôi khí nén SMC 16-100B',
+      name: 'Xy lanh dẫn hướng 2 ty MXQ16-100B SMC',
       maker: 'SMC',
       model: 'MXQ16-100B',
       price: 220,
-      agingInterlock: 'Y', // TRIGGER CROSS-TEAM WARNING!
+      unitPriceFlag: 'Y',
+      agingInterlock: 'Y', // Cross-Team Stock Trigger!
       crossTeamQty: 6,
-      owner: 'PO Module Tech Team 1'
+      peerOwner: 'PO Module Tech Team 1'
+    },
+    QCAD88102: {
+      name: 'Van điện từ khí nén SMC SY5120',
+      maker: 'SMC',
+      model: 'SY5120-5LZD-01',
+      price: 85,
+      unitPriceFlag: 'N', // UP004 RFQ Needed
+      agingInterlock: 'N',
+      crossTeamQty: 0
     }
   };
+
+  const currentPartInfo = partPresets[selectedPart];
+
+  // Auto-calculated 14-character EM No
+  const computeEmNo = () => {
+    const plant = 'HW';
+    const prod = 'BM';
+    const proc = 'TL';
+    const lineCode = line === '201' ? '21' : line === '202' ? '22' : '31';
+    const eqCode = 'EC';
+    const eqSeq = machineType === 'DB-01' ? '01' : machineType === 'TAB-02' ? '02' : '03';
+    const subUnit = mechanism === 'MECH-01' ? '01' : mechanism === 'MECH-02' ? '02' : '03';
+    return `${plant}${prod}${proc}${lineCode}${eqCode}${eqSeq}${subUnit}`;
+  };
+
+  const generatedEmNo = computeEmNo();
+
+  // Friendly names resolution
+  const machineFriendlyName = machineType === 'DB-01' ? 'Die Bonder 01 (DB-01)' : machineType === 'TAB-02' ? 'Tape Automated Bonder (TAB-02)' : 'Polarizer Attach (POL-01)';
+  const mechanismFriendlyName = mechanism === 'MECH-01' ? 'Cụm Đầu Gắp (Bonding Head)' : mechanism === 'MECH-02' ? 'Bàn Nhiệt (Heating Stage)' : 'Cụm Cấp Phôi (Feeder Unit)';
 
   const handleCreateRequisition = (e: React.FormEvent) => {
     e.preventDefault();
     const preset = partPresets[selectedPart];
-    const isLate = mechanismOption === 'LATE_DECLARATION';
 
     addRequisition({
       qCode: selectedPart,
@@ -105,651 +156,832 @@ export const RequestorPortalView: React.FC = () => {
       quantity,
       unit: 'EA',
       estimatedUnitPrice: preset.price,
-      unitPriceFlag: 'Y',
+      unitPriceFlag: preset.unitPriceFlag,
       demandType,
-      machineFriendlyName: machine,
-      lineName: 'Line #201',
-      mechanismFriendlyName: isLate ? `${lateMechanismName || 'Cơ cấu phát sinh ngoài hiện trường'} (Khai Báo Sau)` : mechanism,
-      emNo: isLate ? 'PENDING_EM_MAPPING' : 'HWBMTL21EC0101',
-      status: preset.agingInterlock === 'Y' ? 'CROSS_TEAM_STOCK' : 'PURCHASABLE',
-      planClassification: 'UNCLASSIFIED', // LEC will officially classify
+      machineFriendlyName,
+      lineName: `Line #${line}`,
+      mechanismFriendlyName,
+      emNo: generatedEmNo,
+      status: preset.agingInterlock === 'Y' ? 'CROSS_TEAM_STOCK' : preset.unitPriceFlag === 'N' ? 'RFQ_WAITING' : 'PURCHASABLE',
+      planClassification: 'UNCLASSIFIED',
+      workOrderNo: workOrderNo || undefined,
       requestorName: 'Nguyen Van Thang',
-      partGroup: 'CP/SG Part 1',
-      ebomPendingMapping: isLate,
-      agingInterlockFlag: preset.agingInterlock as 'Y' | 'N',
+      partGroup: line === '301' ? 'CP/SG Part 2' : 'CP/SG Part 1',
+      ebomPendingMapping: isLateDeclaration,
+      agingInterlockFlag: preset.agingInterlock,
       crossTeamStockQty: preset.crossTeamQty,
-      peerTeamOwner: preset.owner,
-      workOrderNo: workOrderNo
+      peerTeamOwner: preset.peerOwner
     });
 
     setFormSuccess(true);
     setTimeout(() => setFormSuccess(false), 4000);
   };
 
-  const handleSimulateFolderUpload = () => {
-    setUploadedFolder('Folder_Setup_DieBonder_DB01 (Bản vẽ CAD, Catalog, Ảnh)');
-    setParsedFiles([
-      { name: 'DWG_CumGatPhoi_DB01_V2.dwg', type: 'CAD 2D/3D', size: '4.8 MB' },
-      { name: 'Catalog_SMC_MXQ_Series.pdf', type: 'Catalog PDF', size: '2.1 MB' },
-      { name: 'Datasheet_Panasonic_CN73.pdf', type: 'Datasheet', size: '890 KB' },
-      { name: 'AnhThucTe_LinhKien_01.jpg', type: 'Hình Ảnh', size: '1.2 MB' },
+  const handleSimulateFolderSelect = () => {
+    setFolderName('CAD_DWG_Catalog_SpecialChuck_RevB');
+    setPartNameInput('Đồ gá Chuck hút phôi mạ vàng tùy biến');
+    setMakerInput('Kyocera Advanced Ceramics');
+    setModelInput('CK-AU-991');
+    setSpecInput('Đồ gá gốm phủ vàng chống xước mặt kính module SW, độ phẳng bề mặt 0.002mm.');
+    setUploadedFiles([
+      { name: 'Assembly_Drawing_Chuck_Plate_v2.dwg', size: '3.8 MB', type: 'CAD' },
+      { name: 'Catalog_Kyocera_Chuck_Series.pdf', size: '2.1 MB', type: 'PDF' },
+      { name: 'ESD_Surface_Test_Report.pdf', size: '0.9 MB', type: 'PDF' },
+      { name: 'Microscope_Inspection_Sample.png', size: '4.2 MB', type: 'IMAGE' }
     ]);
-    setTempCodeGenerated(`TMP-HW-${Math.floor(1000 + Math.random() * 9000)}`);
   };
 
-  const handleSubmitFolderToLec = () => {
+  const handleSubmitFolderPackage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!partNameInput || uploadedFiles.length === 0) return;
+
+    const tempCode = `TMP-HW-${String(Math.floor(1000 + Math.random() * 9000))}`;
+    submitQCodeFolder({
+      tempCode,
+      partName: partNameInput,
+      maker: makerInput || 'Custom Maker',
+      model: modelInput || 'MOD-CUSTOM',
+      specDescription: specInput,
+      files: uploadedFiles,
+      requestorName: 'Nguyen Van Thang',
+      partGroup: 'CP/SG Part 1',
+      machineFriendlyName: 'Die Bonder 01 (DB-01)'
+    });
+
     setFolderSubmitSuccess(true);
-    setTimeout(() => {
-      setFolderSubmitSuccess(false);
-      setUploadedFolder(null);
-      setParsedFiles([]);
-      setTempCodeGenerated(null);
-    }, 4000);
+    setFolderName('');
+    setPartNameInput('');
+    setUploadedFiles([]);
+    setTimeout(() => setFolderSubmitSuccess(false), 4000);
   };
 
-  const handleSendClarificationReply = () => {
+  const handleReplyClarification = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedInquiryId || !replyText) return;
     submitEngineerResponse(selectedInquiryId, replyText);
+    setReplySuccess(true);
     setReplyText('');
-    setSelectedInquiryId(null);
+    setTimeout(() => {
+      setReplySuccess(false);
+      setSelectedInquiryId(null);
+    }, 2000);
   };
 
-  const handleSendAgingJustification = () => {
-    if (!selectedTaskId || !justificationNote) return;
-    submitAgingJustification(selectedTaskId, justificationNote);
-    setJustificationNote('');
-    setSelectedTaskId(null);
+  const handleSubmitAging = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTaskId || !justificationReason) return;
+    submitAgingJustification(selectedTaskId, justificationReason, actionPlan, targetUsageDate);
+    setTaskSubmitSuccess(true);
+    setJustificationReason('');
+    setActionPlan('');
+    setTimeout(() => {
+      setTaskSubmitSuccess(false);
+      setSelectedTaskId(null);
+    }, 2000);
   };
-
-  const pendingInquiriesForEngineer = clarifications.filter(c => c.status === 'PENDING_ENGINEER');
-  const activeAgingTasks = tasks.filter(t => t.type === 'AGING_JUSTIFICATION' && t.status === 'ACTIVE');
-  const activeCrossTeamTasks = tasks.filter(t => t.type === 'INTER_TEAM_BORROW' && t.status === 'ACTIVE');
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Banner */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              UI-ROLE-01: Cổng Kỹ Sư Công Đoạn (Requestor Portal)
-            </h2>
-            <Badge variant="purple">Kỹ Sư Hiện Trường - CP/SG Part 1</Badge>
+      {/* 1. Principle Banner */}
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-400 shrink-0">
+            <Cpu className="w-6 h-6" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Đăng nhập: <strong className="text-slate-800 dark:text-slate-200">Nguyen Van Thang</strong> (Process Engineer) | Thao tác 100% bằng Tên Máy & Cụm Cơ Cấu Thân Thiện.
-          </p>
-        </div>
-
-        {/* Tab Pills */}
-        <div className="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
-          <button
-            onClick={() => setActiveTab('NEW_REQ')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-              activeTab === 'NEW_REQ' 
-                ? 'bg-rose-600 text-white shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Tạo Đơn Mua
-          </button>
-          <button
-            onClick={() => setActiveTab('FOLDER_UPLOAD')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-              activeTab === 'FOLDER_UPLOAD' 
-                ? 'bg-rose-600 text-white shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Upload Folder QCode
-          </button>
-          <button
-            onClick={() => setActiveTab('CLARIFICATIONS')}
-            className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
-              activeTab === 'CLARIFICATIONS' 
-                ? 'bg-rose-600 text-white shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Phản Hồi Với LEC
-            {pendingInquiriesForEngineer.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-cyan-400 text-slate-950 text-[10px] font-bold">
-                {pendingInquiriesForEngineer.length}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('AGING_TASKS')}
-            className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
-              activeTab === 'AGING_TASKS' 
-                ? 'bg-rose-600 text-white shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Task Giải Trình Tồn Kho
-            {activeAgingTasks.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[10px] font-bold">
-                {activeAgingTasks.length}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Persistent Cross-Team Warning Alert */}
-      {activeCrossTeamTasks.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400 dark:border-amber-600 shadow-sm flex items-start gap-3 transition-colors">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 animate-pulse" />
-          <div className="flex-1">
-            <h4 className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide flex items-center gap-2">
-              TASK BẮT BUỘC ĐANG KÍCH HOẠT: CÓ TỒN KHO TẠI TEAM BẠN TRONG FACTORY HW
-              <Badge variant="warning">Không Thể Bỏ Qua Thủ Công</Badge>
-            </h4>
-            <p className="text-xs text-amber-700 dark:text-amber-200/90 mt-1">
-              Phụ tùng <strong className="font-mono font-bold">QCAD38190</strong> hiện đang có 6 đơn vị tồn kho nhàn rỗi tại Kho H1-2F thuộc sở hữu của <strong>PO Module Tech Team 1</strong>.
-              Bạn phải làm việc điều chuyển nội bộ trước khi đăng ký mua mới. 
-              <strong> Task này sẽ tự động đóng ngay khi hệ thống EMS xác nhận phụ tùng đã được xuất ('N').</strong>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                UI-ROLE-01: Cổng Tác Nghiệp Kỹ Sư Hiện Trường (Field Engineer Portal)
+              </h2>
+              <Badge variant="default">Quan Hệ Đồng Nghiệp Ngang Hàng</Badge>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Đăng ký mua sắm theo tên thân thiện máy, tải folder bản vẽ/catalog chuẩn bị đăng ký QCode, giải trình tồn kho đầu tháng và trả lời thẩm tra chi phí.
             </p>
           </div>
         </div>
-      )}
 
-      {/* TAB 1: FORM TẠO ĐƠN MUA */}
+        <div className="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <span className="text-slate-400">Kỹ sư:</span>
+          <strong className="text-slate-800 dark:text-slate-200">Nguyễn Văn Thắng</strong>
+          <span className="text-slate-400">• CP/SG Part 1</span>
+        </div>
+      </div>
+
+      {/* 2. Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 flex-wrap">
+        {[
+          { id: 'NEW_REQ', label: '1. Đăng Ký Theo Tên Thân Thiện', icon: <PlusCircle className="w-4 h-4" />, count: null },
+          { id: 'FOLDER_UPLOAD', label: '2. Tải Folder Chuẩn Bị QCode', icon: <FolderUp className="w-4 h-4" />, count: qcodeSubmissions.length },
+          { id: 'AGING_TASKS', label: '3. Hộp Thư Tác Vụ Bắt Buộc', icon: <Clock className="w-4 h-4" />, count: tasks.filter(t => t.status === 'ACTIVE').length },
+          { id: 'CLARIFICATIONS', label: '4. Cầu Nối Trao Đổi Với LEC', icon: <MessageSquare className="w-4 h-4" />, count: clarifications.filter(c => c.status === 'PENDING_ENGINEER').length },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === tab.id
+                ? 'bg-rose-500 text-white shadow-xs'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+            {tab.count !== null && tab.count > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                activeTab === tab.id ? 'bg-white text-rose-600' : 'bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 font-bold'
+              }`}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* 3. TAB 1: Friendly Machine Requisition Form */}
       {activeTab === 'NEW_REQ' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Form: 2 Cols */}
-          <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 transition-colors">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
               <PlusCircle className="w-4 h-4 text-rose-500" />
-              Đăng Ký Hạng Mục Mua (Bằng Tên Máy Thân Thiện)
+              Tạo Yêu Cầu Mua Sắm Spare Part Mới
             </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
+              Chọn tên thiết bị, chuyền và cơ cấu bằng tên gọi thông dụng; hệ thống tự động biên dịch thành mã EM 14 ký tự chuẩn.
+            </p>
 
             {formSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2 animate-fadeIn">
+              <div className="p-3 mb-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Yêu cầu mua sắm đã gửi thành công sang Hàng Đợi của LEC trong Team!</span>
+                <span>Yêu cầu mua sắm đã được ghi nhận thành công và đẩy vào hàng đợi quét Interlock của LEC!</span>
               </div>
             )}
 
-            <form onSubmit={handleCreateRequisition} className="space-y-4 text-xs">
+            <form onSubmit={handleCreateRequisition} className="space-y-4">
+              {/* Row 1: Line & Floor Rule */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    1. Tên Máy Vận Hành (Friendly Machine Name): (*)
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Dây Chuyền Sản Xuất (Line #)
                   </label>
-                  <select 
-                    value={machine}
-                    onChange={e => setMachine(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                  <select
+                    value={line}
+                    onChange={(e) => setLine(e.target.value as any)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20"
                   >
-                    <option value="Die Bonder 01 (DB-01)">Máy Die Bonder 01 (DB-01) - Line #201</option>
-                    <option value="Die Bonder 02 (DB-02)">Máy Die Bonder 02 (DB-02) - Line #201</option>
-                    <option value="Tape Automated Bonder (TAB-02)">Máy Ép TAB (TAB-02) - Line #202</option>
-                    <option value="Polarizer Attach (POL-01)">Máy Dán Phim (POL-01) - Line #203</option>
+                    <option value="201">Line #201 (Tầng 2F - CP/SG Part 1)</option>
+                    <option value="202">Line #202 (Tầng 2F - CP/SG Part 1)</option>
+                    <option value="301">Line #301 (Tầng 3F - CP/SG Part 2)</option>
                   </select>
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Quy tắc hệ thống: <code>Left(Line, 1) = Tầng (Floor)</code>
+                  </span>
                 </div>
 
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    2. Chi Tiết Cơ Cấu Lắp Đặt: (*)
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Tên Máy Thân Thiện (Machine)
                   </label>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-4 text-xs">
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="mechOpt"
-                          checked={mechanismOption === 'EXISTING'}
-                          onChange={() => setMechanismOption('EXISTING')}
-                          className="text-rose-600"
-                        />
-                        <span className="text-slate-700 dark:text-slate-300">Đã có trong EBOM</span>
-                      </label>
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="mechOpt"
-                          checked={mechanismOption === 'LATE_DECLARATION'}
-                          onChange={() => setMechanismOption('LATE_DECLARATION')}
-                          className="text-rose-600"
-                        />
-                        <span className="text-amber-600 dark:text-amber-400 font-semibold">Chưa có (Khai báo sau)</span>
-                      </label>
-                    </div>
-
-                    {mechanismOption === 'EXISTING' ? (
-                      <select 
-                        value={mechanism}
-                        onChange={e => setMechanism(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                      >
-                        <option value="Cụm Cấp Liệu Feeder (Mech 01)">01. Cụm Cấp Liệu Feeder (Ray trượt)</option>
-                        <option value="Cụm Đầu Gắp Bonding Head (Mech 01)">02. Cụm Đầu Gắp Bonding Head (Xylanh gắp)</option>
-                        <option value="Cụm Gia Nhiệt Heat Nozzle (Mech 02)">02. Cụm Gia Nhiệt Heat Nozzle</option>
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        placeholder="Gõ mô tả cơ cấu máy phát sinh ngoài hiện trường..."
-                        value={lateMechanismName}
-                        onChange={e => setLateMechanismName(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-amber-300 dark:border-amber-700/80 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                        required
-                      />
-                    )}
-                  </div>
+                  <select
+                    value={machineType}
+                    onChange={(e) => setMachineType(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20"
+                  >
+                    <option value="DB-01">Die Bonder 01 (DB-01)</option>
+                    <option value="TAB-02">Tape Automated Bonder (TAB-02)</option>
+                    <option value="POL-01">Polarizer Attach (POL-01)</option>
+                  </select>
                 </div>
               </div>
 
-              {mechanismOption === 'LATE_DECLARATION' && (
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>💡 Chính Sách Khai Báo Sau: Hệ thống <strong>KHÔNG CHẶN</strong> đơn mua! Cờ <code>EBOM_PENDING_MAPPING</code> sẽ được kích hoạt để bạn hoàn thiện vào cây EBOM trong vòng 7 ngày.</span>
+              {/* Row 2: Mechanism selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Cụm Cơ Cấu Lắp Đặt (Mechanism / Assembly)
+                </label>
+                <select
+                  value={mechanism}
+                  onChange={(e) => setMechanism(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500/20"
+                >
+                  <option value="MECH-01">Cụm Đầu Gắp Chip (Bonding Head - SubUnit 01)</option>
+                  <option value="MECH-02">Bàn Nhiệt Gia Nhiệt (Heating Stage - SubUnit 02)</option>
+                  <option value="MECH-03">Cụm Cấp Liệu Phôi (Feeder Unit - SubUnit 03)</option>
+                </select>
+              </div>
+
+              {/* Row 3: Part Selection & Instant Stock Warning */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Chọn Linh Kiện Dự Phòng (QCode & Tên Phụ Tùng)
+                </label>
+                <select
+                  value={selectedPart}
+                  onChange={(e) => setSelectedPart(e.target.value as any)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+                >
+                  <option value="QCAD38190">QCAD38190 — Xy lanh dẫn hướng đôi khí nén SMC MXQ16-100B ($220) [CÓ TỒN LIÊN TEAM]</option>
+                  <option value="QDAB03583">QDAB03583 — Cảm biến quang vuông Panasonic CN-73-C2 ($45) [CÓ HỢP ĐỒNG UP001]</option>
+                  <option value="QDAD12236">QDAD12236 — Bo mạch nguồn cao tần CPX V4 Trumpf ($3,150) [GIÁ TRỊ CAO]</option>
+                  <option value="QCAD88102">QCAD88102 — Van điện từ khí nén SMC SY5120 ($85) [CHƯA CÓ GIÁ UP004 RFQ]</option>
+                </select>
+              </div>
+
+              {/* INSTANT CROSS-TEAM STOCK WARNING BANNER */}
+              {currentPartInfo.agingInterlock === 'Y' && (
+                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-1.5 animate-fadeIn">
+                  <div className="font-bold flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>CẢNH BÁO TỒN KHO LIÊN TEAM (AGING INTERLOCK FLAG = 'Y')</span>
+                  </div>
+                  <p className="leading-relaxed">
+                    Hệ thống phát hiện tại Kho H1-2F của <strong>{currentPartInfo.peerOwner}</strong> đang có sẵn{' '}
+                    <strong className="underline">{currentPartInfo.crossTeamQty} EA</strong> tồn kho chưa sử dụng.
+                  </p>
+                  <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium">
+                    → Theo <strong>Nguyên tắc vàng #3</strong>: Bạn bắt buộc phải ưu tiên mượn/chuyển giao số hàng này. Tác vụ mượn hàng sẽ được gán bắt buộc vào tài khoản của bạn và chỉ tự động giải phóng khi EMS xác nhận cờ = 'N'.
+                  </p>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    3. Chọn Phụ Tùng Cần Mua: (*)
-                  </label>
-                  <select 
-                    value={selectedPart}
-                    onChange={e => setSelectedPart(e.target.value as any)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                  >
-                    <option value="QCAD38190">QCAD38190 — Xylanh đôi SMC MXQ16-100B ($220.00)</option>
-                    <option value="QDAB03583">QDAB03583 — Cảm biến quang vuông Panasonic CN-73-C2 ($45.00)</option>
-                    <option value="QDAD12236">QDAD12236 — Board nguồn CPX V4 Trumpf ($3,150.00)</option>
-                  </select>
+              {/* RFQ Price Warning */}
+              {currentPartInfo.unitPriceFlag === 'N' && (
+                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 text-xs flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>Mã này chưa có đơn giá hợp đồng (UP004). LEC sẽ yêu cầu báo giá RFQ từ bộ phận Mua hàng sau khi tạo yêu cầu.</span>
                 </div>
+              )}
 
+              {/* Row 4: Quantity & Demand Type & WO */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    Số Lượng (EA): (*)
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Số Lượng (EA)
                   </label>
-                  <input 
+                  <input
                     type="number"
                     min="1"
-                    max="50"
                     value={quantity}
-                    onChange={e => setQuantity(Number(e.target.value))}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 font-bold text-center focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    4. Phân Loại Nhu Cầu Cơ Sở:
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Loại Nhu Cầu (Demand Type)
                   </label>
-                  <select 
+                  <select
                     value={demandType}
-                    onChange={e => setDemandType(e.target.value as any)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                    onChange={(e) => setDemandType(e.target.value as any)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
                   >
-                    <option value="BREAKDOWN">3. Thay Thế Sự Cố Máy Hỏng (BREAKDOWN)</option>
-                    <option value="IMPROVE">2. Cải Tiến Kỹ Thuật Hiện Trường (IMPROVE)</option>
-                    <option value="SETUP">1. Setup Dây Chuyền / Model Mới</option>
-                    <option value="PM">4. Bảo Dưỡng Phòng Ngừa Định Kỳ (PM)</option>
+                    <option value="BREAKDOWN">Sự cố khẩn cấp (Breakdown)</option>
+                    <option value="PM">Bảo dưỡng định kỳ (PM)</option>
+                    <option value="IMPROVE">Cải tiến thiết bị (Improve)</option>
+                    <option value="SETUP">Chuẩn bị Model mới (Setup)</option>
+                    <option value="SAFETY_STOCK">Dự phòng tồn an toàn (Safety Stock)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                    Mã Lệnh Sự Cố (Work Order):
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Mã Work Order (WO) Sự Cố
                   </label>
-                  <input 
+                  <input
                     type="text"
                     value={workOrderNo}
-                    onChange={e => setWorkOrderNo(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                    placeholder="WO-248926091"
+                    onChange={(e) => setWorkOrderNo(e.target.value)}
+                    placeholder="e.g. WO-248926095"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-600 dark:text-slate-300 font-medium mb-1">
-                  5. Hiện Trạng Sự Cố & Vấn Đề Gặp Phải (Để LEC Thẩm Định Target vs Over):
-                </label>
-                <textarea 
-                  rows={2}
-                  value={breakdownReasonNote}
-                  onChange={e => setBreakdownReasonNote(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-                  placeholder="Mô tả hiện tượng hỏng hóc, báo lỗi alarm máy..."
+              {/* Late Declaration Option */}
+              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="lateDec"
+                  checked={isLateDeclaration}
+                  onChange={(e) => setIsLateDeclaration(e.target.checked)}
+                  className="rounded text-rose-600 focus:ring-rose-500 w-4 h-4"
                 />
+                <label htmlFor="lateDec" className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                  <span className="font-bold">Khai báo muộn cơ cấu EBOM:</span> Trường hợp máy phát sinh hỏng linh kiện chưa kịp gán Slot EBOM, tích chọn để hệ thống cho phép tạo yêu cầu trước và gán Slot trong 7 ngày.
+                </label>
               </div>
 
-              <div className="pt-2">
+              {/* Submit Button */}
+              <div className="pt-2 flex justify-end">
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold flex items-center justify-center gap-2 shadow-md shadow-rose-600/20 transition-all text-xs"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  Gửi Yêu Cầu Đến Bàn Làm Việc Của LEC
+                  <span>Xác Nhận Đăng Ký Yêu Cầu Mua Sắm</span>
                 </button>
               </div>
             </form>
           </div>
 
-          {/* Right Summary: 1 Col */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 transition-colors">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-cyan-500" />
-              Đối Soát Tồn Kho & Thông Số Linh Kiện
-            </h3>
+          {/* Right Preview Card: 14-character EM No Decomposition */}
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                Giải Mã Mã EM Thiết Bị 14 Ký Tự
+              </h4>
+              <div className="p-3 rounded-xl bg-slate-900 text-white font-mono text-center text-sm font-black tracking-widest border border-slate-700 mb-3 shadow-inner">
+                {generatedEmNo}
+              </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs space-y-2">
-              <div className="text-[11px] text-slate-500 dark:text-slate-400">Linh kiện đang chọn:</div>
-              <div className="font-bold text-slate-900 dark:text-white">{partPresets[selectedPart].name}</div>
-              <div className="text-slate-600 dark:text-slate-300 text-[11px]">
-                Maker: <strong>{partPresets[selectedPart].maker}</strong> | Model: <strong>{partPresets[selectedPart].model}</strong>
+              <div className="space-y-1.5 text-[11px] divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>1-2. Nhà máy (Plant):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">HW (Factory HW)</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>3-4. Ngành hàng (Product):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">BM (Bonding Module)</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>5-6. Công đoạn (Process):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">TL (Total Line)</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>7-8. Số chuyền (Line):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">{line === '201' ? '21' : line === '202' ? '22' : '31'} (Line #{line})</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>9-10. Loại thiết bị (Cat):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">EC (Core Bonder)</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>11-12. Số thứ tự máy (Seq):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">{machineType === 'DB-01' ? '01' : '02'} ({machineFriendlyName})</strong>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>13-14. Cụm cơ cấu (SubUnit):</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">{mechanism === 'MECH-01' ? '01' : '02'} ({mechanismFriendlyName})</strong>
+                </div>
               </div>
-              <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Đơn giá ước tính:</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">${partPresets[selectedPart].price} USD</span>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs">
+              <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
+                Ước tính giá trị yêu cầu:
+              </span>
+              <div className="text-xl font-black text-rose-600 dark:text-rose-400 font-mono">
+                ${(quantity * currentPartInfo.price).toLocaleString()} USD
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Thành tiền dự kiến:</span>
-                <span className="font-mono font-bold text-rose-600 dark:text-rose-400 text-sm">
-                  ${(quantity * partPresets[selectedPart].price).toLocaleString()} USD
+              <p className="text-[11px] text-slate-400 mt-1">
+                Kỹ sư tạo yêu cầu $\rightarrow$ LEC gom mẻ & thẩm tra $\rightarrow$ Ký PRV trên EMS ngoài.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. TAB 2: CAD / Folder Upload for QCode Onboarding */}
+      {activeTab === 'FOLDER_UPLOAD' && (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <FolderUp className="w-4 h-4 text-cyan-500" />
+                  Chuẩn Bị Hồ Sơ Kỹ Thuật Đăng Ký Mã QCode Mới
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Tải lên Folder bản vẽ CAD (.dwg), Catalog PDF và hình ảnh linh kiện để LEC tiến hành đăng ký mã QCode trên ERP/EMS.
+                </p>
+              </div>
+
+              <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Quy định:</strong> Mã tạm <code>TMP-HW-xxxx</code> không được tham gia thẩm định chi phí cho đến khi LEC cấp QCode chính thức!
                 </span>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs space-y-2">
-              <div className="font-bold text-slate-800 dark:text-slate-200 text-xs flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-cyan-500" />
-                Quy Trình Xử Lý Tiếp Theo
+            {folderSubmitSuccess && (
+              <div className="p-3 mb-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Hồ sơ folder đã được chuyển đến Bàn làm việc LEC để đăng ký mã QCode chính thức!</span>
               </div>
-              <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600 dark:text-slate-400">
-                <li>LEC gom đơn cùng trạng thái trong Team.</li>
-                <li>Hệ thống quét Interlock (Cờ Y/N).</li>
-                <li>LEC thẩm định và đánh dấu nhãn <strong>Target / Over</strong>.</li>
-                <li>Đưa vào hồ sơ Thẩm định Offline ngày 25.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
 
-      {/* TAB 2: UPLOAD CẢ FOLDER ĐĂNG KÝ QCODE */}
-      {activeTab === 'FOLDER_UPLOAD' && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6 transition-colors">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <FolderUp className="w-5 h-5 text-indigo-500" />
-              Upload Cả Thư Mục Bản Vẽ CAD & Catalog Để Đăng Ký QCode
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Kỹ sư tải lên toàn bộ folder (chứa file bản vẽ DWG/STEP, catalog PDF, datasheet và ảnh chụp) $\rightarrow$ Hệ thống tự động bóc tách và sinh bảng lưới thông tin $\rightarrow$ Submit cho LEC hoàn thiện mã ngoài.
-            </p>
-          </div>
-
-          {folderSubmitSuccess && (
-            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2 animate-fadeIn">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span>Hồ sơ thư mục kỹ thuật kèm mã tạm <strong>{tempCodeGenerated}</strong> đã được chuyển giao cho LEC để đăng ký QCode trên ERP/EMS!</span>
-            </div>
-          )}
-
-          {/* Drag and Drop Zone */}
-          {!uploadedFolder ? (
-            <div 
-              onClick={handleSimulateFolderUpload}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 bg-slate-50 dark:bg-slate-950/50 rounded-2xl p-10 text-center cursor-pointer transition-all hover:bg-indigo-50/30"
-            >
-              <UploadCloud className="w-12 h-12 mx-auto text-indigo-500 dark:text-indigo-400 mb-3" />
-              <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                Kéo thả nguyên thư mục vào đây hoặc click để chọn thư mục từ máy tính
-              </div>
-              <p className="text-xs text-slate-400 mt-1">
-                Hỗ trợ tệp CAD (.dwg, .step), Catalog PDF, Datasheet thông số, Ảnh chụp JPG/PNG
-              </p>
-              <button 
-                type="button"
-                className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all"
+            <form onSubmit={handleSubmitFolderPackage} className="space-y-4">
+              {/* Drop area */}
+              <div 
+                onClick={handleSimulateFolderSelect}
+                className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-rose-500 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-slate-50/50 dark:bg-slate-800/30"
               >
-                Chọn Thư Mục Tài Liệu Kỹ Thuật
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-600 text-white">
-                    <FolderUp className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-xs text-indigo-950 dark:text-indigo-200">{uploadedFolder}</div>
-                    <div className="text-[11px] text-indigo-600 dark:text-indigo-400">
-                      Hệ thống tự động cấp mã tạm thời: <strong className="font-mono">{tempCodeGenerated}</strong>
-                    </div>
-                  </div>
+                <FolderUp className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {folderName ? `Thư mục đã chọn: ${folderName}` : 'Kéo thả toàn bộ Thư mục (Folder) chứa Bản vẽ & Catalog vào đây'}
                 </div>
-                <button
-                  onClick={() => setUploadedFolder(null)}
-                  className="text-xs text-slate-400 hover:text-slate-600 underline"
-                >
-                  Đổi Thư Mục Khác
-                </button>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Hỗ trợ định dạng: <code>.dwg</code>, <code>.dxf</code>, <code>.pdf</code>, <code>.step</code>, <code>.png</code>, <code>.jpg</code> (Nhấn để nạp thư mục mẫu kiểm thử)
+                </p>
               </div>
 
-              {/* Auto-generated Metadata Table */}
+              {/* Uploaded File List Preview */}
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs">
+                  <span className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Các tệp kỹ thuật đã trích xuất ({uploadedFiles.length} tệp):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {uploadedFiles.map((f, i) => (
+                      <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        {f.type === 'CAD' ? <FileCode className="w-4 h-4 text-blue-500" /> : f.type === 'PDF' ? <FileText className="w-4 h-4 text-rose-500" /> : <ImageIcon className="w-4 h-4 text-emerald-500" />}
+                        <span className="truncate font-mono flex-1 text-[11px]">{f.name}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">{f.size}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Technical Specifications Sheet */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tên Linh Kiện Đề Xuất</label>
+                  <input
+                    type="text"
+                    value={partNameInput}
+                    onChange={(e) => setPartNameInput(e.target.value)}
+                    placeholder="e.g. Tấm đồ gá Chuck kẹp phôi"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nhà Sản Xuất (Maker)</label>
+                  <input
+                    type="text"
+                    value={makerInput}
+                    onChange={(e) => setMakerInput(e.target.value)}
+                    placeholder="e.g. SMC / Kyocera"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Model / Part Number</label>
+                  <input
+                    type="text"
+                    value={modelInput}
+                    onChange={(e) => setModelInput(e.target.value)}
+                    placeholder="e.g. MOD-CK-01"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
               <div>
-                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-2">
-                  Bảng Thuộc Tính Tự Động Sinh Ra Từ Thư Mục:
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 uppercase">
-                        <th className="py-2.5 px-3">Tên Tệp Đã Quét</th>
-                        <th className="py-2.5 px-3">Phân Loại Tệp</th>
-                        <th className="py-2.5 px-3">Dung Lượng</th>
-                        <th className="py-2.5 px-3">Trạng Thái Khớp Nối</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                      {parsedFiles.map((file, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                          <td className="py-2.5 px-3 font-mono font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                            {file.type.includes('CAD') ? <FileCode className="w-4 h-4 text-blue-500" /> : file.type.includes('Ảnh') ? <ImageIcon className="w-4 h-4 text-emerald-500" /> : <FileText className="w-4 h-4 text-amber-500" />}
-                            {file.name}
-                          </td>
-                          <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">{file.type}</td>
-                          <td className="py-2.5 px-3 font-mono text-slate-500">{file.size}</td>
-                          <td className="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5" />
-                            Đã gán vào hồ sơ
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Mô Tả Thông Số Kỹ Thuật (Spec Description)</label>
+                <textarea
+                  rows={2}
+                  value={specInput}
+                  onChange={(e) => setSpecInput(e.target.value)}
+                  placeholder="Kích thước, dung sai gia công, vật liệu, điều kiện áp dụng..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
               </div>
 
-              <div className="pt-2 flex justify-end">
+              <div className="flex justify-end pt-2">
                 <button
-                  onClick={handleSubmitFolderToLec}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 transition-all"
+                  type="submit"
+                  disabled={!partNameInput || uploadedFiles.length === 0}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  Submit Hồ Sơ Cho LEC Hoàn Thiện & Cấp QCode
+                  <span>Nộp Hồ Sơ Folder Cho LEC Đăng Ký QCode</span>
                 </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Submission Queue Table */}
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">
+              Danh Sách Hồ Sơ Đăng Ký Mã QCode Đã Nộp ({qcodeSubmissions.length})
+            </h4>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="p-3">Mã Tạm / Hồ Sơ</th>
+                    <th className="p-3">Tên Phụ Tùng Đề Xuất</th>
+                    <th className="p-3">Tệp Đính Kèm</th>
+                    <th className="p-3">Ngày Nộp</th>
+                    <th className="p-3">Trạng Thái Đăng Ký QCode</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {qcodeSubmissions.map(sub => (
+                    <tr key={sub.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                      <td className="p-3 font-mono font-bold text-slate-900 dark:text-white">
+                        {sub.tempCode}
+                      </td>
+                      <td className="p-3">
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">{sub.partName}</div>
+                        <div className="text-[11px] text-slate-400">{sub.maker} • {sub.model}</div>
+                      </td>
+                      <td className="p-3">
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 font-mono">
+                          {sub.files.length} Tệp (CAD, PDF)
+                        </span>
+                      </td>
+                      <td className="p-3 font-mono text-slate-400">{sub.submittedAt}</td>
+                      <td className="p-3">
+                        {sub.status === 'OFFICIALLY_REGISTERED' ? (
+                          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>ĐÃ CẤP MÃ: {sub.officialQCode}</span>
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                            Chờ LEC Đăng Ký ERP/EMS
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. TAB 3: Mandatory Persistent Tasks Inbox */}
+      {activeTab === 'AGING_TASKS' && (
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              Hộp Thư Tác Vụ Bắt Buộc (Mandatory Persistent Tasks)
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Bao gồm tác vụ mượn hàng tồn liên team (không thể tự đóng, chỉ giải phóng khi EMS xác nhận cờ = N), giải trình tồn kho chậm luân chuyển đầu tháng và khai báo muộn EBOM.
+            </p>
+
+            <div className="space-y-3">
+              {tasks.map(t => {
+                const isActive = t.status === 'ACTIVE';
+
+                return (
+                  <div 
+                    key={t.id} 
+                    className={`p-4 rounded-2xl border transition-all ${
+                      t.type === 'INTER_TEAM_BORROW' 
+                        ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800/80' 
+                        : t.type === 'AGING_JUSTIFICATION'
+                        ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800/80'
+                        : 'bg-blue-50/70 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800/80'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+                      <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+                        <span className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
+                        <span>{t.title}</span>
+                        <span className="font-mono text-slate-500">({t.qCode})</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs font-mono">
+                        <span className="text-slate-400">Hạn chót:</span>
+                        <strong className="text-rose-600 dark:text-rose-400 font-bold">{t.deadline}</strong>
+                        <Badge variant={isActive ? 'warning' : 'success'}>
+                          {t.status}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                      {t.details}
+                    </p>
+
+                    {/* Action buttons based on task type */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                      <span className="text-[11px] text-slate-400">
+                        {t.emsAutoResolvable ? 'Đồng bộ tự động từ EMS Gateway' : 'Yêu cầu kỹ sư thao tác nhập giải trình'}
+                      </span>
+
+                      {isActive && t.type === 'AGING_JUSTIFICATION' && (
+                        <button
+                          onClick={() => setSelectedTaskId(t.id)}
+                          className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                        >
+                          Nhập Bản Giải Trình Tồn Kho Đầu Tháng
+                        </button>
+                      )}
+
+                      {isActive && t.type === 'INTER_TEAM_BORROW' && (
+                        <button
+                          onClick={() => acceptInterTeamBorrow(t.id)}
+                          className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                        >
+                          Xác Nhận Đã Mượn Hàng Thành Công
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Aging Justification Modal */}
+          {selectedTaskId && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 max-w-lg w-full shadow-2xl">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">
+                  Giải Trình Lý Do Linh Kiện Tồn Kho Chưa Đưa Vào Sử Dụng
+                </h4>
+                <p className="text-xs text-slate-500 mb-4">
+                  Bản giải trình này sẽ được xuất vào <strong>Sheet 4 của Báo Cáo Excel Thẩm Định</strong> gửi Ban Giám Đốc.
+                </p>
+
+                <form onSubmit={handleSubmitAging} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Lý Do Kỹ Thuật Chưa Sử Dụng (Tại sao chưa thay thế?)
+                    </label>
+                    <textarea
+                      rows={3}
+                      required
+                      value={justificationReason}
+                      onChange={(e) => setJustificationReason(e.target.value)}
+                      placeholder="e.g. Do xưởng ưu tiên sản lượng Model D111 nên lùi lịch bảo dưỡng PM sang tuần tới..."
+                      className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Kế Hoạch & Hành Động Khắc Phục (Action Plan)
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={actionPlan}
+                      onChange={(e) => setActionPlan(e.target.value)}
+                      placeholder="e.g. Thay thế toàn bộ cụm gắp trong đợt bảo dưỡng ngày 15/11"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Ngày Cam Kết Xuất Dùng Hết Hàng Tồn (Target Usage Date)
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={targetUsageDate}
+                      onChange={(e) => setTargetUsageDate(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTaskId(null)}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      Hủy Bỏ
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs"
+                    >
+                      Nộp Giải Trình Cho Thẩm Định
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* TAB 3: KÊNH ĐỐI THOẠI 2 CHIỀU VỚI LEC */}
+      {/* 6. TAB 4: 2-Way Clarification Thread with LEC */}
       {activeTab === 'CLARIFICATIONS' && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 transition-colors">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-cyan-500" />
-              Kênh Trao Đổi 2 Chiều Với LEC (Khi Đổi Mã Hoặc Báo Giá Bất Thường)
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-indigo-500" />
+              Kênh Trao Đổi Giải Trình Thẩm Định 3 Bên (Cầu Nối Với LEC)
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Phản hồi trực tiếp khi LEC đề xuất đổi sang mã cải tiến hoặc nhận thông báo bất thường từ email của Purchase Dept.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Người Thẩm Định (Quản Lý Chi Phí) $\rightarrow$ LEC chuyển tiếp $\rightarrow$ Kỹ Sư phản hồi bằng chứng $\rightarrow$ LEC tổng hợp đệ trình.
             </p>
-          </div>
 
-          <div className="space-y-3">
-            {clarifications.map(c => (
-              <div 
-                key={c.id} 
-                className={`p-4 rounded-xl border text-xs space-y-3 transition-all ${
-                  c.status === 'PENDING_ENGINEER'
-                    ? 'border-cyan-300 dark:border-cyan-700 bg-cyan-50/50 dark:bg-cyan-950/20 shadow-sm'
-                    : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <span className="font-mono text-cyan-600 dark:text-cyan-400 font-bold">{c.qCode}</span>
-                    <span>—</span>
-                    <span>{c.partName}</span>
+            <div className="space-y-4">
+              {clarifications.map(c => (
+                <div key={c.id} className="p-4 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-indigo-950 dark:text-indigo-200 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-indigo-600" />
+                      Yêu cầu giải trình mã: <strong className="font-mono">{c.qCode}</strong> — {c.partName}
+                    </span>
+                    <Badge variant={c.status === 'RESOLVED' ? 'success' : 'warning'}>
+                      {c.status}
+                    </Badge>
                   </div>
-                  <Badge variant={c.status === 'PENDING_ENGINEER' ? 'warning' : 'success'}>
-                    {c.status === 'PENDING_ENGINEER' ? 'Chờ Kỹ Sư Phản Hồi' : 'Đã Giải Quyết'}
-                  </Badge>
-                </div>
 
-                <div className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-                  <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Ý kiến từ Ban Quản Lý / LEC:</div>
-                  <div className="text-slate-800 dark:text-slate-200 font-medium">"{c.reviewerQuestion}"</div>
+                  {/* 1. Reviewer Question */}
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200">
+                    <span className="font-bold text-rose-600 block mb-1">
+                      1. Câu hỏi từ Bộ phận Quản lý Chi phí:
+                    </span>
+                    <p className="leading-relaxed">{c.reviewerQuestion}</p>
+                  </div>
+
+                  {/* 2. LEC Note */}
                   {c.lecNote && (
-                    <div className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium">
-                      ↳ Ghi chú kỹ thuật từ LEC: {c.lecNote}
+                    <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
+                      <span className="font-bold block mb-1">
+                        2. Hướng dẫn từ LEC (Phạm Đức Long):
+                      </span>
+                      <p>{c.lecNote}</p>
+                    </div>
+                  )}
+
+                  {/* 3. Engineer Response */}
+                  {c.engineerResponse ? (
+                    <div className="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200">
+                      <span className="font-bold block mb-1">
+                        3. Phản hồi của bạn (Kỹ sư Hiện trường):
+                      </span>
+                      <p>{c.engineerResponse}</p>
+                    </div>
+                  ) : (
+                    <div className="pt-2">
+                      <button
+                        onClick={() => setSelectedInquiryId(c.id)}
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs"
+                      >
+                        Viết Phản Hồi Kỹ Thuật Đính Kèm Bằng Chứng
+                      </button>
                     </div>
                   )}
                 </div>
+              ))}
+            </div>
+          </div>
 
-                {c.engineerResponse ? (
-                  <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-[11px]">
-                    <span className="font-semibold text-emerald-800 dark:text-emerald-300">Phản hồi của bạn:</span>
-                    <p className="text-slate-800 dark:text-slate-200 mt-0.5">{c.engineerResponse}</p>
-                  </div>
-                ) : (
+          {/* Reply Editor Modal */}
+          {selectedInquiryId && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 max-w-lg w-full shadow-2xl">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">
+                  Phản Hồi Câu Hỏi Thẩm Định Cho LEC
+                </h4>
+                <form onSubmit={handleReplyClarification} className="space-y-4">
                   <div>
-                    {selectedInquiryId === c.id ? (
-                      <div className="space-y-2">
-                        <textarea
-                          rows={2}
-                          value={replyText}
-                          onChange={e => setReplyText(e.target.value)}
-                          placeholder="Nhập nội dung xác nhận đồng ý đổi mã hoặc giải trình kỹ thuật bổ sung..."
-                          className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => setSelectedInquiryId(null)}
-                            className="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 text-xs"
-                          >
-                            Hủy
-                          </button>
-                          <button
-                            onClick={handleSendClarificationReply}
-                            className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs shadow-sm"
-                          >
-                            Gửi Phản Hồi Cho LEC
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => { setSelectedInquiryId(c.id); setReplyText(''); }}
-                        className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs shadow-sm transition-all"
-                      >
-                        Trả Lời LEC / Xác Nhận Phương Án
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: BÀN TASK GIẢI TRÌNH TỒN KHO CHƯA SỬ DỤNG */}
-      {activeTab === 'AGING_TASKS' && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 transition-colors">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              Bàn Task Giải Trình Tồn Kho Chưa Sử Dụng (&gt; 30 Ngày)
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Phục vụ phiên Kiểm Thảo Định Kỳ ngày 25 với Ban Giám Đốc. Kỹ sư bắt buộc giải trình lý do tại sao phụ tùng đã về kho nhưng chưa xuất lắp máy.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            {activeAgingTasks.map(t => (
-              <div key={t.id} className="p-4 rounded-xl border border-amber-300 dark:border-amber-700/80 bg-amber-50/40 dark:bg-amber-950/20 text-xs space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-900 dark:text-white">
-                    <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">{t.qCode}</span>
-                    <span> — {t.partName}</span>
-                  </div>
-                  <span className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-semibold">
-                    Hạn nộp: {t.deadline}
-                  </span>
-                </div>
-
-                <p className="text-slate-600 dark:text-slate-300 text-[11px]">
-                  {t.details}
-                </p>
-
-                {selectedTaskId === t.id ? (
-                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Nội dung giải trình kỹ thuật
+                    </label>
                     <textarea
-                      rows={2}
-                      value={justificationNote}
-                      onChange={e => setJustificationNote(e.target.value)}
-                      placeholder="Giải trình lý do chưa lắp máy (ví dụ: máy hoạt động tốt chi tiết cũ chưa mòn hỏng, kế hoạch PM dời sang tháng sau...)"
-                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                      rows={4}
+                      required
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder="Mô tả nguyên nhân hư hỏng, biên bản ca đêm, hoặc đối chiếu mã WO..."
+                      className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => setSelectedTaskId(null)}
-                        className="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 text-xs"
-                      >
-                        Hủy
-                      </button>
-                      <button
-                        onClick={handleSendAgingJustification}
-                        className="px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-sm"
-                      >
-                        Nộp Giải Trình Kiểm Thảo
-                      </button>
-                    </div>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => { setSelectedTaskId(t.id); setJustificationNote(''); }}
-                    className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-sm transition-all"
-                  >
-                    Viết Giải Trình Tồn Kho
-                  </button>
-                )}
-              </div>
-            ))}
 
-            {activeAgingTasks.length === 0 && (
-              <div className="text-center py-8 text-slate-400">
-                <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
-                Toàn bộ các phụ tùng nhập kho đều đã được giải trình hoặc xuất lắp máy đầy đủ!
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 text-center text-xs text-slate-400">
+                    <Paperclip className="w-4 h-4 mx-auto mb-1 text-slate-400" />
+                    Đính kèm ảnh chụp hiện trường hoặc biên bản WO đã ký
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedInquiryId(null)}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      Đóng
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs"
+                    >
+                      Gửi Phản Hồi Cho LEC
+                    </button>
+                  </div>
+                </form>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -1,22 +1,23 @@
-export type UserRole = 'COMMON' | 'REQUESTOR' | 'LEADER' | 'LEC' | 'WAREHOUSE' | 'COST_MGMT' | 'EBOM' | 'ADMIN';
+export type UserRole = 'COMMON' | 'REQUESTOR' | 'LEADER' | 'LEC' | 'COST_MGMT' | 'EBOM' | 'ADMIN';
 
 export type DemandType = 'SETUP' | 'IMPROVE' | 'BREAKDOWN' | 'PM' | 'SAFETY_STOCK';
 
 export type PlanClassification = 'TARGET' | 'OVER' | 'UNCLASSIFIED';
 
 export type OverReasonCode = 
-  | 'OVR-01' // Sudden Breakdown / Line Stop
-  | 'OVR-02' // Production Volume Surge
-  | 'OVR-03' // Inter-Entity Transfer Delay
-  | 'OVR-04' // New Model Setup (D111 -> D222)
-  | 'OVR-05' // Supplier Price Increase / Currency Volatility
-  | 'OVR-06'; // Setup / Installation Damage
+  | 'OVR-01' // Sudden Breakdown / Line Stop (Đột xuất hỏng hóc dừng chuyền)
+  | 'OVR-02' // Production Volume Surge (Tăng sản lượng đột biến)
+  | 'OVR-03' // Inter-Entity Transfer Delay (Chậm trễ chuyển giao liên pháp nhân)
+  | 'OVR-04' // New Model Setup (D111 -> D222) (Setup model mới)
+  | 'OVR-05' // Supplier Price Increase / Currency Volatility (Biến động giá / Tỷ giá NCC)
+  | 'OVR-06'; // Setup / Installation Damage (Hư hỏng trong căn chỉnh/lắp đặt)
 
 export type RequisitionStatus = 
   | 'DRAFT'
   | 'INTERLOCK_CHECK'
   | 'CROSS_TEAM_STOCK'
   | 'PURCHASABLE'
+  | 'RFQ_WAITING'
   | 'EOL'
   | 'INTER_ENTITY'
   | 'EMS_APPROVED'
@@ -53,6 +54,8 @@ export interface RequisitionItem {
   vendorConfirmDate?: string;
   etaDate?: string;
   monthlyAllocations?: { month: string; qty: number; amount: number }[];
+  prvNo?: string;
+  poNo?: string;
 }
 
 export interface PersistentTask {
@@ -66,6 +69,8 @@ export interface PersistentTask {
   status: 'ACTIVE' | 'RESOLVED';
   details: string;
   emsAutoResolvable: boolean; // True for cross-team tasks (auto-closes on EMS re-sync to 'N')
+  justificationText?: string;
+  resolvedAt?: string;
 }
 
 export interface ClarificationInquiry {
@@ -79,6 +84,42 @@ export interface ClarificationInquiry {
   status: 'PENDING_LEC' | 'PENDING_ENGINEER' | 'ENGINEER_REPLIED' | 'RESOLVED';
   createdAt: string;
   updatedAt: string;
+  costImpactUsd?: number;
+}
+
+export interface QCodeSubmission {
+  id: string;
+  tempCode: string; // TMP-HW-xxxx
+  partName: string;
+  maker: string;
+  model: string;
+  specDescription: string;
+  files: { name: string; size: string; type: string }[];
+  requestorName: string;
+  partGroup: string;
+  machineFriendlyName: string;
+  submittedAt: string;
+  status: 'PENDING_LEC_REGISTRATION' | 'OFFICIALLY_REGISTERED' | 'REJECTED';
+  officialQCode?: string;
+  registeredAt?: string;
+}
+
+export interface AgingJustificationRecord {
+  id: string;
+  taskId: string;
+  qCode: string;
+  partName: string;
+  lotNo: string;
+  inventoryAgeDays: number;
+  stockQty: number;
+  unit: string;
+  engineerName: string;
+  partGroup: string;
+  justificationReason: string;
+  actionPlan: string;
+  targetUsageDate: string;
+  status: 'SUBMITTED' | 'REVIEWED_BY_LEADER' | 'AUDITED_BY_COST_MGMT';
+  submittedAt: string;
 }
 
 export interface EbomMechanism {
@@ -111,3 +152,13 @@ export interface SgBudgetSummary {
   auditLockDeadline: string; // LEC configured e.g. 2026-11-07
 }
 
+export interface CostClearanceRecord {
+  periodMonth: string;
+  auditorName: string;
+  clearedAt: string;
+  totalItemsAudited: number;
+  totalTargetSpend: number;
+  totalOverSpend: number;
+  status: 'CLEARED' | 'PENDING_CLARIFICATION';
+  stampCode: string;
+}
