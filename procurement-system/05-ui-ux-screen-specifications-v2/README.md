@@ -1,59 +1,112 @@
-# BỘ ĐẶC TẢ GIAO DIỆN MÀN HÌNH THÔNG TIN (PHIÊN BẢN V2)
-# (INFORMATION SCREENS & UI/UX SPECIFICATIONS - V2)
+# BỘ ĐẶC TẢ GIAO DIỆN & CẤU TRÚC MÀN HÌNH NGHIỆP VỤ (PHIÊN BẢN V2)
+# (MASTER SCREEN SPECIFICATIONS & UI/UX ARCHITECTURE - V2)
 
-> **Phân xưởng**: Smart Watch (SW) — Factory HW (Display Module Plant 1 - Org ID: `28753`)  
-> **Kiến trúc vận hành**: Song song & Đồng bộ với Nexacro EMS (Core ERP)  
-> **Mục tiêu phiên bản**: Chuẩn hóa toàn diện các **Màn Hình Thông Tin**, bảng biểu, trường dữ liệu, wireframe ASCII và dòng chảy tương tác, không chỉnh sửa dự án web.
-
----
-
-## 1. TỔNG QUAN PHIÊN BẢN V2 & ĐẶC ĐIỂM CỐT LÕI
-
-Phiên bản V2 này khắc phục triệt để sự "phân hóa" dữ liệu và tình trạng thiếu chức năng ở phiên bản cũ bằng cách tập trung vào **Kiến trúc Thông tin (Information Architecture)**:
-1. **Triệt tiêu phân cấp công đoạn**: Xóa bỏ các cổng phê duyệt rườm rà (POL, TAB, DIP); toàn bộ kỹ sư hiện trường trong Part/Team là **đồng nghiệp ngang hàng**.
-2. **Loại bỏ vai trò Kho vận**: Nhân viên kho không sử dụng hệ thống này; dữ liệu xuất nhập kho được tự động đồng bộ từ EMS `ds_Inv`.
-3. **Tuyệt đối không có nút phê duyệt**: Phê duyệt chính thức PRV và PO diễn ra 100% trên **Nexacro EMS**. Hệ thống chỉ tập trung vào kiểm soát tiến độ, đối soát và điều phối tác nghiệp.
-4. **Hợp nhất vai trò Thẩm định chi phí**: Reviewer & Assistant được hợp nhất thành **1 cá nhân duy nhất** tại Bộ phận Quản lý Chi phí.
-5. **Hỗ trợ Đa LEC (Multi-LEC)**: Nhóm điều phối thiết bị gồm Phạm Đức Long (658359) và các đồng nghiệp LEC có thể chuyển đổi linh hoạt.
-6. **Thời điểm thẩm định chi phí**: Diễn ra định kỳ vào **Đầu Mỗi Tháng (Ngày 01-05)** thay vì ngày 25.
-7. **Điều kiện tiên quyết để thẩm định**: **Bắt buộc phải có mã QCode chính thức**; toàn bộ mã tạm `TMP-HW-xxxx` sinh ra từ việc tải folder bản vẽ/catalog chỉ là bước chuẩn bị dữ liệu kỹ thuật và bị chặn khỏi kỳ thẩm định.
-8. **Đánh dấu thủ công Target/Over**: Tuyệt đối không tự động phân loại; LEC trực tiếp đánh dấu dựa trên mã Work Order và lý do kỹ sư cung cấp, gắn 1 trong 6 mã `OVR-01..06`.
-9. **Cầu nối giải trình 3 bên**: Reviewer $\leftrightarrow$ LEC $\leftrightarrow$ Kỹ sư hiện trường.
-10. **Ngân sách SG không lũy kế (Strict No-Rollover)**: LEC nhập ngân sách hàng tháng thủ công; số dư chuyển sang tháng sau bắt buộc bằng $0.
+> **Dự án**: Spare Parts Procurement Tracking & Engineering Operations Platform  
+> **Phân xưởng áp dụng**: Smart Watch (SW) — Factory HW (Display Module Plant 1 - Org ID: `28753`)  
+> **Kiến trúc vận hành**: Song song & Đồng bộ với Nexacro EMS (Core ERP Mainframe)  
+> **Phiên bản tài liệu**: 2.0 - Hoàn chỉnh, Liền Mạch & Không Rời Rạc (Zero Fragmentation)  
+> **Nguyên tắc bất biến**: KHÔNG chỉnh sửa source code dự án web (`services/procurement-web`); Toàn bộ tài liệu chuẩn hóa cấu trúc dữ liệu, luồng nghiệp vụ, bố cục wireframe và tương tác 10 màn hình.
 
 ---
 
-## 2. DANH MỤC 7 TÀI LIỆU ĐẶC TẢ CHI TIẾT TRONG BỘ V2
+## 1. TỔNG QUAN PHIÊN BẢN V2 & CÁC ĐỘT PHÁ NGHIỆP VỤ
 
-| TT | Tài Liệu Đặc Tả | Mã Màn Hình | Vai Trò Chính | Trọng Tâm Nghiệp Vụ & Thông Tin |
-| :-: | :--- | :---: | :---: | :--- |
-| **00** | [**`00-tong-quan-kien-truc-man-hinh-thong-tin.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/00-tong-quan-kien-truc-man-hinh-thong-tin.md) | **Architecture** | Toàn bộ hệ thống | Ma trận phân quyền 5 vai trò, chuẩn màu sắc, phân tầng thông tin |
-| **01** | [**`01-man-hinh-thong-tin-tong-quan-toan-xuan-dashboard.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/01-man-hinh-thong-tin-tong-quan-toan-xuan-dashboard.md) | **`UI-INFO-00`** | Toàn xưởng | Phễu tiến độ 7 giai đoạn, 3 trục ngân sách SG, phân tích 6 mã Over, xuất Excel 4 sheet |
-| **02** | [**`02-man-hinh-thong-tin-ky-su-va-tien-do-mua-sam.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/02-man-hinh-thong-tin-ky-su-va-tien-do-mua-sam.md) | **`UI-INFO-01`** | Field Engineer | Đăng ký theo tên máy thân thiện, sinh mã EM 14 ký tự, folder QCode, tác vụ bắt buộc |
-| **03** | [**`03-man-hinh-thong-tin-cay-thiet-bi-ebom-va-co-cau.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/03-man-hinh-thong-tin-cay-thiet-bi-ebom-va-co-cau.md) | **`UI-INFO-02`** | Kỹ sư & LEC | Cây thiết bị trực quan, kéo-thả slot cơ cấu, định mức thay thế, hàng đợi khai báo muộn |
-| **04** | [**`04-man-hinh-thong-tin-giam-sat-leader-va-work-order.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/04-man-hinh-thong-tin-giam-sat-leader-va-work-order.md) | **`UI-INFO-03`** | Leader Team/Part | Giám sát Team => Part, đôn đốc giải trình tồn kho đầu tháng, đối soát kỹ thuật Work Order |
-| **05** | [**`05-man-hinh-thong-tin-dieu-phoi-lec-master-workbench.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/05-man-hinh-thong-tin-dieu-phoi-lec-master-workbench.md) | **`UI-INFO-04`** | Điều Phối LEC | Gom mẻ theo trạng thái, giải tỏa Interlock, đánh dấu Target/Over, cấp QCode, mốc Inbound |
-| **06** | [**`06-man-hinh-thong-tin-tham-dinh-chi-phi-dau-thang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/06-man-hinh-thong-tin-tham-dinh-chi-phi-dau-thang.md) | **`UI-INFO-05`** | Cost Management | Thẩm định đầu tháng (01-05), chặn mã tạm, kiểm thảo tồn kho >30d, cấp Cost Clearance |
-| **07** | [**`07-man-hinh-thong-tin-cau-hinh-he-thong-va-gateway-ems.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/07-man-hinh-thong-tin-cau-hinh-he-thong-va-gateway-ems.md) | **`UI-INFO-06`** | System Admin | Cấu trúc phân xưởng đa nhà máy, quy tắc tầng, định mức 5 nhu cầu, giám sát cổng EMS |
+Phiên bản V2 được xây dựng nhằm giải quyết triệt để sự "phân hóa" dữ liệu và tình trạng thiếu các màn hình trọng yếu (đặc biệt là màn hình Đăng ký hạng mục mua hàng) theo yêu cầu phản biện hiện trường:
+
+1. **Bổ Sung Màn Hình Đăng Ký Hạng Mục Mua Hàng Chuyên Dụng (`UI-REG-01`)**:
+   - Kỹ sư làm việc trực tiếp với **Tên Thân Thiện** (`Machine`, `Line`, `Assembly`).
+   - Kiểm tra tức thời cờ tồn kho/đơn giá (<50ms).
+   - Tự động khóa trạng thái `CROSS_TEAM_STOCK` khi có tồn kho liên team; khi mở khóa, hệ thống kích hoạt **2 nhánh tiếp theo**: Chuyển giao liên pháp nhân (Inter-entity transfer) HOẶC Mua thường cục bộ với giá thấp nhất.
+2. **Onboarding QCode & Tải Trọn Gói Thư Mục CAD/Catalog (`UI-QCODE-01`)**:
+   - Cho phép kéo thả cả folder chứa bản vẽ CAD (`.dwg`), tài liệu Catalog (`.pdf`) và bảng kích thước.
+   - Tự động trích xuất bảng thông tin cần điền và nộp cho LEC hoàn thiện trên ERP.
+   - Quản trị mã tạm `TMP-HW-xxxx` với cơ chế chặn cứng không cho tham gia thẩm định chi phí đầu tháng.
+3. **Hộp Thư Tác Vụ Bắt Buộc & Giải Trình Tồn Kho Định Kỳ (`UI-TASK-01`)**:
+   - Buộc kỹ sư phải giải trình tại sao tồn kho không sử dụng trước ngày 05 đầu tháng.
+   - Không cho phép đóng tác vụ bằng một checkbox đơn giản; phải có lý do kỹ thuật, kế hoạch đưa vào máy, ngày cam kết và ảnh chụp hiện trường.
+   - Cầu nối trao đổi 3 bên trực tiếp: Kỹ sư $\leftrightarrow$ LEC $\leftrightarrow$ Quản lý Chi phí.
+4. **Cây Thiết Bị EBOM Kéo Thả Trực Quan & Matching Cơ Cấu (`UI-EBOM-01`)**:
+   - Giảm độ phức tạp của hệ thống EBOM truyền thống thông qua bàn kéo - thả 3 khung trực quan.
+   - Bắt buộc matching linh kiện mua với cụm cơ cấu hỏng hóc thực tế.
+   - Hàng đợi khai báo muộn (Late Declaration Queue) 7 ngày cho các sự cố dừng máy khẩn cấp.
+5. **Bàn Điều Phối LEC Master Đa Năng (`UI-LEC-01`)**:
+   - Hỗ trợ đa LEC và chuyển đổi linh hoạt giữa các Phân xưởng / Team khác nhau.
+   - Gom mẻ các hạng mục cùng trạng thái để xử lý đồng loạt.
+   - Đăng ký mã định danh thiết bị EM No 14 ký tự (`HWBMTL21EC0101`).
+   - Theo dõi trạng thái báo giá RFQ qua email từ Mua hàng, xử lý bất thường và phản hồi cho Requestor.
+   - Đánh dấu thủ công Target/Over với 6 mã sự cố chuẩn (`OVR-01` đến `OVR-06`).
+   - Phân loại lại mã EOL (kể cả khi EMS vẫn hiển thị Active) và phản hồi kỹ sư.
+   - Cấu hình ngân sách SG thủ công không cộng dồn số dư (`Strict No-Rollover`).
+6. **Giám Sát Trưởng Nhóm / Part & Đối Soát Work Order (`UI-LEAD-01`)**:
+   - Giám sát tiến độ theo phân cấp Team $\rightarrow$ Part $\rightarrow$ Kỹ sư đồng nghiệp ngang hàng.
+   - **Tuyệt đối 100% không có nút phê duyệt** (phê duyệt thực hiện trên Nexacro EMS).
+   - Modal đối soát hồ sơ Work Order dừng chuyền phục vụ kiểm thảo.
+7. **Thẩm Định Chi Phí Đầu Tháng & Xuất Báo Cáo 4 Sheet Tiêu Chuẩn (`UI-CST-01`)**:
+   - Duy nhất 1 chuyên viên Quản lý Chi phí (Trần Thị Hường) thực hiện thẩm định ngày 01–05.
+   - Bắt buộc có mã QCode chính thức (chặn mã tạm `TMP-`).
+   - Cấp chứng chỉ Cost Clearance để mở khóa tạo PRV/PO trên EMS.
+   - **Ngày 25 hàng tháng xuất duy nhất 1 file Excel 4 Sheet chuẩn hóa** trình Ban Giám Đốc.
+8. **Dashboard Tổng Quan & Truy Vấn Chi Tiết Danh Mục Gây Over (`UI-DASH-01`)**:
+   - Phễu 7 giai đoạn tương tác lọc dữ liệu.
+   - Đồng hồ 3 trục ngân sách SG (Thực chi PO, Xuất kho `ds_Inv`, Vượt mức Over).
+   - **Công cụ bóc tách danh mục gây Over**: Trả về danh sách chi tiết các hạng mục gây Over của cả mua mới và xuất kho, theo 6 mã OVR.
+9. **Cài Đặt Hệ Thống, Topology & Gateway EMS (`UI-ADM-01`)**:
+   - Nhân bản 1-click cấu hình sang Phân xưởng khác / Nhà máy khác trong tập đoàn.
+   - Quy tắc tầng tự động `Left(Line, 1) = Floor`.
+   - Giám sát bộ điều tiết Token Bucket Rate Limiter (5 req/s) bảo vệ máy chủ EMS.
 
 ---
 
-## 3. SO SÁNH NÂNG CẤP V1 VÀ V2
+## 2. MA TRẬN 10 TÀI LIỆU ĐẶC TẢ CHI TIẾT V2
+
+| STT | Mã Màn Hình | Tên Màn Hình Nghiệp Vụ | Vai Trò Chính | Đường Dẫn File Chi Tiết |
+| :---: | :---: | :--- | :---: | :--- |
+| **00** | `SYS-ARCH` | **Tổng Quan Kiến Trúc Hệ Thống Màn Hình** | Toàn bộ | [**`00-tong-quan-kien-truc-he-thong-man-hinh.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/00-tong-quan-kien-truc-he-thong-man-hinh.md) |
+| **01** | `UI-REG-01` | **Đăng Ký Hạng Mục Mua Hàng** | Kỹ sư hiện trường / LEC | [**`01-man-hinh-dang-ky-hang-muc-mua-hang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/01-man-hinh-dang-ky-hang-muc-mua-hang.md) |
+| **02** | `UI-QCODE-01`| **Onboarding QCode & Tải Folder Tài Liệu** | Kỹ sư / LEC | [**`02-man-hinh-onboarding-qcode-va-tai-folder.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/02-man-hinh-onboarding-qcode-va-tai-folder.md) |
+| **03** | `UI-TASK-01` | **Hộp Thư Tác Vụ & Giải Trình Tồn Kho** | Kỹ sư / LEC / Cost Mgmt| [**`03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/03-man-hinh-hop-thu-tac-vu-va-giai-trinh-ton-kho.md) |
+| **04** | `UI-EBOM-01` | **EBOM Kéo Thả & Matching Cơ Cấu** | Kỹ sư / LEC | [**`04-man-hinh-ebom-keo-tha-co-cau.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/04-man-hinh-ebom-keo-tha-co-cau.md) |
+| **05** | `UI-LEC-01`  | **Bàn Điều Phối LEC Master Workbench** | Chuyên viên LEC | [**`05-man-hinh-dieu-phoi-lec-master-workbench.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/05-man-hinh-dieu-phoi-lec-master-workbench.md) |
+| **06** | `UI-LEAD-01` | **Giám Sát Trưởng Nhóm / Part & Work Order**| Trưởng nhóm Part | [**`06-man-hinh-giam-sat-leader-va-work-order.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/06-man-hinh-giam-sat-leader-va-work-order.md) |
+| **07** | `UI-CST-01`  | **Thẩm Định Chi Phí Đầu Tháng & Báo Cáo**| Quản lý Chi phí (1 người)| [**`07-man-hinh-tham-dinh-chi-phi-dau-thang.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/07-man-hinh-tham-dinh-chi-phi-dau-thang.md) |
+| **08** | `UI-DASH-01` | **Dashboard Tổng Quan Vận Hành Toàn Xưởng**| Toàn bộ ban ngành | [**`08-man-hinh-dashboard-tong-quan-toan-xuan.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/08-man-hinh-dashboard-tong-quan-toan-xuan.md) |
+| **09** | `UI-ADM-01`  | **Cài Đặt Hệ Thống, Topology & Cổng EMS** | Quản trị hệ thống | [**`09-man-hinh-cai-dat-he-thong-va-gateway-ems.md`**](file:///home/longp/projects/company/ops-workflow/procurement-system/05-ui-ux-screen-specifications-v2/09-man-hinh-cai-dat-he-thong-va-gateway-ems.md) |
+
+---
+
+## 3. BẢNG TRUY XUẤT ĐỐI ỨNG 10 NGUYÊN TẮC VÀNG (TRACEABILITY MATRIX)
+
+| STT | Nguyên Tắc Vàng (Master Specification) | Màn Hình Hiện Thực Hóa Cốt Lõi | Cơ Chế Bảo Đảm Kỹ Thuật |
+| :-: | :--- | :---: | :--- |
+| **#1** | Phê duyệt PRV/PO 100% trên Nexacro EMS | `UI-LEAD-01`, `UI-REG-01` | Triệt tiêu hoàn toàn nút Approve trên web; giao diện chỉ hiển thị trạng thái EMS. |
+| **#2** | Kỹ sư là đồng nghiệp ngang hàng | `UI-REG-01`, `UI-LEAD-01` | Xóa các phân cấp công đoạn POL/TAB; làm việc theo Tên Máy Thân Thiện. |
+| **#3** | Quét cờ tồn kho liên team & Tác vụ mượn kho | `UI-REG-01`, `UI-TASK-01` | Quét <50ms; khóa `CROSS_TEAM_STOCK`; bắt buộc mượn kho trước khi mua cục bộ. |
+| **#4** | Thẩm định chi phí kỳ đầu tháng (01–05) | `UI-CST-01`, `UI-TASK-01` | Cửa sổ thẩm định ngày 01–05; giải trình tồn kho >30 ngày trước khi cấp Clearance. |
+| **#5** | Bắt buộc có mã QCode chính thức trên ERP | `UI-QCODE-01`, `UI-CST-01` | Mã tạm `TMP-HW-xxxx` sinh từ folder bị chặn cứng khỏi danh mục thẩm định đầu tháng. |
+| **#6** | Đánh dấu Target/Over thủ công (6 mã OVR) | `UI-LEC-01`, `UI-DASH-01` | Không tự động phân loại; LEC gán 1 trong 6 mã `OVR-01..06` kèm mã Work Order. |
+| **#7** | LEC toàn quyền cấu hình deadline kiểm thảo | `UI-LEC-01`, `UI-ADM-01` | Cấu hình hạn nộp giải trình (ngày 05), hạn khóa thẩm định (ngày 07). |
+| **#8** | Cầu nối giải trình 3 bên trực tuyến | `UI-TASK-01`, `UI-LEC-01` | Reviewer phát hành câu hỏi $\rightarrow$ LEC chỉ dẫn kỹ thuật $\rightarrow$ Kỹ sư gửi ảnh/giải trình. |
+| **#9** | Xuất báo cáo duy nhất 1 file Excel 4 Sheet | `UI-CST-01`, `UI-DASH-01` | Ngày 25 hàng tháng xuất 4 Sheet cố định: Ngân sách SG, Hạng mục Over, Inbound, Tồn kho. |
+| **#10**| Ngân sách SG không lũy kế (No-Rollover) | `UI-LEC-01`, `UI-DASH-01` | Số dư tháng trước bị hủy về $0; trần ngân sách kiểm soát thực chi PO & xuất kho `ds_Inv`. |
+
+---
+
+## 4. BẢNG SO SÁNH V1 VÀ V2 TOÀN DIỆN
 
 ```
-+───────────────────────────────+─────────────────────────────────────────────────────────────+
-| TIÊU CHÍ SO SÁNH              | PHIÊN BẢN CŨ (V1)           | PHIÊN BẢN THÔNG TIN MỚI (V2)  |
-+───────────────────────────────+─────────────────────────────────────────────────────────────+
-| Phân chia vai trò             | 6-7 vai trò rời rạc         | 5 vai trò tinh gọn, đúng RACI |
-| Vai trò Thủ kho               | Tồn tại màn hình riêng      | Đã loại bỏ (đồng bộ từ EMS)   |
-| Quy trình phê duyệt           | Có nút duyệt trên màn hình  | Không phê duyệt (duyệt trên EMS)
-| Cơ cấu kỹ sư                  | Chia theo công đoạn POL/TAB | Đồng nghiệp ngang hàng        |
-| Quản lý Chi phí               | Chia Reviewer & Assistant   | 1 chuyên viên duy nhất        |
-| Thời điểm thẩm định           | Thẩm định ngày 25           | Thẩm định đầu tháng (01-05)   |
-| Điều kiện thẩm định           | Chưa kiểm soát mã tạm       | Bắt buộc có QCode chính thức  |
-| Đánh dấu Target/Over          | Mơ hồ, dễ nhầm tự động hóa  | Thủ công 100% do LEC đánh dấu |
-| Giải trình tồn kho            | Báo cáo đơn lẻ              | Tác vụ bắt buộc trên màn hình |
-| Cây thiết bị EBOM             | Danh sách tĩnh              | Bàn kéo - thả trực quan 3 khung|
-| Xuất báo cáo                  | Nhiều biểu mẫu phân tán     | Duy nhất 1 file Excel 4 sheet |
-+───────────────────────────────+─────────────────────────────────────────────────────────────+
++─────────────────────────────────+──────────────────────────────+─────────────────────────────────────────+
+| TIÊU CHÍ SO SÁNH                | PHIÊN BẢN CŨ (V1)            | PHIÊN BẢN V2 CHUẨN HÓA MỚI              |
++─────────────────────────────────+──────────────────────────────+─────────────────────────────────────────+
+| Màn hình Đăng ký mua hàng       | Không có (bị gộp sơ sài)     | UI-REG-01 chuyên biệt, tên thân thiện   |
+| Xử lý khóa Interlock            | Chỉ báo cờ chung chung       | Khóa CROSS_TEAM_STOCK, 2 nhánh sau mở   |
+| Quy trình xin cấp QCode         | Nhập tay từng trường         | Kéo thả cả folder CAD/Catalog UI-QCODE  |
+| Hộp thư giải trình tồn kho      | Không có, nhắc việc miệng    | UI-TASK-01 bắt buộc nộp trước ngày 05   |
+| Thao tác Cây thiết bị EBOM      | Danh mục text tĩnh cồng kềnh | UI-EBOM-01 Kéo-Thả trực quan 3 khung    |
+| Tác nghiệp của LEC              | Duyệt đơn lẻ, mất thời gian  | Gom mẻ theo trạng thái, theo dõi RFQ mail|
+| Giám sát của Leader             | Dễ nhầm có nút phê duyệt     | UI-LEAD-01: Tuyệt đối 0 nút duyệt nội bộ|
+| Thẩm tra Quản lý Chi phí        | Làm việc ngày 25, thiếu tool | UI-CST-01: Thẩm định 01-05, chặn mã TMP |
+| Báo cáo Ban Giám Đốc            | Nhiều file rời rạc           | Duy nhất 1 file Excel 4 Sheet chuẩn hóa |
+| Phân tích chi phí vượt mức      | Chỉ báo tổng số tiền Over    | Bóc tách danh mục gây Over (mua & kho)  |
+| Nhân bản cho Team/Nhà máy khác  | Phải code lại từ đầu         | UI-ADM-01: 1-Click nhân bản cấu hình    |
++─────────────────────────────────+──────────────────────────────+─────────────────────────────────────────+
 ```
