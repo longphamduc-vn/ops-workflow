@@ -202,3 +202,34 @@ Nhà máy Smart Watch có nhiều dây chuyền (Line 201, 202, 301, 302...) s�
    - Kỹ sư không phải nhập lại từ đầu cấu trúc cơ cấu hay số lượng lắp trên máy.
 3. **Đồng bộ hóa & Khớp nối**:
    - Việc mua phụ tùng cho máy này có thể dễ dàng tham chiếu sang các máy cùng model trên line khác để kiểm tra xem line bạn có linh kiện dự phòng tương đương hay không.
+
+
+---
+
+## 7. THEO DÕI TIẾN ĐỘ TỪNG HẠNG MỤC & LIÊN KẾT TÁC VỤ (ITEM PROGRESS & TASK BINDING)
+
+Khi kỹ sư nhấp vào bất kỳ một dòng hạng mục nào trên Bảng Requisition Status Monitor, Ngăn kéo Drawer mở ra hiển thị **Tiến độ Milestone thời gian thực** và **Tác vụ liên quan**:
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 📑 TIẾN ĐỘ CHI TIẾT HẠNG MỤC: PR-2611-0083 | Xylanh 2 ty SMC MXQ16-30 | $880 USD                     │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. THANH TIẾN ĐỘ VÒNG ĐỜI 7 MỐC (ITEM MILESTONE TIMELINE):                                           │
+│  [🟢 1.Đăng Ký] ── [🔴 2.Quét Interlock] ── [⏳ 3.Báo Giá] ── [⏳ 4.Thẩm Định] ── [⏳ 5.Ký Duyệt EMS]│
+│      2026-11-04        BỊ KHÓA TỒN KHO         UP001 ($220)       Chờ 01-05         Chưa ký PO       │
+│  ── [⏳ 6.Inbound Vận Chuyển] ── [⏳ 7.Xuất Lắp Máy (ds_Inv)]                                       │
+│          Chưa giao hàng                  Chưa xuất                                                   │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 2. TÁC VỤ BẮT BUỘC LIÊN KẾT (ASSOCIATED PERSISTENT TASK):                                            │
+│ • Mã Tác Vụ: [ 📬 TASK-LCK-0018: Mượn Kho Liên Team ] ➔ Trạng thái: 🟡 Đang Mở                       │
+│ • Vị trí tồn kho: Kho H1-2F (PO Module Team 1) đang có sẵn 6 EA dư thừa.                             │
+│ • Thao tác nhanh: [ 🔗 Mở Tác Vụ Tại UI-TASK-01 ]   [ 💬 Nhắn Tin Nhờ LEC Mở Khóa ]                 │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 3. TRA CỨU LỊCH SỬ MUA HÀNG TRONG QUÁ KHỨ (HISTORICAL PROCUREMENT LOOKUP):                           │
+│ • Lịch sử mua gần nhất của mã QCAD38190:                                                             │
+│   - Đợt 1: 2026-10-12 (PO-99120) - Mua 4 EA x $220 USD cho Line #201 (Nhà cung cấp: SMC Vietnam)     │
+│   - Đợt 2: 2026-08-05 (PO-97541) - Mua 2 EA x $225 USD cho Line #202 (Nhà cung cấp: SMC Vietnam)     │
+│ • Đơn giá biến động: Giảm $5 USD (-2.2%) so với quý trước.                                           │
+│ [ 📊 Mở Phân Tích Lịch Sử Mua & Xu Hướng Over Đa Tháng Tại UI-DASH-01 ]                              │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```

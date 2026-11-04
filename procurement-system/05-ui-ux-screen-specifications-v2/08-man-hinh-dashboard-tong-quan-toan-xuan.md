@@ -1,9 +1,9 @@
 # 08. MÀN HÌNH DASHBOARD TỔNG QUAN VẬN HÀNH & PHÂN TÍCH TOÀN XƯỞNG (UNIVERSAL OPERATIONS & ANALYTICS DASHBOARD)
 
 > **Mã màn hình**: `UI-DASH-01`  
-> **Tên màn hình**: Universal Operations, Procurement Funnel, SG Budget Dials & Over-Budget Deep Dive Dashboard  
+> **Tên màn hình**: Universal Operations, Procurement Funnel, Multi-Month Target/Over Comparison & Historical Purchase Analytics  
 > **Phạm vi hiển thị (Visibility Scope)**: Toàn bộ phân xưởng Smart Watch (Factory HW - Org ID: 28753), tự động phân quyền dữ liệu theo vai trò đăng nhập.  
-> **Mục tiêu cốt lõi**: Trung tâm thông tin điều hành toàn diện: Phễu tiến độ 7 giai đoạn thời gian thực; kiểm soát 3 trục ngân sách SG (không lũy kế); **công cụ chuyên sâu truy vấn danh mục gây Over (trả về danh sách chi tiết các hạng mục gây Over của cả xuất kho EMS và mua sắm mới)**; kết xuất báo cáo Excel 4 Sheet phục vụ họp Ban Giám Đốc.
+> **Mục tiêu cốt lõi**: Trung tâm thông tin điều hành toàn diện: Phễu tiến độ 7 giai đoạn thời gian thực; kiểm soát 3 trục ngân sách SG (không lũy kế); **truy vấn danh mục chi tiết gây Over (cả mua sắm và xuất kho EMS theo 6 mã OVR)**; **tra cứu toàn diện lịch sử mua hàng theo mã QCode/máy**; **so sánh chỉ số Target mua và phân tích xu hướng nguyên nhân Over giữa các tháng liên tiếp**; kết xuất báo cáo Excel 4 Sheet phục vụ Ban Giám Đốc.
 
 ---
 
@@ -23,8 +23,11 @@
      * *Giai đoạn 6: Hàng Về Cảng / Kho Nhà Máy (ETA Date)*.
      * *Giai đoạn 7: Xuất Lắp Đặt Vào Máy (Ghi nhận `ds_Inv`)*.
 3. **Phân Tích Chuyên Sâu Danh Mục Gây Over (Over-Budget Deep Dive Analyzer)**:
-   - Hệ thống giải quyết trọn vẹn yêu cầu phản biện: *Vượt do lý do gì? Trả về danh sách những hạng mục nào gây vượt ngân sách của cả mua sắm và xuất kho?*
-   - Cung cấp bảng bóc tách theo **6 mã sự cố chuẩn (`OVR-01` đến `OVR-06`)** và phân loại tách bạch giữa Over Mua Sắm Mới vs. Over Xuất Kho Dây Chuyền.
+   - Bóc tách theo **6 mã sự cố chuẩn (`OVR-01` đến `OVR-06`)** và phân loại tách bạch giữa Over Mua Sắm Mới vs. Over Xuất Kho Dây Chuyền.
+4. **Tra Cứu Lịch Sử Mua Hàng & So Sánh Target / Over Đa Tháng (Multi-Month Analytics)**:
+   - **Tra cứu lịch sử mua (Historical Purchase Lookup)**: Tra cứu nhanh theo mã QCode, theo máy hoặc theo nhà cung cấp trong 3, 6, 12 tháng gần nhất (Số lượng mua, đơn giá biến động qua từng đợt, số PO EMS, ngày nhận hàng, tỷ lệ hỏng hóc thực tế so với tuổi thọ EBOM).
+   - **So sánh Target giữa các tháng (Cross-Month Target Comparison)**: So sánh hạn mức kế hoạch Target được duyệt, tỷ lệ hoàn thành kế hoạch Target, và tỷ lệ chuyển dịch giữa Target vs Over qua các tháng ($T-2$, $T-1$, $T$).
+   - **Theo dõi xu hướng lý do Over đa tháng**: Biểu đồ phân tích biến động 6 mã Over qua các tháng; cảnh báo danh mục **Hạng mục Over lặp lại nhiều tháng (Chronic Over Items)** để kỹ sư xử lý triệt để nguyên nhân gốc.
 
 ---
 
@@ -70,7 +73,30 @@
 │ │   │QDAD12236    │SMC MHZ2-16D │Cụm Kẹp kính LCD          │(PO Commit│WO-2489991│(4 EA)    │phẩm Smart Watch D2 │ │
 │ └───┴─────────────┴─────────────┴──────────────────────────┴──────────┴──────────┴──────────┴────────────────────┘ │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHÂN VÙNG 4: XUẤT BÁO CÁO TỔNG HỢP EXCEL 4 SHEET TIÊU CHUẨN (NGÀY 25 HÀNG THÁNG)                                │
+│ PHÂN VÙNG 4: TRA CỨU LỊCH SỬ MUA HÀNG & SO SÁNH TARGET / OVER ĐA THÁNG (MULTI-MONTH PROCUREMENT ANALYTICS)        │
+│ ┌────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────┐ │
+│ │ 1. TRA CỨU LỊCH SỬ MUA THEO MÃ QCODE / TÊN MÁY:            │ 2. SO SÁNH TARGET MUA GIỮA CÁC THÁNG (TREND):   │ │
+│ │ 🔎 Nhập QCode: [ QCAD38190           ] [ 🔍 Tra Cứu ]      │ • Tháng 09/2026: Target: $118k | Over: $18.5k   │ │
+│ │ • Lịch sử mua 6 tháng:                                     │ • Tháng 10/2026: Target: $125k | Over: $22.1k   │ │
+│ │   - 2026-10-12: PO-99120 (4 EA x $220 USD) - Line 201      │ • Tháng 11/2026: Target: $122k | Over: $26.2k   │ │
+│ │   - 2026-08-05: PO-97541 (2 EA x $225 USD) - Line 202      │ • Tháng 12/2026 (Dự kiến): Target: $130k        │ │
+│ │ • Đơn giá bình quân: $221.5 USD | NCC chính: SMC Vietnam   │ ↳ Tỷ lệ Target đạt chuẩn bình quân: 83.5%       │ │
+│ │ • Chu kỳ thay thực tế: 14,200h (Đạt 94.6% định mức EBOM)   │ ↳ Xu hướng Over tăng +18.5% do chạy Model D2    │ │
+│ ├────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────┤ │
+│ │ 3. MA TRẬN PHÂN TÍCH BIẾN ĐỘNG NGUYÊN NHÂN OVER QUA CÁC THÁNG (6 MÃ OVR TREND):                              │ │
+│ │ ┌────────────┬──────────────────────────────────┬──────────────┬──────────────┬──────────────┬─────────────┐ │ │
+│ │ │Mã Sự Cố    │Ý Nghĩa Nguyên Nhân Gốc           │Tháng 09/2026 │Tháng 10/2026 │Tháng 11/2026 │Đánh Giá     │ │ │
+│ │ ├────────────┼──────────────────────────────────┼──────────────┼──────────────┼──────────────┼─────────────┤ │ │
+│ │ │OVR-01      │Đột xuất dừng chuyền (Line Stop)  │$6,200 (33.5%)│$8,400 (38.0%)│$13,500(51.5%)│🔴 Tăng mạnh │ │ │
+│ │ │OVR-02      │Tăng sản lượng đột biến           │$4,100 (22.2%)│$7,200 (32.6%)│$5,800 (22.1%)│🟡 Giảm nhẹ  │ │ │
+│ │ │OVR-03      │Chậm trễ chuyển giao kho bạn      │$2,800 (15.1%)│$3,100 (14.0%)│$3,900 (14.9%)│🟡 Ổn định   │ │ │
+│ │ │OVR-04      │Setup model mới (NPI)             │$4,500 (24.3%)│$2,400 (10.9%)│$1,800 (6.9%) │🟢 Giảm tốt  │ │ │
+│ │ │OVR-05/06   │Biến động giá & Hư hỏng lắp đặt   │$900 (4.9%)   │$1,000 (4.5%) │$1,200 (4.6%) │🟢 Kiểm soát │ │ │
+│ │ └────────────┴──────────────────────────────────┴──────────────┴──────────────┴──────────────┴─────────────┘ │ │
+│ │ ⚠️ CẢNH BÁO MÃ GÂY OVER LẶP LẠI (CHRONIC OVER): Bo mạch QCAD55421 bị Over 2 tháng liên tiếp do nguồn điện Line201│ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ PHÂN VÙNG 5: XUẤT BÁO CÁO TỔNG HỢP EXCEL 4 SHEET TIÊU CHUẨN (NGÀY 25 HÀNG THÁNG)                                │
 │ Báo cáo Form cố định 4 Sheet chuẩn hóa phục vụ họp Ban Giám Đốc và Kiểm Thảo:                                   │
 │ [Sheet 1: Ngân Sách SG & Kho] [Sheet 2: Danh Mục Gây Over] [Sheet 3: Mốc Inbound] [Sheet 4: Tồn Kho & Giải Trình]│
 │ [ 📥 Tải File Excel 4 Sheet (.xlsx) ]   [ 🖨️ In Báo Cáo Phân Tích ]                                             │
@@ -116,4 +142,6 @@ flowchart TD
 | **Mã Sự Cố Over** | `overReasonCode` | Enum | 1 trong 6 mã chuẩn `OVR-01` đến `OVR-06`. |
 | **Mã Work Order** | `workOrderNo` | String | Phiếu bảo trì sự cố liên kết để đối soát hiện trường. |
 | **Phễu 7 Giai Đoạn** | `stageCounts` | Array[Object]| Số lượng và số tiền ở từng giai đoạn trong 7 bước. |
-
+| **Lịch Sử Đơn Hàng Cũ** | `historicalPurchases`| Array[Object]| Danh sách các PO trong quá khứ theo từng mã QCode (Ngày, Giá, NCC, Số lượng). |
+| **Target Giữa Các Tháng** | `monthlyTargetTrends`| Array[Object]| Chuỗi giá trị Target và Over của các tháng $T-2$, $T-1$, $T$, $T+1$. |
+| **Cảnh Báo Over Lặp Lại** | `chronicOverFlag` | Boolean | `true` nếu mã phụ tùng bị đánh dấu Over từ 2 tháng liên tiếp trở lên. |

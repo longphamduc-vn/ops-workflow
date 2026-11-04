@@ -147,3 +147,21 @@ sequenceDiagram
     end
 ```
 
+
+
+---
+
+## 5. CÔNG CỤ ĐỐI SOÁT LỊCH SỬ MUA & TARGET / OVER ĐA THÁNG DÀNH CHO QUẢN LÝ CHI PHÍ
+
+Để đảm bảo thẩm định khách quan và không duyệt sai số liệu:
+1. **Tra Cứu Lịch Sử Mua Hàng & Giá Hợp Đồng Trong Quá Khứ (Historical Purchase Verification)**:
+   - Khi Quản lý Chi phí kiểm tra một dòng phụ tùng (ví dụ: `QCAD55421 - Board nguồn Trumpf $3,150 USD`):
+   - Nhấn nút `[🕒 Lịch Sử Mua]`: Hệ thống lập tức trả về lịch sử 12 tháng qua: *Mã này từng mua bao nhiêu lần? Giá các đợt trước là bao nhiêu? Nhà cung cấp nào cung cấp? Máy nào đã sử dụng?*.
+   - Giúp phát hiện ngay việc tăng giá bất thường hoặc mua vượt quá tần suất hư hỏng thực tế.
+2. **So Sánh Biến Động Target Mua Giữa Các Tháng (Monthly Target Benchmarking)**:
+   - Bảng tổng hợp đối chiếu chỉ tiêu Target tháng này ($122,000 USD) so với Tháng 10 ($125,000 USD) và Tháng 09 ($118,000 USD).
+   - Nếu tỷ lệ Target của một Part tăng đột biến $>20\%$ so với mức bình quân, hệ thống tự động gắn cờ vàng yêu cầu giải trình định mức.
+3. **Kiểm Soát Lý Do Over Giữa Các Tháng & Cảnh Báo "Chronic Over"**:
+   - Đối soát lý do Over tháng hiện tại với các tháng trước:
+     * Nếu một máy hoặc một mã phụ tùng bị khai báo mã `OVR-01` (Line Stop) 2 tháng liên tiếp $\rightarrow$ Cảnh báo đỏ: *"Hạng mục Over lặp lại liên tục (Chronic Over). Đề nghị kỹ sư trưởng rà soát chất lượng bo mạch hoặc nâng cấp hệ thống điện"*.
+   - Ngăn chặn triệt để việc kỹ sư lạm dụng lý do sự cố khẩn để mua vật tư ngoài kế hoạch tháng này qua tháng khác.
