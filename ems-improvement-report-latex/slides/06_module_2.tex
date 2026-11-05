@@ -1,87 +1,87 @@
 % ==============================================================================
-% SLIDE 6: MODULE 2 (FOUR PO ROUTES, AUTO-ESCALATED)
+% SLIDE 4: MODULE 2 (FOUR PO ROUTES, AUTO-ESCALATED)
 % ==============================================================================
 \begin{frame}{Module 2: Four PO routes, auto-escalated}
-    \vspace{0.05cm}
+    \vspace{0.1cm}
     
     % Top Waterfall Steps (4 Escalation Steps)
     \centering
     \begin{tikzpicture}[x=1cm, y=1cm]
         % Step 1: Stock Transfer
         \node[
-            fill=softblue, draw=brandblue!60, rounded corners=3pt,
-            text width=3.0cm, inner sep=4.5pt, minimum height=1.7cm, align=left
+            fill=cardbg, draw=cardborder, rounded corners=3pt,
+            text width=3.0cm, inner sep=4.5pt, minimum height=1.65cm, align=left
         ] (s1) at (0, 0) {
-            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandblue}STEP 1}\par
+            {\fontsize{7}{8.5}\bfseries\selectfont\color{primary}STEP 1}\par
             \vspace{1pt}
-            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}Stock transfer}\par
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{darkslate}Stock transfer}\par
             \vspace{2pt}
-            {\fontsize{7.2}{9}\selectfont\color{mutedgray}Use entity stock first.}\par
+            {\fontsize{7}{8.5}\selectfont\color{mutedgray}Use entity stock first.}\par
             \vspace{2pt}
-            {\fontsize{6.8}{8.5}\selectfont\color{brandorange}\textbf{Locked / rejected} $\rightarrow$ Step 2}
+            {\fontsize{6.5}{8}\selectfont\color{problemtext}\textbf{Locked / rejected} $\rightarrow$ Step 2}
         };
         
         % Arrow 1 -> 2
-        \draw[-{Latex[length=2mm]}, brandblue!80, line width=0.8pt] (1.6, 0) -- (1.95, 0);
+        \draw[-{Latex[length=2mm]}, mutedgray, line width=0.7pt] (1.6, 0) -- (1.95, 0);
         
         % Step 2: Internal PO
         \node[
-            fill=softblue, draw=brandblue!60, rounded corners=3pt,
-            text width=3.0cm, inner sep=4.5pt, minimum height=1.7cm, align=left
+            fill=cardbg, draw=cardborder, rounded corners=3pt,
+            text width=3.0cm, inner sep=4.5pt, minimum height=1.65cm, align=left
         ] (s2) at (3.55, 0) {
-            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandblue}STEP 2}\par
+            {\fontsize{7}{8.5}\bfseries\selectfont\color{primary}STEP 2}\par
             \vspace{1pt}
-            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}Internal PO}\par
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{darkslate}Internal PO}\par
             \vspace{2pt}
-            {\fontsize{7.2}{9}\selectfont\color{mutedgray}Buy via entity if cheaper.}\par
+            {\fontsize{7}{8.5}\selectfont\color{mutedgray}Buy via entity if cheaper.}\par
             \vspace{2pt}
-            {\fontsize{6.8}{8.5}\selectfont\color{brandorange}\textbf{Rejected} $\rightarrow$ Step 3}
+            {\fontsize{6.5}{8}\selectfont\color{problemtext}\textbf{Rejected} $\rightarrow$ Step 3}
         };
         
         % Arrow 2 -> 3
-        \draw[-{Latex[length=2mm]}, brandblue!80, line width=0.8pt] (5.15, 0) -- (5.5, 0);
+        \draw[-{Latex[length=2mm]}, mutedgray, line width=0.7pt] (5.15, 0) -- (5.5, 0);
         
         % Step 3: Standard PO
         \node[
-            fill=softgreen, draw=brandteal!60, rounded corners=3pt,
-            text width=3.0cm, inner sep=4.5pt, minimum height=1.7cm, align=left
+            fill=cardbg, draw=cardborder, rounded corners=3pt,
+            text width=3.0cm, inner sep=4.5pt, minimum height=1.65cm, align=left
         ] (s3) at (7.1, 0) {
-            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandteal}STEP 3}\par
+            {\fontsize{7}{8.5}\bfseries\selectfont\color{primary}STEP 3}\par
             \vspace{1pt}
-            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}Standard PO}\par
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{darkslate}Standard PO}\par
             \vspace{2pt}
-            {\fontsize{7.2}{9}\selectfont\color{mutedgray}Regular order with SLA and ETA tracking.}
+            {\fontsize{7}{8.5}\selectfont\color{mutedgray}Regular order with SLA and ETA tracking.}
         };
         
         % Arrow 3 -> 4
-        \draw[-{Latex[length=2mm]}, brandteal!80, line width=0.8pt] (8.7, 0) -- (9.05, 0);
+        \draw[-{Latex[length=2mm]}, mutedgray, line width=0.7pt] (8.7, 0) -- (9.05, 0);
         
         % Step 4: Urgent PO
         \node[
-            fill=softred, draw=brandorange!60, rounded corners=3pt,
-            text width=3.0cm, inner sep=4.5pt, minimum height=1.7cm, align=left
+            fill=cardbg, draw=cardborder, rounded corners=3pt,
+            text width=3.0cm, inner sep=4.5pt, minimum height=1.65cm, align=left
         ] (s4) at (10.65, 0) {
-            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandorange}STEP 4}\par
+            {\fontsize{7}{8.5}\bfseries\selectfont\color{primary}STEP 4}\par
             \vspace{1pt}
-            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}Urgent PO}\par
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{darkslate}Urgent PO}\par
             \vspace{2pt}
-            {\fontsize{7.2}{9}\selectfont\color{mutedgray}Fast approval for urgent downtime needs.}
+            {\fontsize{7}{8.5}\selectfont\color{mutedgray}Fast approval for line downtime needs.}
         };
     \end{tikzpicture}
     
-    \vspace{0.15cm}
+    \vspace{0.25cm}
     
     % Bottom Comparison
     \begin{columns}[T]
         % BEFORE Box
         \begin{column}{0.485\textwidth}
             \begin{beforebox}
-                {\fontsize{7.5}{10}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandorange}{\textbullet}] One Excel editor at a time (U-dock file lock)
-                    \item[\textcolor{brandorange}{\textbullet}] Multi-layer review: LEC, Reviewer, Requestor
-                    \item[\textcolor{brandorange}{\textbullet}] Rejects rechecked by hand; critical information gets lost
-                    \item[\textcolor{brandorange}{\textbullet}] ETA chased manually through LEC and Corporate Purchase
+                {\fontsize{7.5}{10}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{problemtext}{\textbullet}] One Excel editor at a time (U-dock file lock)
+                    \item[\textcolor{problemtext}{\textbullet}] Multi-layer review: LEC, Reviewer, Requestor
+                    \item[\textcolor{problemtext}{\textbullet}] Rejects rechecked by hand; information gets lost
+                    \item[\textcolor{problemtext}{\textbullet}] ETA chased manually through intermediaries
                 \end{itemize}
                 }
             \end{beforebox}
@@ -90,16 +90,15 @@
         % AFTER Box
         \begin{column}{0.485\textwidth}
             \begin{afterbox}
-                {\fontsize{7.5}{10}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandteal}{\textbullet}] Real-time multi-user concurrent work; replaces U-dock
-                    \item[\textcolor{brandteal}{\textbullet}] LEC handles hundreds of items in bulk
-                    \item[\textcolor{brandteal}{\textbullet}] In-system comments with a complete immutable audit trail
-                    \item[\textcolor{brandteal}{\textbullet}] Overdue orders highlighted; ETA updated directly in-system
+                {\fontsize{7.5}{10}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{primary}{\textbullet}] Real-time multi-user work; replaces U-dock
+                    \item[\textcolor{primary}{\textbullet}] LEC handles hundreds of items in bulk
+                    \item[\textcolor{primary}{\textbullet}] In-system comments with an immutable audit trail
+                    \item[\textcolor{primary}{\textbullet}] Overdue orders highlighted; ETA updated in-system
                 \end{itemize}
                 }
             \end{afterbox}
         \end{column}
     \end{columns}
 \end{frame}
-

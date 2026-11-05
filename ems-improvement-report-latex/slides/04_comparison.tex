@@ -1,57 +1,56 @@
 % ==============================================================================
-% SLIDE 4: BEFORE AND AFTER AT A GLANCE (COMPARISON TABLE)
+% SLIDE 2: BEFORE AND AFTER AT A GLANCE (COMPARISON TABLE)
 % ==============================================================================
 \begin{frame}{Before and after at a glance}
-    \vspace{0.1cm}
+    \vspace{0.15cm}
     
     \renewcommand{\arraystretch}{1.12}
-    {\fontsize{7.5}{9}\selectfont
+    {\fontsize{7.5}{9.5}\selectfont
     \begin{tabularx}{\textwidth}{
-        >{\bfseries\color{slatenavy}}p{1.8cm}
+        >{\bfseries\color{darkslate}}p{1.9cm}
         >{\color{mutedgray}}X
-        >{\color{slatenavy}}X
-        >{\bfseries\color{brandteal}}p{3.1cm}
+        >{\color{darkslate}}X
+        >{\bfseries\color{primary}}p{3.2cm}
     }
         \toprule
         \rowcolor{tableheader}
-        \textcolor{slatenavy}{\textbf{Area}} & 
-        \textcolor{brandorange}{\textbf{Before}} & 
-        \textcolor{brandteal}{\textbf{After}} & 
-        \textcolor{slatenavy}{\textbf{Impact}} \\
+        \textcolor{darkslate}{\textbf{Area}} & 
+        \textcolor{problemtext}{\textbf{Before (Legacy)}} & 
+        \textcolor{primary}{\textbf{After (EMS 2.0)}} & 
+        \textcolor{darkslate}{\textbf{Operational Impact}} \\
         \midrule
         
         0 \hspace{3pt} Planning &
         Reactive; no forecast or safety stock &
         Auto forecast, reorder alerts, stock cap &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {Proactive planning}; \\
+        Proactive planning \\
         
         1 \hspace{3pt} Search &
         Excel plus legacy system; no bulk lookup &
         Bulk lookup of price, interlock, photos, 4 PO routes &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {$-$80\% lookup time}; \\
+        $-$80\% lookup time \\
         
         2 \hspace{3pt} Purchasing &
         One editor per file; rejects get missed &
         Real-time multi-user; bulk handling; audit log &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {No file locks, no lost orders}; \\
+        No file locks, no lost orders \\
         
         3 \hspace{3pt} ETA \& cost &
         ETA via intermediaries; no live cost view &
         Direct ETA updates; overdue alerts; cost at issue &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {Real-time budget control}; \\
+        Real-time budget control \\
         
         4 \hspace{3pt} EBOM &
         Hard to read; missing groups unnoticed &
         Visual tree; sanity rules; fast cloning &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {Standardized EBOM data}; \\
+        Standardized EBOM data \\
         
         5 \hspace{3pt} Work Orders &
         Manual; 1 WO covers 10 lines &
         Bulk WO split by line and mechanism &
-        \tikz[baseline=-0.5ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] {Accurate MTBF / MTTR}; \\
+        Accurate MTBF / MTTR \\
         
         \bottomrule
     \end{tabularx}
     }
 \end{frame}
-

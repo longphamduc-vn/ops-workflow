@@ -20,39 +20,42 @@
 \tcbuselibrary{skins, raster}
 
 % ==============================================================================
-% COLOR PALETTE (EXACT CORPORATE EMS 2.0 THEME)
+% COLOR PALETTE (MINIMALIST CORPORATE SLATE & BLUE)
 % ==============================================================================
-\definecolor{brandnavy}{HTML}{0B2545}   % Midnight Navy (Title & Executive Summary)
-\definecolor{slatenavy}{HTML}{1B2A3A}   % Dark Slate Navy (Headers & Primary Text)
-\definecolor{brandteal}{HTML}{0E8F80}   % Emerald / Brand Teal (Module Badges & AFTER)
-\definecolor{brandmint}{HTML}{5EEAD4}   % Mint Highlight (Title Badge & Accents)
-\definecolor{brandorange}{HTML}{D9480F} % Terracotta / Orange Red (Alerts & BEFORE)
-\definecolor{brandyellow}{HTML}{E8A317} % Amber Gold (Warnings)
-\definecolor{brandblue}{HTML}{2F6FDB}   % Tech Blue (Process & Mechanism)
-\definecolor{cardbg}{HTML}{F1F5F9}      % Light Slate 100 (Card Background)
-\definecolor{cardborder}{HTML}{CBD5E1}  % Slate 300 (Border lines)
-\definecolor{mutedgray}{HTML}{5B6B7B}   % Slate Gray (Body & Subtitles)
-\definecolor{tableheader}{HTML}{E2E8F0} % Slate 200 (Table Header BG)
-\definecolor{softred}{HTML}{FEF2F2}     % Red 50 (Soft Alert BG)
-\definecolor{softgreen}{HTML}{ECFDF5}   % Emerald 50 (Soft Success BG)
-\definecolor{softblue}{HTML}{EFF6FF}    % Blue 50 (Soft Process BG)
+\definecolor{primary}{HTML}{1E40AF}       % Corporate Deep Blue (Primary Accent)
+\definecolor{darkslate}{HTML}{0F172A}     % Dark Slate (Headings & Primary Text)
+\definecolor{mutedgray}{HTML}{475569}     % Slate 600 (Secondary & Body text)
+\definecolor{lightgray}{HTML}{94A3B8}     % Slate 400 (Dividers & Sub-captions)
+\definecolor{cardbg}{HTML}{F8FAFC}        % Slate 50 (Soft Neutral Card Background)
+\definecolor{cardborder}{HTML}{E2E8F0}    % Slate 200 (Clean Hairline Border)
+\definecolor{tableheader}{HTML}{F1F5F9}  % Slate 100 (Table Header Background)
 
-% Set Global Font Colors
-\setbeamercolor{normal text}{fg=slatenavy,bg=white}
-\setbeamercolor{frametitle}{fg=slatenavy,bg=white}
+% Subtle Functional Tints (Restrained, Never Over-Saturated)
+\definecolor{problemtext}{HTML}{991B1B}   % Deep Maroon (Before / Issue Text)
+\definecolor{problembg}{HTML}{FEF2F2}     % Soft Tint for Before Box
+\definecolor{problemborder}{HTML}{FCA5A5} % Soft Border for Before Box
+
+\definecolor{solutiontext}{HTML}{1E40AF}  % Deep Blue (After / Feature Text)
+\definecolor{solutionbg}{HTML}{F8FAFC}    % Clean Slate for After Box
+\definecolor{solutionborder}{HTML}{CBD5E1}% Clean Border for After Box
+
+% Global Beamer Font Colors
+\setbeamercolor{normal text}{fg=darkslate,bg=white}
+\setbeamercolor{frametitle}{fg=darkslate,bg=white}
 \setbeamercolor{footline}{fg=mutedgray,bg=white}
+\setbeamercolor{background canvas}{bg=white}
 
 % Disable Navigation Symbols
 \setbeamertemplate{navigation symbols}{}
 
-% Slide Geometry & Margins (16:9)
-\setbeamersize{text margin left=0.65cm, text margin right=0.65cm}
+% Slide Geometry & Margins (16:9 Widescreen)
+\setbeamersize{text margin left=0.7cm, text margin right=0.7cm}
 
-% Custom Frametitle
+% Custom Minimal Frametitle
 \setbeamertemplate{frametitle}{%
     \vspace{0.35cm}%
-    \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.65cm,rightskip=0.65cm]{frametitle}%
-        {\fontsize{14}{17}\selectfont\textbf{\insertframetitle}}\par%
+    \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.7cm,rightskip=0.7cm]{frametitle}%
+        {\fontsize{13.5}{17}\selectfont\textbf{\insertframetitle}}\par%
         \ifx\insertframesubtitle\@empty\else%
             \vspace{2pt}%
             {\color{mutedgray}\fontsize{8.5}{11}\selectfont\insertframesubtitle}\par%
@@ -61,73 +64,56 @@
     \vspace{-0.15cm}%
 }
 
-% Custom Footline (Clean Minimal Footer)
+% Custom Minimal Footline
 \setbeamertemplate{footline}{%
-    \ifnum\thepage>1%
-    \begin{beamercolorbox}[wd=\paperwidth,ht=0.45cm,dp=0.2cm,leftskip=0.65cm,rightskip=0.65cm]{footline}%
-        {\color{mutedgray}\fontsize{7}{9}\selectfont\textbf{Spare Part EMS 2.0} \textbullet\ Improvement Report}%
+    \ifnum\thepage>0%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=0.45cm,dp=0.2cm,leftskip=0.7cm,rightskip=0.7cm]{footline}%
+        {\color{lightgray}\fontsize{7}{9}\selectfont\textbf{Spare Part EMS 2.0} \textbullet\ Improvement Report}%
         \hfill%
-        {\color{mutedgray}\fontsize{7}{9}\selectfont\insertframenumber{} / \inserttotalframenumber}%
+        {\color{lightgray}\fontsize{7}{9}\selectfont Slide \insertframenumber{} / \inserttotalframenumber}%
     \end{beamercolorbox}%
     \fi%
 }
 
 % ==============================================================================
-% CUSTOM BOX STYLES & REUSABLE COMPONENTS
+% REUSABLE MINIMALIST BOX STYLES
 % ==============================================================================
 
-% Pill / Badge
-\newcommand{\badge}[3][brandteal]{%
-    \tikz[baseline=-0.6ex]\node[fill=#1, text=#2, rounded corners=2pt, inner xsep=5pt, inner ysep=2.5pt, font=\fontsize{7.5}{9}\bfseries\selectfont] {#3};%
-}
-
-% Comparison Box: BEFORE
-\newtcolorbox{beforebox}[1][]{
-    colback=softred,
-    colframe=brandorange!60,
-    coltitle=brandorange,
-    fonttitle=\fontsize{8}{10}\bfseries\selectfont,
-    title={\textbf{BEFORE}},
-    arc=3pt,
-    boxrule=0.8pt,
-    left=6pt, right=6pt, top=5pt, bottom=5pt,
-    #1
-}
-
-% Comparison Box: AFTER
-\newtcolorbox{afterbox}[1][]{
-    colback=softgreen,
-    colframe=brandteal!60,
-    coltitle=brandteal,
-    fonttitle=\fontsize{8}{10}\bfseries\selectfont,
-    title={\textbf{AFTER}},
-    arc=3pt,
-    boxrule=0.8pt,
-    left=6pt, right=6pt, top=5pt, bottom=5pt,
-    #1
-}
-
-% General Card
-\newtcolorbox{cardbox}[2][]{
+% Neutral Clean Card
+\newtcolorbox{minimalcard}[1][]{
     colback=cardbg,
     colframe=cardborder,
-    coltitle=slatenavy,
-    fonttitle=\fontsize{9}{11}\bfseries\selectfont,
-    title={#2},
-    arc=4pt,
-    boxrule=0.7pt,
-    left=7pt, right=7pt, top=6pt, bottom=6pt,
+    arc=3pt,
+    boxrule=0.6pt,
+    left=6pt, right=6pt, top=5pt, bottom=5pt,
     #1
 }
 
-% ==============================================================================
-% PRESENTATION METADATA
-% ==============================================================================
-\title{Spare Part EMS 2.0}
-\subtitle{One platform to manage the full spare part lifecycle}
-\author{Engineering Operations \& Procurement Platform}
-\institute{Factory HW \textbullet\ Smart Watch Division}
-\date{Improvement Report}
+% Restrained BEFORE Box
+\newtcolorbox{beforebox}[1][]{
+    colback=problembg,
+    colframe=problemborder,
+    coltitle=problemtext,
+    fonttitle=\fontsize{7.5}{9.5}\bfseries\selectfont,
+    title={\textbf{BEFORE}},
+    arc=3pt,
+    boxrule=0.6pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt,
+    #1
+}
+
+% Restrained AFTER Box
+\newtcolorbox{afterbox}[1][]{
+    colback=solutionbg,
+    colframe=solutionborder,
+    coltitle=primary,
+    fonttitle=\fontsize{7.5}{9.5}\bfseries\selectfont,
+    title={\textbf{AFTER}},
+    arc=3pt,
+    boxrule=0.6pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt,
+    #1
+}
 
 % ==============================================================================
 % DOCUMENT BODY (COMBINED EXECUTIVE DECK: 8 SLIDES)
@@ -144,4 +130,3 @@
 \input{slides/10_impact.tex}
 
 \end{document}
-

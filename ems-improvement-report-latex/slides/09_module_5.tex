@@ -1,91 +1,71 @@
 % ==============================================================================
-% SLIDE 9: MODULE 5 (ONE ACTION, EVERY WORK ORDER)
+% SLIDE 7: MODULE 5 (ONE ACTION, EVERY WORK ORDER)
 % ==============================================================================
 \begin{frame}{Module 5: One action, every work order}
-    \vspace{0.05cm}
+    \vspace{0.1cm}
     
     % Top Section: Visual Comparison (10 lines WO allocation)
     \begin{columns}[T]
         % BEFORE
         \begin{column}{0.485\textwidth}
-            \begin{tcolorbox}[
-                colback=softred, colframe=brandorange!70, arc=4pt, boxrule=0.8pt,
-                left=7pt, right=7pt, top=5pt, bottom=5pt, height=2.4cm
-            ]
-                {\fontsize{7.5}{9}\bfseries\selectfont\color{brandorange}BEFORE}\par
+            \begin{beforebox}[height=2.3cm]
+                {\fontsize{7.5}{9}\selectfont\color{mutedgray}10 lines use the same part}\par
                 \vspace{2pt}
-                {\fontsize{8}{10}\selectfont\color{mutedgray}10 lines use the part}\par
-                \vspace{3pt}
-                \tikz[baseline=-0.5ex]\node[fill=brandorange!20, text=brandorange, rounded corners=2pt, font=\fontsize{8}{10}\bfseries\selectfont, inner sep=3pt] {1 WO $\longrightarrow$ 1 mechanism};
+                \tikz[baseline=-0.5ex]\node[fill=white, draw=problemborder, text=problemtext, rounded corners=2pt, font=\fontsize{7.5}{9.5}\bfseries\selectfont, inner sep=3pt] {1 WO $\longrightarrow$ 1 mechanism};
                 \par
                 \vspace{3pt}
-                {\fontsize{7.5}{9.5}\bfseries\selectfont\color{brandorange}Line 1 shows 10$\times$ the cost; the other 9 show zero}
-            \end{tcolorbox}
+                {\fontsize{7.2}{9}\selectfont\color{problemtext}Line 1 takes 10$\times$ cost; other 9 lines show zero cost.}
+            \end{beforebox}
         \end{column}
         
         % AFTER
         \begin{column}{0.485\textwidth}
-            \begin{tcolorbox}[
-                colback=softgreen, colframe=brandteal!70, arc=4pt, boxrule=0.8pt,
-                left=7pt, right=7pt, top=5pt, bottom=5pt, height=2.4cm
-            ]
-                {\fontsize{7.5}{9}\bfseries\selectfont\color{brandteal}AFTER}\par
+            \begin{afterbox}[height=2.3cm]
+                {\fontsize{7.5}{9}\selectfont\color{mutedgray}10 lines use the same part}\par
                 \vspace{2pt}
-                {\fontsize{8}{10}\selectfont\color{mutedgray}10 lines use the part}\par
-                \vspace{3pt}
-                \tikz[baseline=-0.5ex]\node[fill=brandteal!20, text=brandteal, rounded corners=2pt, font=\fontsize{8}{10}\bfseries\selectfont, inner sep=3pt] {10 WOs, each on its own mechanism};
+                \tikz[baseline=-0.5ex]\node[fill=white, draw=solutionborder, text=primary, rounded corners=2pt, font=\fontsize{7.5}{9.5}\bfseries\selectfont, inner sep=3pt] {10 WOs, each on its own mechanism};
                 \par
                 \vspace{3pt}
-                {\fontsize{7.5}{9.5}\bfseries\selectfont\color{brandteal}100\% precise cost allocation per line \& mechanism}
-            \end{tcolorbox}
+                {\fontsize{7.2}{9}\selectfont\color{darkslate}100\% accurate cost allocation per line and mechanism.}
+            \end{afterbox}
         \end{column}
     \end{columns}
     
-    \vspace{0.25cm}
+    \vspace{0.2cm}
     
     % Bottom Section: 3 Feature Cards
     \begin{columns}[T]
         % Card 1
         \begin{column}{0.315\textwidth}
-            \begin{tcolorbox}[
-                colback=cardbg, colframe=cardborder, arc=4pt, boxrule=0.7pt,
-                left=7pt, right=7pt, top=7pt, bottom=7pt, height=2.3cm
-            ]
-                {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Less manual work}\par
-                \vspace{0.2cm}
-                {\fontsize{8}{10.5}\selectfont\color{mutedgray}
-                One single action automatically generates and releases all work orders simultaneously.
+            \begin{minimalcard}[height=2.3cm]
+                {\fontsize{8.5}{10.5}\bfseries\selectfont\color{primary}Less manual work}\par
+                \vspace{0.15cm}
+                {\fontsize{7.5}{10}\selectfont\color{mutedgray}
+                A single action automatically generates and releases all work orders in bulk.
                 }
-            \end{tcolorbox}
+            \end{minimalcard}
         \end{column}
         
         % Card 2
         \begin{column}{0.315\textwidth}
-            \begin{tcolorbox}[
-                colback=cardbg, colframe=cardborder, arc=4pt, boxrule=0.7pt,
-                left=7pt, right=7pt, top=7pt, bottom=7pt, height=2.3cm
-            ]
-                {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Correct allocation}\par
-                \vspace{0.2cm}
-                {\fontsize{8}{10.5}\selectfont\color{mutedgray}
-                Parts post accurately to the specific mechanism of the exact line that consumed them.
+            \begin{minimalcard}[height=2.3cm]
+                {\fontsize{8.5}{10.5}\bfseries\selectfont\color{primary}Correct allocation}\par
+                \vspace{0.15cm}
+                {\fontsize{7.5}{10}\selectfont\color{mutedgray}
+                Parts post accurately to the specific mechanism of the exact line consuming them.
                 }
-            \end{tcolorbox}
+            \end{minimalcard}
         \end{column}
         
         % Card 3
         \begin{column}{0.315\textwidth}
-            \begin{tcolorbox}[
-                colback=cardbg, colframe=cardborder, arc=4pt, boxrule=0.7pt,
-                left=7pt, right=7pt, top=7pt, bottom=7pt, height=2.3cm
-            ]
-                {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Reliable history}\par
-                \vspace{0.2cm}
-                {\fontsize{8}{10.5}\selectfont\color{mutedgray}
-                Issuance data matches shop floor reality for exact MTBF/MTTR and audit compliance.
+            \begin{minimalcard}[height=2.3cm]
+                {\fontsize{8.5}{10.5}\bfseries\selectfont\color{primary}Reliable history}\par
+                \vspace{0.15cm}
+                {\fontsize{7.5}{10}\selectfont\color{mutedgray}
+                Issuance records reflect shop floor reality for precise MTBF/MTTR audits.
                 }
-            \end{tcolorbox}
+            \end{minimalcard}
         \end{column}
     \end{columns}
 \end{frame}
-

@@ -1,25 +1,22 @@
 % ==============================================================================
-% SLIDE 5: MODULES 0-1 (FORECAST & MASS SEARCH)
+% SLIDE 3: MODULES 0-1 (PLAN AHEAD, CHECK BEFORE ORDERING)
 % ==============================================================================
 \begin{frame}{Modules 0–1: Plan ahead, check before ordering}
-    \vspace{0.1cm}
+    \vspace{0.15cm}
     
     \begin{columns}[T]
         % Module 0: Forecast & Safety Stock
         \begin{column}{0.485\textwidth}
-            % Header
-            \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=2.5pt, font=\fontsize{8}{10}\bfseries\selectfont, minimum width=0.55cm, minimum height=0.55cm] {0};
-            \hspace{4pt}
-            {\fontsize{10.5}{13}\bfseries\selectfont\color{slatenavy}Forecast \& Safety Stock}\par
-            \vspace{0.25cm}
+            {\fontsize{9.5}{12}\bfseries\selectfont\color{primary}0 \textbullet\ Forecast \& Safety Stock}\par
+            \vspace{0.2cm}
             
             % BEFORE Box
             \begin{beforebox}
-                {\fontsize{8}{10.5}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandorange}{\textbullet}] No usage forecast; ordering is reactive
-                    \item[\textcolor{brandorange}{\textbullet}] Long-lead parts are ordered too late
-                    \item[\textcolor{brandorange}{\textbullet}] No safety stock: over- or under-buying
+                {\fontsize{7.8}{10.5}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{problemtext}{\textbullet}] No usage forecast; ordering is reactive
+                    \item[\textcolor{problemtext}{\textbullet}] Long-lead parts are ordered too late
+                    \item[\textcolor{problemtext}{\textbullet}] No safety stock: over- or under-buying
                 \end{itemize}
                 }
             \end{beforebox}
@@ -28,12 +25,12 @@
             
             % AFTER Box
             \begin{afterbox}
-                {\fontsize{8}{10.5}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandteal}{\textbullet}] Auto forecast from output and time
-                    \item[\textcolor{brandteal}{\textbullet}] Reorder alerts when an order is due
-                    \item[\textcolor{brandteal}{\textbullet}] Safety-stock limit set per part
-                    \item[\textcolor{brandteal}{\textbullet}] Bulk Q-Code registration
+                {\fontsize{7.8}{10.5}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{primary}{\textbullet}] Auto forecast from production output and time
+                    \item[\textcolor{primary}{\textbullet}] Automated reorder alerts when an order is due
+                    \item[\textcolor{primary}{\textbullet}] Safety-stock limit configured per part
+                    \item[\textcolor{primary}{\textbullet}] Bulk Q-Code onboarding and registration
                 \end{itemize}
                 }
             \end{afterbox}
@@ -41,19 +38,16 @@
         
         % Module 1: Mass Search
         \begin{column}{0.485\textwidth}
-            % Header
-            \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=2.5pt, font=\fontsize{8}{10}\bfseries\selectfont, minimum width=0.55cm, minimum height=0.55cm] {1};
-            \hspace{4pt}
-            {\fontsize{10.5}{13}\bfseries\selectfont\color{slatenavy}Mass Search}\par
-            \vspace{0.25cm}
+            {\fontsize{9.5}{12}\bfseries\selectfont\color{primary}1 \textbullet\ Mass Search}\par
+            \vspace{0.2cm}
             
             % BEFORE Box
             \begin{beforebox}
-                {\fontsize{8}{10.5}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandorange}{\textbullet}] Excel and legacy system checked separately
-                    \item[\textcolor{brandorange}{\textbullet}] One item at a time; no bulk lookup
-                    \item[\textcolor{brandorange}{\textbullet}] Orders rejected after registration
+                {\fontsize{7.8}{10.5}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{problemtext}{\textbullet}] Excel and legacy system checked separately
+                    \item[\textcolor{problemtext}{\textbullet}] One item at a time; no bulk lookup capability
+                    \item[\textcolor{problemtext}{\textbullet}] Orders rejected downstream after registration
                 \end{itemize}
                 }
             \end{beforebox}
@@ -62,15 +56,14 @@
             
             % AFTER Box
             \begin{afterbox}
-                {\fontsize{8}{10.5}\selectfont
-                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
-                    \item[\textcolor{brandteal}{\textbullet}] Bulk lookup: price, interlock, stock, photos
-                    \item[\textcolor{brandteal}{\textbullet}] Status of all 4 PO routes in one view
-                    \item[\textcolor{brandteal}{\textbullet}] Item issues flagged before ordering
+                {\fontsize{7.8}{10.5}\selectfont\color{darkslate}
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{10pt}
+                    \item[\textcolor{primary}{\textbullet}] Bulk lookup: price, interlock, stock, photos
+                    \item[\textcolor{primary}{\textbullet}] Status of all 4 PO routes visible in one view
+                    \item[\textcolor{primary}{\textbullet}] Critical part issues flagged before ordering
                 \end{itemize}
                 }
             \end{afterbox}
         \end{column}
     \end{columns}
 \end{frame}
-
