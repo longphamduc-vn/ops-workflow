@@ -95,3 +95,4 @@ File kết quả sẽ là `EMS_2.0_From_LaTeX.pptx` với tỉ lệ 16:9, mở v
 ```bash
 soffice --infilter="impress_pdf_import" --headless --convert-to pptx main.pdf
 ```
+

@@ -1,0 +1,8 @@
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.synctex.gz
+_temp_slide_images/
