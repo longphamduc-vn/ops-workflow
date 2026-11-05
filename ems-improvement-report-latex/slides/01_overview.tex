@@ -1,0 +1,218 @@
+% ==============================================================================
+% SLIDE 1 (COMBINED): TITLE, TODAY'S PROBLEM & 6 CONNECTED MODULES
+% ==============================================================================
+\begin{frame}[plain]
+    \vspace{0.15cm}
+    
+    % Top Header Banner
+    \begin{beamercolorbox}[wd=\textwidth]{plain}
+        \tikz[baseline=-0.6ex]\node[fill=brandmint, text=brandnavy, rounded corners=2pt, inner xsep=5pt, inner ysep=2pt, font=\fontsize{7}{8.5}\bfseries\selectfont] {IMPROVEMENT REPORT};
+        \hspace{4pt}
+        {\fontsize{13}{16}\bfseries\selectfont\color{brandnavy}Spare Part EMS 2.0}
+        \hspace{6pt}
+        {\fontsize{8.5}{10.5}\selectfont\color{mutedgray}\textbar\hspace{6pt}One platform to manage the full spare part lifecycle}
+    \end{beamercolorbox}
+    
+    \vspace{0.15cm}
+    
+    \begin{columns}[T]
+        % ======================================================================
+        % LEFT COLUMN: TODAY'S PAIN POINTS (OLD SLIDE 2)
+        % ======================================================================
+        \begin{column}{0.375\textwidth}
+            % Section Header
+            \tikz[baseline=-0.6ex]\node[fill=softred, text=brandorange, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{6.8}{8}\bfseries\selectfont] {TODAY'S PROCESS};
+            \hspace{3pt}
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}Loses Data, Time \& Accuracy}\par
+            \vspace{0.15cm}
+            
+            % 4 Slim Problem Cards
+            \begin{tcolorbox}[
+                colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                left=3.5pt, right=3.5pt, top=3pt, bottom=3pt, height=1.15cm
+            ]
+                \begin{columns}[c]
+                    \begin{column}{0.18\textwidth}
+                        \centering
+                        \includegraphics[height=0.58cm, keepaspectratio]{images/image-2-1.png}
+                    \end{column}
+                    \begin{column}{0.80\textwidth}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Fragmented data}\par
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}Excel/legacy in parallel; 1 editor lock.}
+                    \end{column}
+                \end{columns}
+            \end{tcolorbox}
+            
+            \vspace{0.06cm}
+            
+            \begin{tcolorbox}[
+                colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                left=3.5pt, right=3.5pt, top=3pt, bottom=3pt, height=1.15cm
+            ]
+                \begin{columns}[c]
+                    \begin{column}{0.18\textwidth}
+                        \centering
+                        \includegraphics[height=0.58cm, keepaspectratio]{images/image-2-2.png}
+                    \end{column}
+                    \begin{column}{0.80\textwidth}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Missed purchase info}\par
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}No bulk interlock/price check; high rejects.}
+                    \end{column}
+                \end{columns}
+            \end{tcolorbox}
+            
+            \vspace{0.06cm}
+            
+            \begin{tcolorbox}[
+                colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                left=3.5pt, right=3.5pt, top=3pt, bottom=3pt, height=1.15cm
+            ]
+                \begin{columns}[c]
+                    \begin{column}{0.18\textwidth}
+                        \centering
+                        \includegraphics[height=0.58cm, keepaspectratio]{images/image-2-3.png}
+                    \end{column}
+                    \begin{column}{0.80\textwidth}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}No cost control}\par
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}No live cost or over-budget view; manual ETA.}
+                    \end{column}
+                \end{columns}
+            \end{tcolorbox}
+            
+            \vspace{0.06cm}
+            
+            \begin{tcolorbox}[
+                colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                left=3.5pt, right=3.5pt, top=3pt, bottom=3pt, height=1.15cm
+            ]
+                \begin{columns}[c]
+                    \begin{column}{0.18\textwidth}
+                        \centering
+                        \includegraphics[height=0.58cm, keepaspectratio]{images/image-2-4.png}
+                    \end{column}
+                    \begin{column}{0.80\textwidth}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Wrong EBOM and WO}\par
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}10 lines merged into 1 WO on wrong unit.}
+                    \end{column}
+                \end{columns}
+            \end{tcolorbox}
+        \end{column}
+        
+        \hspace{0.01\textwidth}
+        
+        % ======================================================================
+        % RIGHT COLUMN: THE 6 CONNECTED MODULES (OLD SLIDE 3)
+        % ======================================================================
+        \begin{column}{0.605\textwidth}
+            % Section Header
+            \tikz[baseline=-0.6ex]\node[fill=softgreen, text=brandteal, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{6.8}{8}\bfseries\selectfont] {EMS 2.0 SOLUTION};
+            \hspace{3pt}
+            {\fontsize{8.5}{10.5}\bfseries\selectfont\color{slatenavy}One Platform, Six Connected Modules}\par
+            \vspace{0.15cm}
+            
+            % Row 1: Modules 0, 1, 2
+            \begin{columns}[T]
+                % Module 0
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {0};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Forecast \& Stock}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        Predicts usage, triggers reorders and caps stock levels.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+                
+                % Module 1
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {1};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Mass Search}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        Price, interlock, photos and 4 PO routes in one view.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+                
+                % Module 2
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {2};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Purchasing Flow}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        Multi-user requests, auto-routing and an audit trail.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+            \end{columns}
+            
+            \vspace{0.1cm}
+            
+            % Row 2: Modules 3, 4, 5
+            \begin{columns}[T]
+                % Module 3
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {3};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Cost \& ETA}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        ETA tracking, over-budget reasons, cost booked at issue.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+                
+                % Module 4
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {4};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}EBOM}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        Visual line and mechanism tree with sanity rules.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+                
+                % Module 5
+                \begin{column}{0.318\textwidth}
+                    \begin{tcolorbox}[
+                        colback=cardbg, colframe=cardborder, arc=3pt, boxrule=0.5pt,
+                        left=4pt, right=4pt, top=4pt, bottom=4pt, height=2.35cm
+                    ]
+                        \tikz[baseline=-0.5ex]\node[fill=brandteal, text=white, rounded corners=2pt, inner sep=1.8pt, font=\fontsize{6.8}{8}\bfseries\selectfont, minimum width=0.42cm, minimum height=0.42cm] {5};
+                        \hspace{2pt}
+                        {\fontsize{7.5}{9}\bfseries\selectfont\color{slatenavy}Work Orders}\par
+                        \vspace{0.1cm}
+                        {\fontsize{6.6}{8}\selectfont\color{mutedgray}
+                        Mass WO creation with correct mechanism allocation.
+                        }
+                    \end{tcolorbox}
+                \end{column}
+            \end{columns}
+        \end{column}
+    \end{columns}
+\end{frame}
