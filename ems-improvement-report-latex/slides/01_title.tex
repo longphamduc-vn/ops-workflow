@@ -1,0 +1,54 @@
+% ==============================================================================
+% SLIDE 1: TITLE SLIDE
+% ==============================================================================
+{
+\setbeamercolor{background canvas}{bg=brandnavy}
+\begin{frame}[plain]
+    \vspace{0.8cm}
+    
+    % Top Category Badge
+    \begin{beamercolorbox}[wd=\textwidth]{plain}
+        \tikz\node[fill=brandmint, text=brandnavy, rounded corners=3pt, inner xsep=8pt, inner ysep=3.5pt, font=\fontsize{8}{10}\bfseries\selectfont] {IMPROVEMENT REPORT};
+    \end{beamercolorbox}
+    
+    \vspace{0.5cm}
+    
+    % Hero Title & Subtitle
+    {\fontsize{28}{34}\bfseries\selectfont\color{white}Spare Part EMS 2.0}\par
+    \vspace{0.3cm}
+    {\fontsize{13}{17}\selectfont\color{white!85}One platform to manage the full spare part lifecycle}\par
+    
+    \vspace{1.5cm}
+    
+    % 6 Connected Modules Pill Ribbon at Bottom
+    \begin{tikzpicture}[x=1cm, y=1cm]
+        \foreach \i/\num/\title in {
+            0/0/Forecast \& Safety Stock,
+            1/1/Mass Search,
+            2/2/Purchasing Flow,
+            3/3/Cost \& ETA,
+            4/4/EBOM,
+            5/5/Work Orders
+        } {
+            \node[
+                anchor=west,
+                fill=white!12,
+                draw=white!25,
+                rounded corners=4pt,
+                inner xsep=6pt,
+                inner ysep=5pt,
+                text width=2.1cm,
+                minimum height=1.1cm,
+                align=left
+            ] at (\i*2.42, 0) {
+                {\fontsize{8}{10}\bfseries\selectfont\color{brandmint}\num}\par
+                \vspace{2pt}
+                {\fontsize{7.5}{9}\selectfont\color{white}\textbf{\title}}
+            };
+        }
+    \end{tikzpicture}
+    
+    \vfill
+    {\fontsize{7}{9}\selectfont\color{white!50}LG Display Vietnam Haiphong \textbullet\ Factory HW Module Plant 1 \textbullet\ Confidential}
+\end{frame}
+}

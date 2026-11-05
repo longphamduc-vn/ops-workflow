@@ -1,0 +1,103 @@
+% ==============================================================================
+% SLIDE 6: MODULE 2 (FOUR PO ROUTES, AUTO-ESCALATED)
+% ==============================================================================
+\begin{frame}{Module 2: Four PO routes, auto-escalated}
+    \vspace{0.05cm}
+    
+    % Top Waterfall Steps (4 Escalation Steps)
+    \begin{tikzpicture}[x=1cm, y=1cm]
+        % Step 1: Stock Transfer
+        \node[
+            fill=softblue, draw=brandblue!60, rounded corners=3pt,
+            text width=3.2cm, inner sep=5pt, minimum height=1.75cm, align=left
+        ] (s1) at (0, 0) {
+            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandblue}STEP 1}\par
+            \vspace{1pt}
+            {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Stock transfer}\par
+            \vspace{2pt}
+            {\fontsize{7.5}{9.5}\selectfont\color{mutedgray}Use entity stock first.}\par
+            \vspace{3pt}
+            {\fontsize{7}{8.5}\selectfont\color{brandorange}\textbf{Locked / rejected} $\rightarrow$ Step 2}
+        };
+        
+        % Arrow 1 -> 2
+        \draw[-{Latex[length=2.5mm]}, brandblue!80, line width=1pt] (1.75, 0) -- (2.2, 0);
+        
+        % Step 2: Internal PO
+        \node[
+            fill=softblue, draw=brandblue!60, rounded corners=3pt,
+            text width=3.2cm, inner sep=5pt, minimum height=1.75cm, align=left
+        ] (s2) at (3.9, 0) {
+            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandblue}STEP 2}\par
+            \vspace{1pt}
+            {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Internal PO}\par
+            \vspace{2pt}
+            {\fontsize{7.5}{9.5}\selectfont\color{mutedgray}Buy via entity if cheaper.}\par
+            \vspace{3pt}
+            {\fontsize{7}{8.5}\selectfont\color{brandorange}\textbf{Rejected} $\rightarrow$ Step 3}
+        };
+        
+        % Arrow 2 -> 3
+        \draw[-{Latex[length=2.5mm]}, brandblue!80, line width=1pt] (5.65, 0) -- (6.1, 0);
+        
+        % Step 3: Standard PO
+        \node[
+            fill=softgreen, draw=brandteal!60, rounded corners=3pt,
+            text width=3.2cm, inner sep=5pt, minimum height=1.75cm, align=left
+        ] (s3) at (7.8, 0) {
+            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandteal}STEP 3}\par
+            \vspace{1pt}
+            {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Standard PO}\par
+            \vspace{2pt}
+            {\fontsize{7.5}{9.5}\selectfont\color{mutedgray}Regular order with SLA and ETA tracking.}
+        };
+        
+        % Arrow 3 -> 4
+        \draw[-{Latex[length=2.5mm]}, brandteal!80, line width=1pt] (9.55, 0) -- (10.0, 0);
+        
+        % Step 4: Urgent PO
+        \node[
+            fill=softred, draw=brandorange!60, rounded corners=3pt,
+            text width=3.2cm, inner sep=5pt, minimum height=1.75cm, align=left
+        ] (s4) at (11.7, 0) {
+            {\fontsize{7.5}{9}\bfseries\selectfont\color{brandorange}STEP 4}\par
+            \vspace{1pt}
+            {\fontsize{9}{11}\bfseries\selectfont\color{slatenavy}Urgent PO}\par
+            \vspace{2pt}
+            {\fontsize{7.5}{9.5}\selectfont\color{mutedgray}Fast approval for urgent downtime needs.}
+        };
+    \end{tikzpicture}
+    
+    \vspace{0.15cm}
+    
+    % Bottom Comparison
+    \begin{columns}[T]
+        % BEFORE Box
+        \begin{column}{0.485\textwidth}
+            \begin{beforebox}
+                {\fontsize{7.5}{10}\selectfont
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
+                    \item[\textcolor{brandorange}{\textbullet}] One Excel editor at a time (U-dock file lock)
+                    \item[\textcolor{brandorange}{\textbullet}] Multi-layer review: LEC, Reviewer, Requestor
+                    \item[\textcolor{brandorange}{\textbullet}] Rejects rechecked by hand; critical information gets lost
+                    \item[\textcolor{brandorange}{\textbullet}] ETA chased manually through LEC and Corporate Purchase
+                \end{itemize}
+                }
+            \end{beforebox}
+        \end{column}
+        
+        % AFTER Box
+        \begin{column}{0.485\textwidth}
+            \begin{afterbox}
+                {\fontsize{7.5}{10}\selectfont
+                \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{12pt}
+                    \item[\textcolor{brandteal}{\textbullet}] Real-time multi-user concurrent work; replaces U-dock
+                    \item[\textcolor{brandteal}{\textbullet}] LEC handles hundreds of items in bulk
+                    \item[\textcolor{brandteal}{\textbullet}] In-system comments with a complete immutable audit trail
+                    \item[\textcolor{brandteal}{\textbullet}] Overdue orders highlighted; ETA updated directly in-system
+                \end{itemize}
+                }
+            \end{afterbox}
+        \end{column}
+    \end{columns}
+\end{frame}
