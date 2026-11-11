@@ -171,3 +171,63 @@ async def test_webhook_subscription_registration(api_client: httpx.AsyncClient) 
     data = res.json()
     assert data["target_url"] == "https://consumer.app/webhook"
     assert "sub_" in data["id"]
+
+
+@pytest.mark.asyncio
+async def test_list_runs_pagination_and_filters(api_client: httpx.AsyncClient) -> None:
+    headers = {"X-API-Key": "test_api_key"}
+    assert workflows.APP_REPO is not None
+
+    # Seed test runs
+    await workflows.APP_REPO.create_run("run_test_01", "equipment-status-lookup", {"eq": "1"})
+    await workflows.APP_REPO.update_run_status("run_test_01", "success")
+
+    await workflows.APP_REPO.create_run("run_test_02", "equipment-status-lookup", {"eq": "2"})
+    await workflows.APP_REPO.update_run_status("run_test_02", "failed")
+
+    await workflows.APP_REPO.create_run("run_test_03", "other-workflow", {"eq": "3"})
+    await workflows.APP_REPO.update_run_status("run_test_03", "success")
+
+    # 1. Query all
+    res = await api_client.get("/api/v1/runs", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total"] >= 3
+    assert len(data["items"]) >= 3
+
+    # 2. Filter by status
+    res_failed = await api_client.get("/api/v1/runs?status=failed", headers=headers)
+    assert res_failed.status_code == 200
+    data_failed = res_failed.json()
+    assert data_failed["total"] >= 1
+    assert all(r["status"] == "failed" for r in data_failed["items"])
+
+    # 3. Filter by workflow_name
+    res_wf = await api_client.get(
+        "/api/v1/runs?workflow_name=equipment-status-lookup", headers=headers
+    )
+    assert res_wf.status_code == 200
+    data_wf = res_wf.json()
+    assert all(r["workflow_name"] == "equipment-status-lookup" for r in data_wf["items"])
+
+
+@pytest.mark.asyncio
+async def test_replay_run_endpoint(api_client: httpx.AsyncClient) -> None:
+    headers = {"X-API-Key": "test_api_key"}
+    assert workflows.APP_REPO is not None
+
+    # Seed a run
+    seed_id = "run_to_replay_01"
+    await workflows.APP_REPO.create_run(seed_id, "equipment-status-lookup", {"wip_entity_id": "999"})
+    await workflows.APP_REPO.update_run_status(seed_id, "failed")
+
+    # Trigger replay
+    res = await api_client.post(
+        f"/api/v1/runs/{seed_id}/replay",
+        headers=headers,
+        json={"resume_from_failed": True, "new_run": False},
+    )
+    assert res.status_code == 202
+    data = res.json()
+    assert data["run_id"] == seed_id
+    assert data["workflow_name"] == "equipment-status-lookup"

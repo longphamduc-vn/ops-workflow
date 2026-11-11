@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Opsflow Console – Monitoring & Debug Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .node-pulse { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  @keyframes pulse-ring { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">
+        <i class="fa-solid fa-diagram-project"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-100 tracking-tight text-sm">OPSFLOW CONSOLE</span>
+          <span class="px-2 py-0.5 text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded">Component 1</span>
+        </div>
+        <div class="text-[11px] text-slate-400 flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Engine Online (:8000)
+          <span class="text-slate-600">|</span>
+          <span class="text-emerald-400 font-medium"><i class="fa-solid fa-link text-[10px] mr-1"></i>EMS Nexacro Session Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Tabs -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-lg border border-slate-800/80 text-xs font-medium">
+      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="px-3 py-1.5 rounded-md text-blue-400 bg-slate-800 shadow-sm transition">
+        <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
+      </button>
+      <button onclick="switchTab('inspector')" id="tab-btn-inspector" class="px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+        <i class="fa-solid fa-bug mr-1.5"></i>Debug & DAG Inspector
+        <span class="ml-1 px-1.5 py-0.2 bg-red-500/20 text-red-400 rounded-full text-[10px] font-bold">1 lỗi</span>
+      </button>
+      <button onclick="switchTab('runs')" id="tab-btn-runs" class="px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+        <i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Lịch sử Runs
+      </button>
+      <button onclick="switchTab('workflows')" id="tab-btn-workflows" class="px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+        <i class="fa-solid fa-file-code mr-1.5"></i>Workflows (6)
+      </button>
+      <button onclick="switchTab('connectors')" id="tab-btn-connectors" class="px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+        <i class="fa-solid fa-network-wired mr-1.5"></i>Connectors & EMS
+      </button>
+    </nav>
+
+    <!-- Right Header Actions -->
+    <div class="flex items-center gap-2">
+      <button onclick="openTriggerModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+        <i class="fa-solid fa-play text-[10px]"></i> Trigger Run
+      </button>
+      <button onclick="replayCurrentRun()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-md text-xs font-semibold flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-rotate text-[10px] text-amber-400"></i> Replay
+      </button>
+      <div class="h-6 w-px bg-slate-800 mx-1"></div>
+      <span class="text-xs text-slate-400 font-mono bg-slate-900 border border-slate-800 px-2 py-1 rounded">Asia/Ho_Chi_Minh</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-5">
+
+    <!-- ==================== TAB 1: OVERVIEW DASHBOARD ==================== -->
+    <section id="tab-dashboard" class="space-y-5">
+      <!-- 4 Top KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span>Runs (24h)</span>
+            <span class="p-1.5 bg-blue-500/10 text-blue-400 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-white">1,428</span>
+            <span class="text-xs text-emerald-400 font-medium"><i class="fa-solid fa-arrow-trend-up"></i> +12%</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">1 active running • 2 pending</p>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span>Tỷ lệ Thành công</span>
+            <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-emerald-400">98.6%</span>
+            <span class="text-xs text-slate-400 font-normal">Mục tiêu ≥ 98%</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">1,408 thành công / 20 lỗi</p>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span>EMS Gateway Latency (P95)</span>
+            <span class="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg"><i class="fa-solid fa-gauge-high"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-white">420 ms</span>
+            <span class="text-xs text-emerald-400 font-medium">Bình thường</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Nexacro XML Protocol • Session OK</p>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span>Cron Triggers / Webhooks</span>
+            <span class="p-1.5 bg-purple-500/10 text-purple-400 rounded-lg"><i class="fa-solid fa-clock"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-white">6 Jobs</span>
+            <span class="text-xs text-slate-400 font-normal">0 DLQ Events</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Next: `equipment-status` in 4m</p>
+        </div>
+      </div>
+
+      <!-- Live Alerts & Recent Errors -->
+      <div class="bg-red-950/30 border border-red-800/40 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-red-200">Phát hiện Run gần nhất thất bại: <span class="font-mono text-red-300">run_01H9A8Z12</span></div>
+            <div class="text-xs text-red-400/80">Workflow: `equipment-status-lookup` • Bước `get_wip_entity` lỗi Nexacro 500 (Session Expired hoặc DB ORA)</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('inspector')" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-magnifying-glass mr-1"></i> Soi lỗi & Debug ngay
+          </button>
+        </div>
+      </div>
+
+      <!-- Two Column Layout: Recent Runs & Cron Schedule -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Recent Runs (2 cols) -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-blue-400"></i> Lần chạy gần đây (Recent Runs)
+            </h3>
+            <button onclick="switchTab('runs')" class="text-xs text-blue-400 hover:text-blue-300">Xem toàn bộ ›</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-400">
+                  <th class="pb-2 font-medium">Run ID</th>
+                  <th class="pb-2 font-medium">Workflow</th>
+                  <th class="pb-2 font-medium">Trạng thái</th>
+                  <th class="pb-2 font-medium">Độ trễ</th>
+                  <th class="pb-2 font-medium">Bắt đầu lúc</th>
+                  <th class="pb-2 font-medium text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/60 font-mono">
+                <tr class="hover:bg-slate-800/30 transition">
+                  <td class="py-2.5 text-blue-400 font-semibold cursor-pointer" onclick="switchTab('inspector')">run_01H9A8Z12</td>
+                  <td class="py-2.5 text-slate-200">equipment-status-lookup</td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-sans font-semibold">FAILED</span></td>
+                  <td class="py-2.5 text-slate-400">1,250 ms</td>
+                  <td class="py-2.5 text-slate-400 font-sans">09:42:10 (1 phút trước)</td>
+                  <td class="py-2.5 text-right font-sans">
+                    <button onclick="switchTab('inspector')" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fa-solid fa-bug"></i> Debug</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-800/30 transition">
+                  <td class="py-2.5 text-blue-400 font-semibold">run_01H9A7X99</td>
+                  <td class="py-2.5 text-slate-200">spare-parts-inventory-audit</td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans font-semibold">SUCCESS</span></td>
+                  <td class="py-2.5 text-slate-400">3,420 ms</td>
+                  <td class="py-2.5 text-slate-400 font-sans">09:30:00 (13 phút trước)</td>
+                  <td class="py-2.5 text-right font-sans">
+                    <span class="text-slate-400">Hoàn thành</span>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-800/30 transition">
+                  <td class="py-2.5 text-blue-400 font-semibold">run_01H9A6W55</td>
+                  <td class="py-2.5 text-slate-200">procurement-rfq-stock-optimization</td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-sans font-semibold">WAIT_APPROVAL</span></td>
+                  <td class="py-2.5 text-slate-400">--</td>
+                  <td class="py-2.5 text-slate-400 font-sans">09:15:22 (28 phút trước)</td>
+                  <td class="py-2.5 text-right font-sans">
+                    <button class="px-2 py-0.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-[11px] font-semibold">Duyệt ngay</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-800/30 transition">
+                  <td class="py-2.5 text-blue-400 font-semibold">run_01H9A5M10</td>
+                  <td class="py-2.5 text-slate-200">purchase-order-tracking</td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans font-semibold">SUCCESS</span></td>
+                  <td class="py-2.5 text-slate-400">890 ms</td>
+                  <td class="py-2.5 text-slate-400 font-sans">09:00:00 (43 phút trước)</td>
+                  <td class="py-2.5 text-right font-sans">
+                    <span class="text-slate-400">Hoàn thành</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cron Triggers & Active Jobs (1 col) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-purple-400"></i> Lịch Cron (APScheduler)
+            </h3>
+            <span class="text-[11px] px-2 py-0.5 bg-purple-500/10 text-purple-300 rounded font-mono">6 active</span>
+          </div>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-lg">
+              <div class="flex items-center justify-between font-semibold text-slate-200">
+                <span>equipment-status-lookup</span>
+                <span class="font-mono text-emerald-400 text-[11px]">*/15 * * * *</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1 flex justify-between">
+                <span>Next run: in 4 phút</span>
+                <span class="text-slate-400">Asia/Ho_Chi_Minh</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-lg">
+              <div class="flex items-center justify-between font-semibold text-slate-200">
+                <span>spare-parts-inventory-sync</span>
+                <span class="font-mono text-purple-400 text-[11px]">0 */2 * * *</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1 flex justify-between">
+                <span>Next run: lúc 10:00 AM</span>
+                <span class="text-slate-400">Mỗi 2 tiếng</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-lg">
+              <div class="flex items-center justify-between font-semibold text-slate-200">
+                <span>target-stock-optimization</span>
+                <span class="font-mono text-blue-400 text-[11px]">0 2 * * *</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1 flex justify-between">
+                <span>Next run: 02:00 AM ngày mai</span>
+                <span class="text-slate-400">Chạy đêm hàng ngày</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: [TRỌNG TÂM] RUN INSPECTOR & WIRE DEBUGGER ==================== -->
+    <section id="tab-inspector" class="space-y-4 hidden">
+      <!-- Run Status Banner -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold text-white font-mono">run_01H9A8Z12</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">FAILED (Step 1)</span>
+              <span class="text-xs text-slate-400 font-mono">wf: equipment-status-lookup (v1.0)</span>
+            </div>
+            <div class="text-xs text-slate-400 mt-0.5">
+              Bắt đầu: 09:42:10.142 • Thời lượng: 1,250 ms • Trigger: <span class="text-slate-300 font-mono">cron</span> • Máy chủ: <span class="text-slate-300 font-mono">opsflow-prod-01</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="replayCurrentRun()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+            <i class="fa-solid fa-play"></i> Replay từ bước lỗi (Resume)
+          </button>
+          <button class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition">
+            <i class="fa-solid fa-download mr-1"></i> Tải Log (.log)
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Half: Visual Interactive DAG -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-diagram-project text-blue-400"></i> Đồ thị Luồng Thực thi (Visual DAG)
+            </h3>
+            <span class="text-[11px] text-slate-400 font-mono">(Bấm vào từng bước để xem chi tiết Wire Telemetry)</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-400">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Thành công</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Thất bại</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span> Bị bỏ qua (Skipped)</span>
+          </div>
+        </div>
+
+        <!-- DAG Visual Flow (Interactive Nodes) -->
+        <div class="bg-slate-950 rounded-xl border border-slate-800 p-6 flex flex-wrap items-center justify-center gap-4 overflow-x-auto">
+          
+          <!-- Node 1: FAILED STEP -->
+          <div onclick="selectStep('step-1')" id="node-step-1" class="cursor-pointer bg-slate-900 border-2 border-red-500 rounded-xl p-3.5 w-60 shadow-lg shadow-red-500/10 hover:border-red-400 transition">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400">call: ems</span>
+              <span class="text-red-400 font-semibold font-mono text-[11px]">1,250 ms</span>
+            </div>
+            <div class="font-bold text-sm text-slate-100 truncate">get_wip_entity</div>
+            <div class="text-[11px] text-slate-400 truncate mt-1">/woSearchNav/retrieveWipEntity</div>
+            <div class="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
+              <span class="text-red-400 font-medium"><i class="fa-solid fa-circle-xmark mr-1"></i>Thử lần 3/3</span>
+              <span class="text-blue-400 underline font-sans text-[10px]">Đang chọn</span>
+            </div>
+          </div>
+
+          <div class="text-slate-600 text-lg"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <!-- Node 2: SKIPPED STEP -->
+          <div onclick="selectStep('step-2')" id="node-step-2" class="cursor-pointer bg-slate-900/40 border border-slate-800 rounded-xl p-3.5 w-60 hover:border-slate-700 transition opacity-60">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">transform</span>
+              <span class="text-slate-400 font-mono text-[11px]">--</span>
+            </div>
+            <div class="font-bold text-sm text-slate-300 truncate">transform_wip_data</div>
+            <div class="text-[11px] text-slate-400 truncate mt-1">JMESPath filter status</div>
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Skipped (Upstream Fail)</span>
+            </div>
+          </div>
+
+          <div class="text-slate-600 text-lg"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <!-- Node 3: SKIPPED STEP -->
+          <div onclick="selectStep('step-3')" id="node-step-3" class="cursor-pointer bg-slate-900/40 border border-slate-800 rounded-xl p-3.5 w-60 hover:border-slate-700 transition opacity-60">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">call: ems</span>
+              <span class="text-slate-400 font-mono text-[11px]">--</span>
+            </div>
+            <div class="font-bold text-sm text-slate-300 truncate">query_master_details</div>
+            <div class="text-[11px] text-slate-400 truncate mt-1">/woMasterNav/WoMasterRetInit</div>
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Skipped</span>
+            </div>
+          </div>
+
+          <div class="text-slate-600 text-lg"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <!-- Node 4: SKIPPED STEP -->
+          <div onclick="selectStep('step-4')" id="node-step-4" class="cursor-pointer bg-slate-900/40 border border-slate-800 rounded-xl p-3.5 w-60 hover:border-slate-700 transition opacity-60">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">call: http</span>
+              <span class="text-slate-400 font-mono text-[11px]">--</span>
+            </div>
+            <div class="font-bold text-sm text-slate-300 truncate">notify_slack</div>
+            <div class="text-[11px] text-slate-400 truncate mt-1">Webhook #ops-alerts</div>
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Skipped</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Half: Detailed Debugger Panel with Tabs -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <!-- Sub Tabs -->
+        <div class="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs font-semibold">
+            <button onclick="switchSubTab('wire')" id="subtab-btn-wire" class="px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-bolt text-amber-400"></i> Wire Telemetry (Nexacro XML)
+            </button>
+            <button onclick="switchSubTab('log')" id="subtab-btn-log" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-terminal"></i> Console Log Stream
+            </button>
+            <button onclick="switchSubTab('params')" id="subtab-btn-params" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-code"></i> Step Inputs & Context
+            </button>
+            <button onclick="switchSubTab('retries')" id="subtab-btn-retries" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử Retry (3 lần)
+            </button>
+          </div>
+          <div class="text-xs text-slate-400 font-mono">
+            Step: <span class="text-slate-200 font-bold">get_wip_entity</span> (Connector: <span class="text-blue-400 font-bold">ems</span>)
+          </div>
+        </div>
+
+        <!-- SubTab Content 1: Wire Telemetry (Nexacro XML Debugger) -->
+        <div id="subtab-wire" class="p-4 space-y-4 font-mono text-xs">
+          <!-- Request & Response 2-Column Split -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            
+            <!-- Wire Request Column -->
+            <div class="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-blue-400 font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-arrow-up text-xs"></i> [WIRE: REQ] Gói tin gửi lên Nexacro EMS
+                </span>
+                <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px]">POST</span>
+              </div>
+              <div class="text-slate-300 break-all">
+                <span class="text-slate-400">URL:</span> http://localhost:9000/emscom/woSearchNav/retrieveWipEntity.lgdn
+              </div>
+              <div class="text-slate-400 text-[11px] space-y-0.5">
+                <div>Content-Type: application/xml; charset=UTF-8</div>
+                <div>Cookie: JSESSIONID=09F81827461827AA.jvm1; UserOrg=28753</div>
+                <div>User-Agent: Opsflow-Nexacro-Client/1.0</div>
+              </div>
+              <div class="mt-2">
+                <div class="text-slate-400 text-[11px] mb-1">Body XML Payload:</div>
+                <pre class="bg-slate-900 p-2.5 rounded border border-slate-800/80 text-emerald-400 text-[11px] overflow-x-auto custom-scrollbar">&lt;Root xmlns="http://www.nexacroplatform.com/platform/dataset"&gt;
+  &lt;Dataset id="ds_input"&gt;
+    &lt;ColumnInfo&gt;
+      &lt;Column id="wip_entity_id" type="string" size="32"/&gt;
+      &lt;Column id="organization_id" type="string" size="16"/&gt;
+      &lt;Column id="user_id" type="string" size="16"/&gt;
+    &lt;/ColumnInfo&gt;
+    &lt;Rows&gt;
+      &lt;Row&gt;
+        &lt;Col id="wip_entity_id"&gt;337389615&lt;/Col&gt;
+        &lt;Col id="organization_id"&gt;28753&lt;/Col&gt;
+        &lt;Col id="user_id"&gt;658359&lt;/Col&gt;
+      &lt;/Row&gt;
+    &lt;/Rows&gt;
+  &lt;/Dataset&gt;
+&lt;/Root&gt;</pre>
+              </div>
+            </div>
+
+            <!-- Wire Response Column -->
+            <div class="bg-slate-950 border border-red-900/50 rounded-lg p-3.5 space-y-2">
+              <div class="flex items-center justify-between border-b border-red-900/40 pb-2">
+                <span class="text-red-400 font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-arrow-down text-xs"></i> [WIRE: RESP] Phản hồi lỗi từ máy chủ
+                </span>
+                <span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 text-[10px] font-bold">HTTP 500 / Nexacro Error</span>
+              </div>
+              <div class="text-slate-300">
+                <span class="text-slate-400">Latency:</span> <span class="text-amber-400 font-bold">1,250 ms</span> • <span class="text-slate-400">Bytes:</span> 482 B
+              </div>
+              <div class="p-2.5 bg-red-950/40 border border-red-800/50 rounded text-red-200 text-[11px]">
+                <div class="font-bold flex items-center gap-1 text-red-300">
+                  <i class="fa-solid fa-circle-exclamation"></i> Chẩn đoán lỗi tự động (Auto Diagnostics):
+                </div>
+                <div class="mt-1">Hệ thống EMS trả về dataset mã lỗi <code class="text-amber-300">ErrorCode = -1</code> (Database ORA-01017: invalid credentials or session invalidated by EMS gateway).</div>
+              </div>
+              <div class="mt-2">
+                <div class="text-slate-400 text-[11px] mb-1">Raw XML Response Body:</div>
+                <pre class="bg-slate-900 p-2.5 rounded border border-slate-800/80 text-red-300 text-[11px] overflow-x-auto custom-scrollbar">&lt;Root xmlns="http://www.nexacroplatform.com/platform/dataset"&gt;
+  &lt;Dataset id="ErrorCode"&gt;
+    &lt;ColumnInfo&gt;
+      &lt;Column id="code" type="string" size="10"/&gt;
+      &lt;Column id="message" type="string" size="256"/&gt;
+    &lt;/ColumnInfo&gt;
+    &lt;Rows&gt;
+      &lt;Row&gt;
+        &lt;Col id="code"&gt;-1&lt;/Col&gt;
+        &lt;Col id="message"&gt;SESSION_EXPIRED: Please re-login with valid credentials&lt;/Col&gt;
+      &lt;/Row&gt;
+    &lt;/Rows&gt;
+  &lt;/Dataset&gt;
+&lt;/Root&gt;</pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SubTab Content 2: Raw Console Log Stream -->
+        <div id="subtab-log" class="p-4 space-y-2 font-mono text-xs hidden">
+          <div class="flex items-center justify-between text-slate-400 pb-2 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <span>Nguồn: <span class="text-slate-200">logs/runs/run_01H9A8Z12.log</span></span>
+              <span class="text-slate-600">|</span>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" checked class="rounded bg-slate-800 border-slate-700 text-blue-600"> Auto-scroll
+              </label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" placeholder="Tìm kiếm trong log (Regex)..." class="bg-slate-950 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 w-64 focus:outline-none focus:border-blue-500">
+            </div>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[11px] leading-relaxed space-y-1 max-h-72 overflow-y-auto custom-scrollbar">
+            <div class="text-slate-400">[2026-11-11 09:42:10.012] <span class="text-blue-400">[INFO]</span> [SCHEDULER] Starting run run_01H9A8Z12 for workflow 'equipment-status-lookup'</div>
+            <div class="text-slate-400">[2026-11-11 09:42:10.045] <span class="text-purple-400">[DEBUG]</span> [SECRETS] Resolving secrets: EMS_PASSWORD resolved (auto-masking active)</div>
+            <div class="text-slate-400">[2026-11-11 09:42:10.060] <span class="text-cyan-400">[STEP:START]</span> step_id='get_wip_entity' type='call' attempt=1</div>
+            <div class="text-slate-400">[2026-11-11 09:42:10.065] <span class="text-blue-400">[WIRE:REQ]</span> connector='ems' method=POST url=http://localhost:9000/emscom/woSearchNav/retrieveWipEntity.lgdn</div>
+            <div class="text-slate-400">[2026-11-11 09:42:10.450] <span class="text-amber-400">[WARN]</span> [CONNECTOR:EMS] Attempt 1 failed with session error. Backing off 2.0s...</div>
+            <div class="text-slate-400">[2026-11-11 09:42:12.455] <span class="text-cyan-400">[STEP:RETRY]</span> step_id='get_wip_entity' attempt=2 backoff=2s</div>
+            <div class="text-slate-400">[2026-11-11 09:42:12.460] <span class="text-blue-400">[WIRE:REQ]</span> Triggering session auto-relogin to /login.do...</div>
+            <div class="text-slate-400">[2026-11-11 09:42:12.890] <span class="text-amber-400">[WARN]</span> [CONNECTOR:EMS] Attempt 2 failed: HTTP 500. Backing off 4.0s...</div>
+            <div class="text-slate-400">[2026-11-11 09:42:16.895] <span class="text-cyan-400">[STEP:RETRY]</span> step_id='get_wip_entity' attempt=3 (max_attempts reached)</div>
+            <div class="text-red-400 font-bold">[2026-11-11 09:42:17.262] [ERROR] [SCHEDULER] Step 'get_wip_entity' failed after 3 attempts. Error: NexacroApiError('SESSION_EXPIRED')</div>
+            <div class="text-red-400">[2026-11-11 09:42:17.265] [ERROR] [SCHEDULER] Dependent steps ['transform_wip_data', 'query_master_details', 'notify_slack'] marked as SKIPPED</div>
+            <div class="text-red-400 font-bold">[2026-11-11 09:42:17.270] [FATAL] [RUN:FAILED] run_01H9A8Z12 finished with status FAILED (Total latency: 1250ms active call)</div>
+          </div>
+        </div>
+
+        <!-- SubTab Content 3: Params & Context -->
+        <div id="subtab-params" class="p-4 space-y-3 font-mono text-xs hidden">
+          <div class="text-slate-300 font-sans font-semibold">Tham số đầu vào của Run (Inputs context):</div>
+          <pre class="bg-slate-950 p-3 rounded border border-slate-800 text-blue-300 overflow-x-auto">{
+  "wip_entity_id": "337389615",
+  "organization_id": "28753",
+  "user_id": "658359",
+  "language": "EN",
+  "alert_channel": "#ops-alerts"
+}</pre>
+          <div class="text-slate-300 font-sans font-semibold mt-3">Biến môi trường (Environment variables):</div>
+          <pre class="bg-slate-950 p-3 rounded border border-slate-800 text-slate-300 overflow-x-auto">{
+  "DOMAIN": "WORK_ORDERS",
+  "SYSTEM_SOURCE": "EMS_NEXACRO",
+  "EMS_PASSWORD": "*** (masked)"
+}</pre>
+        </div>
+
+        <!-- SubTab Content 4: Retries History -->
+        <div id="subtab-retries" class="p-4 space-y-3 font-mono text-xs hidden">
+          <div class="text-slate-300 font-sans font-semibold">Chi tiết 3 lần gọi thử nghiệm (Exponential Backoff with Jitter):</div>
+          <div class="space-y-2 font-sans">
+            <div class="p-2.5 bg-slate-950 border border-slate-800 rounded flex justify-between items-center">
+              <div>
+                <span class="font-bold text-red-400">Attempt 1:</span> <span class="text-slate-300">Nexacro HTTP 500 (Session Expired)</span>
+              </div>
+              <div class="text-slate-400 text-xs font-mono">Latency: 385ms • Backoff: 2.0s</div>
+            </div>
+            <div class="p-2.5 bg-slate-950 border border-slate-800 rounded flex justify-between items-center">
+              <div>
+                <span class="font-bold text-red-400">Attempt 2:</span> <span class="text-slate-300">Auto-relogin failed (Tomcat 500)</span>
+              </div>
+              <div class="text-slate-400 text-xs font-mono">Latency: 430ms • Backoff: 4.0s</div>
+            </div>
+            <div class="p-2.5 bg-slate-950 border border-red-800/60 rounded flex justify-between items-center bg-red-950/20">
+              <div>
+                <span class="font-bold text-red-400">Attempt 3:</span> <span class="text-red-300 font-semibold">Max attempts (3/3) reached. Aborting step.</span>
+              </div>
+              <div class="text-slate-400 text-xs font-mono">Latency: 435ms • Trạng thái: FAILED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: RUNS HISTORY ==================== -->
+    <section id="tab-runs" class="space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <input type="text" placeholder="Tìm theo Run ID hoặc Idempotency-Key..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-72 focus:outline-none focus:border-blue-500">
+          <select class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+            <option>Tất cả trạng thái (All)</option>
+            <option>Success</option>
+            <option>Failed</option>
+            <option>Running</option>
+            <option>Pending</option>
+          </select>
+          <select class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+            <option>Tất cả Workflows (6)</option>
+            <option>equipment-status-lookup</option>
+            <option>spare-parts-inventory-audit</option>
+            <option>procurement-rfq-stock-optimization</option>
+          </select>
+        </div>
+        <div class="text-xs text-slate-400">Hiển thị 1 - 10 trong tổng số 1,428 runs</div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="p-3 font-semibold">Run ID</th>
+              <th class="p-3 font-semibold">Workflow</th>
+              <th class="p-3 font-semibold">Trạng thái</th>
+              <th class="p-3 font-semibold">Trigger</th>
+              <th class="p-3 font-semibold">Độ trễ</th>
+              <th class="p-3 font-semibold">Bắt đầu lúc</th>
+              <th class="p-3 font-semibold">Hoàn thành lúc</th>
+              <th class="p-3 font-semibold text-right">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-mono">
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-3 text-blue-400 font-bold cursor-pointer" onclick="switchTab('inspector')">run_01H9A8Z12</td>
+              <td class="p-3 text-slate-200">equipment-status-lookup</td>
+              <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-semibold border border-red-500/30">FAILED</span></td>
+              <td class="p-3 text-slate-400 font-sans">cron (*/15)</td>
+              <td class="p-3 text-slate-300">1,250 ms</td>
+              <td class="p-3 text-slate-400 font-sans">09:42:10</td>
+              <td class="p-3 text-slate-400 font-sans">09:42:17</td>
+              <td class="p-3 text-right font-sans">
+                <button onclick="switchTab('inspector')" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fa-solid fa-bug"></i> Debug</button>
+                <button onclick="replayCurrentRun()" class="text-amber-400 hover:text-amber-300"><i class="fa-solid fa-rotate"></i> Replay</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-3 text-blue-400 font-bold">run_01H9A7X99</td>
+              <td class="p-3 text-slate-200">spare-parts-inventory-audit</td>
+              <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30">SUCCESS</span></td>
+              <td class="p-3 text-slate-400 font-sans">manual (api)</td>
+              <td class="p-3 text-slate-300">3,420 ms</td>
+              <td class="p-3 text-slate-400 font-sans">09:30:00</td>
+              <td class="p-3 text-slate-400 font-sans">09:30:03</td>
+              <td class="p-3 text-right font-sans">
+                <span class="text-slate-400">Xem log</span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-3 text-blue-400 font-bold">run_01H9A6W55</td>
+              <td class="p-3 text-slate-200">procurement-rfq-stock-optimization</td>
+              <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-semibold border border-purple-500/30">WAIT_APPROVAL</span></td>
+              <td class="p-3 text-slate-400 font-sans">manual</td>
+              <td class="p-3 text-slate-400">--</td>
+              <td class="p-3 text-slate-400 font-sans">09:15:22</td>
+              <td class="p-3 text-slate-400 font-sans">--</td>
+              <td class="p-3 text-right font-sans">
+                <button class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold">Phê duyệt</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: WORKFLOWS CATALOG ==================== -->
+    <section id="tab-workflows" class="space-y-4 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- WF Card 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-xs font-semibold">v1.0</span>
+            <span class="text-xs text-purple-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>cron: */15 * * * *</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-100 text-base">equipment-status-lookup</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">Tra cứu trạng thái WIP entity thiết bị, chi tiết master lệnh làm việc và lịch sử bảo trì từ Nexacro EMS.</p>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+            <span class="text-slate-400">4 bước • Nexacro EMS</span>
+            <button onclick="openTriggerModal('equipment-status-lookup')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold flex items-center gap-1 transition">
+              <i class="fa-solid fa-play text-[10px]"></i> Trigger
+            </button>
+          </div>
+        </div>
+
+        <!-- WF Card 2 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-xs font-semibold">v1.0</span>
+            <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-hand text-[10px] mr-1"></i>manual / api</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-100 text-base">spare-parts-inventory-audit</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">Kiểm kê đối soát tồn kho phụ tùng thực tế so với định mức tối thiểu (safety stock) từ database EMS.</p>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+            <span class="text-slate-400">5 bước • Dataset read-model</span>
+            <button onclick="openTriggerModal('spare-parts-inventory-audit')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold flex items-center gap-1 transition">
+              <i class="fa-solid fa-play text-[10px]"></i> Trigger
+            </button>
+          </div>
+        </div>
+
+        <!-- WF Card 3 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-xs font-semibold">v1.2</span>
+            <span class="text-xs text-amber-400 font-mono"><i class="fa-solid fa-user-check mr-1"></i>approval gate</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-100 text-base">procurement-rfq-stock-optimization</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">Quy trình 9 bước tối ưu hóa báo giá RFQ, kiểm tra 3-tier waterfall interlock và yêu cầu duyệt ngân sách SG.</p>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+            <span class="text-slate-400">9 bước • Full Lifecycle</span>
+            <button onclick="openTriggerModal('procurement-rfq-stock-optimization')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold flex items-center gap-1 transition">
+              <i class="fa-solid fa-play text-[10px]"></i> Trigger
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: CONNECTORS & EMS GATEWAY ==================== -->
+    <section id="tab-connectors" class="space-y-5 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Connector 1: Legacy Nexacro EMS -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-slate-100 text-base">Connector: ems (Nexacro XML)</h3>
+            </div>
+            <span class="text-xs text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Session Active</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Base URL:</span>
+              <span class="font-mono text-slate-200">http://localhost:9000</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Session TTL còn lại:</span>
+              <span class="font-mono text-emerald-400 font-bold">24 phút 18 giây</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Giới hạn Rate-Limit:</span>
+              <span class="font-mono text-slate-200">max_concurrent=3, min_interval=100ms</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">SSL Verify:</span>
+              <span class="font-mono text-amber-400">false (Bypass nội bộ)</span>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <div class="text-xs font-semibold text-slate-300 mb-2">Danh sách Dịch vụ Được phép Gọi (Allowed Services Whitelist):</div>
+            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 font-mono text-[11px] text-slate-300 space-y-1">
+              <div>• /emscom/woSearchNav/retrieveWipEntity.lgdn</div>
+              <div>• /emscom/woMasterNav/WoMasterRetInit.lgdn</div>
+              <div>• /emsworkorder/wo50/wo580Nav/statusHistory.lgdn</div>
+              <div>• /emsspareparts/sp101/sp110Nav/RetStockStatusList.lgdn</div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex gap-2">
+            <button class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-semibold border border-slate-700 transition">
+              <i class="fa-solid fa-arrows-rotate mr-1"></i> Force Relogin Thủ công
+            </button>
+            <button class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-semibold border border-slate-700 transition">
+              <i class="fa-solid fa-heart-pulse mr-1"></i> Ping Heartbeat
+            </button>
+          </div>
+        </div>
+
+        <!-- Connector 2: Generic HTTP / Webhook -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-slate-100 text-base">Connector: http (REST APIs)</h3>
+            </div>
+            <span class="text-xs text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Ready</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Default Timeout:</span>
+              <span class="font-mono text-slate-200">30s</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Retry Strategy:</span>
+              <span class="font-mono text-slate-200">Exponential backoff (delay 2s, max 3)</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Webhook HMAC Secret:</span>
+              <span class="font-mono text-slate-400">sha256:****** (Configured)</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">DLQ Backlog:</span>
+              <span class="font-mono text-emerald-400 font-bold">0 events</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Trigger Workflow Studio -->
+  <div id="trigger-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div>
+          <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-play text-blue-400"></i> Trigger Workflow Execution
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5" id="modal-wf-name">equipment-status-lookup</p>
+        </div>
+        <button onclick="closeTriggerModal()" class="text-slate-400 hover:text-slate-200 text-lg">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Idempotency-Key (Chống gọi trùng lặp):</label>
+          <div class="flex gap-2">
+            <input type="text" id="modal-idempotency-key" value="req-uuid-9f8a21" class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+            <button onclick="generateUuid()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold">Tạo mới</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Inputs Parameters (Tự sinh theo YAML Schema):</label>
+          <div class="space-y-3 bg-slate-950 p-3.5 rounded-lg border border-slate-800">
+            <div>
+              <span class="text-slate-400 font-mono">wip_entity_id:</span>
+              <input type="text" value="337389615" class="w-full mt-1 bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200">
+            </div>
+            <div>
+              <span class="text-slate-400 font-mono">organization_id:</span>
+              <input type="text" value="28753" class="w-full mt-1 bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200">
+            </div>
+            <div>
+              <span class="text-slate-400 font-mono">alert_channel:</span>
+              <input type="text" value="#ops-alerts" class="w-full mt-1 bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="wait-sync" class="rounded bg-slate-950 border-slate-800 text-blue-600">
+          <label for="wait-sync" class="text-slate-300 cursor-pointer">Chờ kết quả đồng bộ (Synchronous wait, timeout 10s)</label>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 border-t border-slate-800 bg-slate-950 flex justify-end gap-2">
+        <button onclick="closeTriggerModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold text-xs transition">Hủy</button>
+        <button onclick="executeTrigger()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold text-xs shadow-sm transition">
+          <i class="fa-solid fa-bolt mr-1"></i> Kích hoạt Run ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      const tabs = ['dashboard', 'inspector', 'runs', 'workflows', 'connectors'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        const btn = document.getElementById('tab-btn-' + t);
+        if (el) el.classList.add('hidden');
+        if (btn) {
+          btn.classList.remove('bg-slate-800', 'text-blue-400');
+          btn.classList.add('text-slate-400');
+        }
+      });
+      const target = document.getElementById('tab-' + tabId);
+      const targetBtn = document.getElementById('tab-btn-' + tabId);
+      if (target) target.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.add('bg-slate-800', 'text-blue-400');
+        targetBtn.classList.remove('text-slate-400');
+      }
+    }
+
+    function switchSubTab(subId) {
+      const subs = ['wire', 'log', 'params', 'retries'];
+      subs.forEach(s => {
+        const el = document.getElementById('subtab-' + s);
+        const btn = document.getElementById('subtab-btn-' + s);
+        if (el) el.classList.add('hidden');
+        if (btn) {
+          btn.classList.remove('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/30');
+          btn.classList.add('text-slate-400');
+        }
+      });
+      const target = document.getElementById('subtab-' + subId);
+      const targetBtn = document.getElementById('subtab-btn-' + subId);
+      if (target) target.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.add('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/30');
+        targetBtn.classList.remove('text-slate-400');
+      }
+    }
+
+    function selectStep(stepId) {
+      alert("Đã chọn " + stepId + ". Bảng Wire Telemetry và logs bên dưới sẽ hiển thị tương ứng dữ liệu của bước này.");
+    }
+
+    function openTriggerModal(name = 'equipment-status-lookup') {
+      document.getElementById('modal-wf-name').innerText = name;
+      document.getElementById('trigger-modal').classList.remove('hidden');
+    }
+
+    function closeTriggerModal() {
+      document.getElementById('trigger-modal').classList.add('hidden');
+    }
+
+    function generateUuid() {
+      const uuid = 'req-' + Math.random().toString(36).substring(2, 10);
+      document.getElementById('modal-idempotency-key').value = uuid;
+    }
+
+    function executeTrigger() {
+      closeTriggerModal();
+      alert("Đã kích hoạt workflow thành công! Run ID mới: run_" + Math.random().toString(36).substring(2, 10).toUpperCase());
+      switchTab('runs');
+    }
+
+    function replayCurrentRun() {
+      alert("Đang kích hoạt Replay cho run_01H9A8Z12 (chế độ resume từ bước 'get_wip_entity')...");
+    }
+  </script>
+</body>
+</html>
+

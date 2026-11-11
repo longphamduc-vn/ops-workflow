@@ -69,6 +69,35 @@ class RunRepository:
         async with self.session_factory() as session:
             return await session.get(RunRecord, run_id)
 
+    async def list_runs(
+        self,
+        status: str | None = None,
+        workflow_name: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> tuple[list[RunRecord], int]:
+        """List workflow runs with optional filtering and pagination."""
+        async with self.session_factory() as session:
+            from sqlalchemy import func
+
+            query = select(RunRecord)
+            count_query = select(func.count(RunRecord.id))
+
+            if status:
+                query = query.where(RunRecord.status == status)
+                count_query = count_query.where(RunRecord.status == status)
+            if workflow_name:
+                query = query.where(RunRecord.workflow_name == workflow_name)
+                count_query = count_query.where(RunRecord.workflow_name == workflow_name)
+
+            total_result = await session.execute(count_query)
+            total = total_result.scalar_one() or 0
+
+            query = query.order_by(RunRecord.created_at.desc()).limit(limit).offset(offset)
+            result = await session.execute(query)
+            runs = list(result.scalars().all())
+            return runs, total
+
     async def create_or_update_step_run(
         self,
         run_id: str,

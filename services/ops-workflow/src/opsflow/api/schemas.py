@@ -84,6 +84,23 @@ class RunStatusResponse(BaseModel):
     completed_at: str | None = None
 
 
+class RunListResponse(BaseModel):
+    """Paginated list of workflow runs."""
+
+    items: list[RunStatusResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class ReplayRunRequest(BaseModel):
+    """Payload to replay or resume an existing run."""
+
+    resume_from_failed: bool = True
+    new_run: bool = False
+    inputs: dict[str, Any] | None = None
+
+
 class StepRunResponse(BaseModel):
     """Execution status and logs for a single workflow step."""
 

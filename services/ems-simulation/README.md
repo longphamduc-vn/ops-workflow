@@ -112,7 +112,7 @@ services/ems-simulation/
 
 ### 4.1 Running with Python CLI
 ```bash
-cd services/ems-simulation
+
 
 # Create venv and install
 uv venv
