@@ -158,6 +158,29 @@ async def get_run_logs(
     return Response(content=content, media_type="text/plain; charset=utf-8")
 
 
+@router.delete("/{run_id}/logs", summary="Delete execution log file for a run")
+async def delete_run_logs(
+    run_id: str,
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:trigger"))],
+) -> dict[str, Any]:
+    """Delete or clear the execution log file for a specific run."""
+    from opsflow.core.logger import get_run_log_path
+
+    log_path = get_run_log_path(run_id)
+    if log_path.exists():
+        log_path.unlink()
+        return {
+            "run_id": run_id,
+            "status": "cleared",
+            "message": f"Log file for run '{run_id}' has been cleared",
+        }
+    return {
+        "run_id": run_id,
+        "status": "not_found",
+        "message": f"No log file found for run '{run_id}'",
+    }
+
+
 @router.post("/{run_id}/cancel", summary="Cancel a running run")
 async def cancel_run(
     run_id: str,
@@ -207,10 +230,13 @@ async def replay_run(
     if not wf:
         from opsflow.core.parser import load_workflow_from_file
 
-        wf_path = Path("workflows") / f"{wf_name}.yml"
-        if not wf_path.exists():
-            wf_path = Path(f"{wf_name}.yml")
-        if wf_path.exists():
+        candidate_paths = [
+            Path("workflows") / f"{wf_name}.yml",
+            Path("services/ops-workflow/workflows") / f"{wf_name}.yml",
+            Path(f"{wf_name}.yml"),
+        ]
+        wf_path = next((p for p in candidate_paths if p.exists()), None)
+        if wf_path and wf_path.exists():
             try:
                 wf = load_workflow_from_file(wf_path)
                 WORKFLOW_REGISTRY[wf.name] = wf

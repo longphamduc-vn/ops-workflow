@@ -16,7 +16,7 @@ export const ConnectorsView: React.FC = () => {
     setIsRelogging(true);
     setTimeout(() => {
       setIsRelogging(false);
-      alert('Đã tái tạo phiên đăng nhập Nexacro EMS thành công (/login.do). Session TTL được làm mới 30 phút.');
+      alert('Successfully refreshed Nexacro EMS session (/login.do). Session TTL reset to 30 minutes.');
     }, 800);
   };
 
@@ -30,10 +30,10 @@ export const ConnectorsView: React.FC = () => {
       <div className="pb-2 border-b border-slate-800">
         <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
           <Network className="w-5 h-5 text-blue-400" />
-          Giám sát Connectors & Legacy EMS Gateway
+          Connectors & Legacy EMS Gateway Monitor
         </h2>
         <p className="text-xs text-slate-400 mt-0.5">
-          Tình trạng phiên kết nối, giới hạn gọi hàm (Token Bucket Rate Limiting) và danh sách dịch vụ whitelist
+          Connection session health, Token Bucket rate-limiting parameters, and service whitelist
         </p>
       </div>
 
@@ -55,20 +55,20 @@ export const ConnectorsView: React.FC = () => {
 
           <div className="space-y-2 text-xs">
             <div className="flex justify-between py-1 border-b border-slate-800/60">
-              <span className="text-slate-400">Giao thức Payload:</span>
+              <span className="text-slate-400">Payload Protocol:</span>
               <span className="font-mono text-slate-200">Nexacro XML Dataset Codec</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-800/60">
-              <span className="text-slate-400">Session TTL còn lại:</span>
-              <span className="font-mono text-emerald-400 font-bold">24 phút 18 giây</span>
+              <span className="text-slate-400">Remaining Session TTL:</span>
+              <span className="font-mono text-emerald-400 font-bold">24m 18s</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-800/60">
-              <span className="text-slate-400">Giới hạn Rate-Limit:</span>
+              <span className="text-slate-400">Rate-Limit Bounds:</span>
               <span className="font-mono text-slate-200">max_concurrent=3, min_interval=100ms</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-800/60">
               <span className="text-slate-400">SSL Verification:</span>
-              <span className="font-mono text-amber-400 font-semibold">false (Bypass nội bộ)</span>
+              <span className="font-mono text-amber-400 font-semibold">false (Internal Self-Signed Bypass)</span>
             </div>
           </div>
 
@@ -93,7 +93,7 @@ export const ConnectorsView: React.FC = () => {
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition disabled:opacity-50"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isRelogging ? 'animate-spin' : ''}`} />
-              {isRelogging ? 'Đang Relogin...' : 'Force Relogin Thủ công'}
+              {isRelogging ? 'Relogging...' : 'Force Re-login'}
             </button>
 
             <button

@@ -231,3 +231,21 @@ async def test_replay_run_endpoint(api_client: httpx.AsyncClient) -> None:
     data = res.json()
     assert data["run_id"] == seed_id
     assert data["workflow_name"] == "equipment-status-lookup"
+
+
+@pytest.mark.asyncio
+async def test_delete_run_logs_endpoint(api_client: httpx.AsyncClient) -> None:
+    headers = {"X-API-Key": "test_api_key"}
+    from opsflow.core.logger import get_run_log_path
+
+    run_id = "run_log_delete_test"
+    log_file = get_run_log_path(run_id)
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    log_file.write_text("Test log line to delete\n", encoding="utf-8")
+    assert log_file.exists()
+
+    # Delete log via API
+    res = await api_client.delete(f"/api/v1/runs/{run_id}/logs", headers=headers)
+    assert res.status_code == 200
+    assert res.json()["status"] == "cleared"
+    assert not log_file.exists()

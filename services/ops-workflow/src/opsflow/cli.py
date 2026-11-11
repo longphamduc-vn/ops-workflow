@@ -94,6 +94,7 @@ def api(
         from opsflow.core.logger import set_dev_mode
         set_dev_mode(True)
         console.print("[bold yellow][DEV MODE ENABLED][/bold yellow] Detailed execution telemetry active for all API runs.")
+        reload = True
 
     if log_file:
         from opsflow.core.logger import set_log_file

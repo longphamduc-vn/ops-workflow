@@ -90,11 +90,11 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({ stepId, isFailed = t
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
           <div className="text-xs">
             <span className="font-bold text-red-300">
-              Phát hiện Lỗi Giao thức Nexacro XML (ErrorCode = -1):
+              Nexacro XML Protocol Error Detected (ErrorCode = -1):
             </span>
             <p className="text-red-200/90 mt-0.5">
-              Máy chủ EMS trả về HTTP 500 kèm dataset báo lỗi phiên: <code className="bg-red-900/40 px-1 py-0.5 rounded text-amber-300">SESSION_EXPIRED</code>.
-              Hệ thống đã tự động thử relogin vào <code className="bg-red-900/40 px-1 py-0.5 rounded">/login.do</code> qua connector <code className="text-blue-300">ems</code> 3 lần nhưng không thành công.
+              The EMS backend returned HTTP 500 with session error dataset: <code className="bg-red-900/40 px-1 py-0.5 rounded text-amber-300">SESSION_EXPIRED</code>.
+              The engine automatically attempted re-login to <code className="bg-red-900/40 px-1 py-0.5 rounded">/login.do</code> via connector <code className="text-blue-300">ems</code> 3 times without success.
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({ stepId, isFailed = t
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 text-xs">
               <span className="font-bold text-blue-400 flex items-center gap-1.5 font-mono">
                 <ArrowUpRight className="w-3.5 h-3.5" />
-                [WIRE: REQ] Gói tin gửi đi ({stepId})
+                [WIRE: REQ] Outbound Request ({stepId})
               </span>
               <div className="flex items-center gap-2">
                 <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded font-mono text-[10px] font-bold">
@@ -154,7 +154,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({ stepId, isFailed = t
                 isFailed ? 'text-red-400' : 'text-emerald-400'
               }`}>
                 <ArrowDownLeft className="w-3.5 h-3.5" />
-                [WIRE: RESP] Phản hồi từ máy chủ
+                [WIRE: RESP] Server Response
               </span>
               <div className="flex items-center gap-2">
                 <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold ${

@@ -33,14 +33,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     workflows.APP_READ_MODELS = read_models
 
     # 2. Discover and register workflows from workflows/ directory
-    wf_dir = Path(os.getenv("WORKFLOWS_DIR", "workflows"))
-    if wf_dir.exists():
-        for yml_file in wf_dir.glob("*.yml"):
-            try:
-                wf = load_workflow_from_file(yml_file)
-                workflows.WORKFLOW_REGISTRY[wf.name] = wf
-            except Exception as exc:
-                print(f"[WARN] Failed to load workflow from {yml_file}: {exc}")
+    candidate_dirs = [
+        Path(os.getenv("WORKFLOWS_DIR", "workflows")),
+        Path("services/ops-workflow/workflows"),
+    ]
+    for d in candidate_dirs:
+        if d.exists() and d.is_dir():
+            for yml_file in sorted(d.glob("*.yml")):
+                try:
+                    wf = load_workflow_from_file(yml_file)
+                    workflows.WORKFLOW_REGISTRY[wf.name] = wf
+                except Exception as exc:
+                    print(f"[WARN] Failed to load workflow from {yml_file}: {exc}")
+            if workflows.WORKFLOW_REGISTRY:
+                break
 
     yield
 

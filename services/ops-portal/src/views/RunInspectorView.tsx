@@ -7,6 +7,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Trash2,
 } from 'lucide-react';
 import { RunRecord, StepRunRecord } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -19,6 +20,7 @@ interface RunInspectorViewProps {
   steps: StepRunRecord[];
   logs: string;
   onOpenReplay: () => void;
+  onClearLogs?: () => Promise<void> | void;
 }
 
 export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
@@ -26,11 +28,14 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
   steps,
   logs,
   onOpenReplay,
+  onClearLogs,
 }) => {
   const [selectedStepId, setSelectedStepId] = useState<string>(
     steps.find((s) => s.status === 'failed')?.step_id || steps[0]?.step_id || 'get_wip_entity'
   );
   const [activeTab, setActiveTab] = useState<'wire' | 'logs' | 'context' | 'retries'>('wire');
+  const [isConfirmingClearHeader, setIsConfirmingClearHeader] = useState<boolean>(false);
+  const [isClearingHeader, setIsClearingHeader] = useState<boolean>(false);
 
   const selectedStep = steps.find((s) => s.step_id === selectedStepId);
   const isFailed = selectedStep?.status === 'failed' || run.status === 'failed';
@@ -56,23 +61,61 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               <span className="text-xs text-slate-400 font-mono">wf: {run.workflow_name}</span>
             </div>
             <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-2">
-              <span>Bắt đầu: {run.started_at ? new Date(run.started_at).toLocaleTimeString('vi-VN') : '--'}</span>
+              <span>Started: {run.started_at ? new Date(run.started_at).toLocaleTimeString('en-US') : '--'}</span>
               <span className="text-slate-700">•</span>
               <span>Trigger: <code className="bg-slate-800 px-1 py-0.2 rounded font-mono text-slate-300">cron</code></span>
               <span className="text-slate-700">•</span>
-              <span>Độ trễ: <span className="text-amber-400 font-mono font-bold">1,250 ms</span></span>
+              <span>Duration: <span className="text-amber-400 font-mono font-bold">1,250 ms</span></span>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {onClearLogs && (
+            isConfirmingClearHeader ? (
+              <div className="flex items-center gap-1.5 bg-red-950/80 border border-red-800 px-2.5 py-1 rounded-lg">
+                <span className="text-xs text-red-300 font-medium">Clear logs for this run?</span>
+                <button
+                  onClick={async () => {
+                    setIsClearingHeader(true);
+                    try {
+                      await onClearLogs();
+                    } finally {
+                      setIsClearingHeader(false);
+                      setIsConfirmingClearHeader(false);
+                    }
+                  }}
+                  disabled={isClearingHeader}
+                  className="px-2 py-0.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-bold transition"
+                >
+                  {isClearingHeader ? 'Clearing...' : 'Yes, Delete'}
+                </button>
+                <button
+                  onClick={() => setIsConfirmingClearHeader(false)}
+                  className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsConfirmingClearHeader(true)}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-red-950/60 hover:text-red-300 text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition"
+                title="Clear execution log for this run"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                Clear Logs
+              </button>
+            )
+          )}
+
           <button
             onClick={onOpenReplay}
             className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Replay từ bước lỗi (Resume)
+            Replay from Failed Step (Resume)
           </button>
         </div>
       </div>
@@ -82,14 +125,14 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-sm text-slate-200">
-              Đồ thị Luồng Thực thi (Visual Interactive DAG)
+              Interactive Execution DAG Flow
             </h3>
             <span className="text-[11px] text-slate-400">
-              (Bấm vào từng bước để soi Wire Telemetry và biến đổi dữ liệu)
+              (Click on any step to inspect Wire Telemetry and runtime payload)
             </span>
           </div>
           <div className="text-xs font-mono text-slate-400">
-            Bước đang chọn: <span className="text-blue-400 font-bold">{selectedStepId}</span>
+            Inspecting Step: <span className="text-blue-400 font-bold">{selectedStepId}</span>
           </div>
         </div>
 
@@ -150,7 +193,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
-              Lịch sử Retry (3 lần)
+              Retry History (3 attempts)
             </button>
           </div>
 
@@ -166,14 +209,14 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
           )}
 
           {activeTab === 'logs' && (
-            <LogConsole logs={logs} runId={run.run_id} />
+            <LogConsole logs={logs} runId={run.run_id} onClearLogs={onClearLogs} />
           )}
 
           {activeTab === 'context' && (
             <div className="space-y-4 font-mono text-xs">
               <div>
                 <div className="text-slate-300 font-sans font-semibold mb-1">
-                  Tham số đầu vào của Run (Inputs Context):
+                  Run Input Parameters (Inputs Context):
                 </div>
                 <pre className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-blue-300 overflow-x-auto">
                   {JSON.stringify(run.inputs, null, 2)}
@@ -182,7 +225,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
 
               <div>
                 <div className="text-slate-300 font-sans font-semibold mb-1">
-                  Dữ liệu đầu ra của Run (Outputs):
+                  Run Output Data (Outputs):
                 </div>
                 <pre className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-emerald-400 overflow-x-auto">
                   {JSON.stringify(run.outputs, null, 2)}
@@ -206,7 +249,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center">
                 <div>
                   <span className="font-bold text-red-400">Attempt 2:</span>{' '}
-                  <span className="text-slate-300">Auto-relogin vào /login.do thất bại</span>
+                  <span className="text-slate-300">Auto-relogin to /login.do failed</span>
                 </div>
                 <div className="text-slate-400 font-mono text-[11px]">
                   Latency: 430ms • Backoff: 4.0s
@@ -216,10 +259,10 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               <div className="p-3 bg-red-950/20 border border-red-800/60 rounded-lg flex justify-between items-center">
                 <div>
                   <span className="font-bold text-red-400">Attempt 3:</span>{' '}
-                  <span className="text-red-300 font-semibold">Đạt số lần thử tối đa (3/3). Hủy bước.</span>
+                  <span className="text-red-300 font-semibold">Max attempts reached (3/3). Step aborted.</span>
                 </div>
                 <div className="text-slate-400 font-mono text-[11px]">
-                  Latency: 435ms • Trạng thái: FAILED
+                  Latency: 435ms • Status: FAILED
                 </div>
               </div>
             </div>

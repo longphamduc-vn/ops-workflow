@@ -100,25 +100,25 @@ export const DagVisualizer: React.FC<DagVisualizerProps> = ({
                   <div className="flex items-center gap-1">
                     {isSuccess && (
                       <span className="text-emerald-400 font-medium flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Thành công
+                        <CheckCircle2 className="w-3 h-3" /> Success
                       </span>
                     )}
                     {isFailed && (
                       <span className="text-red-400 font-medium flex items-center gap-1">
-                        <XCircle className="w-3 h-3" /> Thất bại (Lần {step.attempt})
+                        <XCircle className="w-3 h-3" /> Failed (Attempt {step.attempt})
                       </span>
                     )}
-                    {isSkipped && <span className="text-slate-400">Đã bỏ qua (Skipped)</span>}
+                    {isSkipped && <span className="text-slate-400">Skipped</span>}
                     {isRunning && (
                       <span className="text-blue-400 font-medium flex items-center gap-1">
-                        <Clock className="w-3 h-3 animate-spin" /> Đang chạy...
+                        <Clock className="w-3 h-3 animate-spin" /> Running...
                       </span>
                     )}
                   </div>
 
                   {isSelected && (
                     <span className="text-blue-400 font-semibold text-[10px] underline">
-                      Đang soi
+                      Inspecting
                     </span>
                   )}
                 </div>

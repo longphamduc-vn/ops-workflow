@@ -15,7 +15,7 @@ export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<PortalTab>('dashboard');
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [runs, setRuns] = useState<RunRecord[]>([]);
-  const [selectedRunId, setSelectedRunId] = useState<string>('run_01H9A8Z12');
+  const [selectedRunId, setSelectedRunId] = useState<string>('');
   const [currentRun, setCurrentRun] = useState<RunRecord | null>(null);
   const [currentSteps, setCurrentSteps] = useState<StepRunRecord[]>([]);
   const [currentLogs, setCurrentLogs] = useState<string>('');
@@ -38,14 +38,18 @@ export const App: React.FC = () => {
       const runList = await opsClient.listRuns();
       setRuns(runList.items);
 
-      if (selectedRunId) {
-        const runDetail = await opsClient.getRun(selectedRunId);
+      const activeId = selectedRunId || runList.items[0]?.run_id || '';
+      if (activeId) {
+        if (!selectedRunId) {
+          setSelectedRunId(activeId);
+        }
+        const runDetail = await opsClient.getRun(activeId);
         setCurrentRun(runDetail);
 
-        const steps = await opsClient.getRunSteps(selectedRunId);
+        const steps = await opsClient.getRunSteps(activeId);
         setCurrentSteps(steps);
 
-        const logs = await opsClient.getRunLogs(selectedRunId);
+        const logs = await opsClient.getRunLogs(activeId);
         setCurrentLogs(logs);
       }
     } catch (err) {
@@ -84,6 +88,16 @@ export const App: React.FC = () => {
     loadData();
     handleSelectRun(targetRunId);
     setCurrentTab('inspector');
+  };
+
+  const handleClearLogs = async (targetRunId?: string) => {
+    const idToClear = targetRunId || selectedRunId;
+    if (idToClear) {
+      await opsClient.deleteRunLogs(idToClear);
+      if (idToClear === selectedRunId) {
+        setCurrentLogs('');
+      }
+    }
   };
 
   const failedRunsCount = runs.filter((r) => r.status === 'failed').length;
@@ -125,6 +139,7 @@ export const App: React.FC = () => {
               steps={currentSteps}
               logs={currentLogs}
               onOpenReplay={() => setIsReplayModalOpen(true)}
+              onClearLogs={handleClearLogs}
             />
           )}
 
@@ -137,6 +152,7 @@ export const App: React.FC = () => {
                 setIsReplayModalOpen(true);
               }}
               onNavigateInspector={() => setCurrentTab('inspector')}
+              onClearRunLogs={handleClearLogs}
             />
           )}
 

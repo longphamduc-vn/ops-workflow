@@ -40,7 +40,7 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
       onReplaySuccess(res.run_id);
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi khi kích hoạt Replay');
+      setErrorMsg(err.message || 'Failed to trigger replay');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,7 +57,7 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-slate-100 text-sm">Replay & Crash-Resume Run</h3>
-              <p className="text-[11px] text-slate-400">Phục hồi thực thi từ điểm đứt gãy</p>
+              <p className="text-[11px] text-slate-400">Resume execution from the exact point of failure</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
@@ -93,10 +93,10 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
               <div>
                 <div className="font-bold text-slate-200 flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  Kích hoạt Crash-Resume (Khuyến nghị)
+                  Enable Crash-Resume (Recommended)
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
-                  Tái sử dụng kết quả các bước đã chạy thành công trước đó, chỉ thực thi lại bước bị lỗi và các bước phụ thuộc tiếp theo.
+                  Reuses outputs from previously succeeded steps; only retries the failed step and its downstream dependencies.
                 </div>
               </div>
             </label>
@@ -111,10 +111,10 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
               <div>
                 <div className="font-bold text-slate-200 flex items-center gap-1.5">
                   <Copy className="w-3.5 h-3.5 text-blue-400" />
-                  Nhân bản sang Run ID mới (Clone)
+                  Clone into a New Run ID
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
-                  Tạo một Run ID riêng biệt để giữ nguyên lịch sử lần chạy cũ phục vụ đối soát kiểm toán (Audit trail).
+                  Generates a fresh Run ID to preserve immutable execution history for auditing.
                 </div>
               </div>
             </label>
@@ -127,7 +127,7 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold text-xs transition"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={handleReplay}
@@ -135,11 +135,10 @@ export const ReplayModal: React.FC<ReplayModalProps> = ({
             className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm transition disabled:opacity-50"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            {isSubmitting ? 'Đang Replay...' : 'Bắt đầu Replay'}
+            {isSubmitting ? 'Replaying...' : 'Start Replay'}
           </button>
         </div>
       </div>
     </div>
   );
 };
-

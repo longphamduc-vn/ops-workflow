@@ -32,7 +32,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* 4 KPI Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Tổng Runs (24h)"
+          title="Total Runs (24h)"
           value="1,428"
           subtitle="1 active running • 2 pending"
           icon={<Activity className="w-4 h-4" />}
@@ -41,11 +41,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         />
 
         <MetricCard
-          title="Tỷ lệ Thành công"
+          title="Success Rate"
           value="98.6%"
-          subtitle="1,408 thành công / 20 lỗi"
+          subtitle="1,408 Succeeded / 20 Failed"
           icon={<CheckCircle2 className="w-4 h-4" />}
-          trend={{ value: 'Mục tiêu ≥ 98%', isPositive: true }}
+          trend={{ value: 'Target ≥ 98%', isPositive: true }}
           highlightColor="emerald"
         />
 
@@ -54,7 +54,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           value="420 ms"
           subtitle="Nexacro XML Protocol • Session OK"
           icon={<Gauge className="w-4 h-4" />}
-          trend={{ value: 'Bình thường', isPositive: true }}
+          trend={{ value: 'Normal', isPositive: true }}
           highlightColor="amber"
         />
 
@@ -76,12 +76,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
             <div>
               <div className="text-xs font-bold text-red-200">
-                Phát hiện lần chạy thất bại gần nhất:{' '}
+                Recent execution failure detected:{' '}
                 <span className="font-mono text-red-300">{latestFailedRun.run_id}</span>
               </div>
               <div className="text-[11px] text-red-400/90 mt-0.5">
                 Workflow: <code className="bg-red-900/40 px-1 py-0.2 rounded font-mono">{latestFailedRun.workflow_name}</code>
-                {' '}• Lỗi giao tiếp Nexacro XML hoặc hết hạn Session trên bước <code className="bg-red-900/40 px-1 py-0.2 rounded font-mono">get_wip_entity</code>
+                {' '}• Nexacro XML communication failure or session timeout on step <code className="bg-red-900/40 px-1 py-0.2 rounded font-mono">get_wip_entity</code>
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow-sm transition"
           >
             <Bug className="w-3.5 h-3.5" />
-            Soi lỗi & Debug ngay
+            Inspect & Debug Now
           </button>
         </div>
       )}
@@ -106,13 +106,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-sm text-slate-200 flex items-center gap-2">
               <ListTree className="w-4 h-4 text-blue-400" />
-              Lần chạy gần đây (Recent Runs)
+              Recent Execution Runs
             </h3>
             <button
               onClick={() => onNavigateTab('runs')}
               className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium"
             >
-              Xem toàn bộ <ArrowRight className="w-3.5 h-3.5" />
+              View All <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -122,9 +122,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <tr className="border-b border-slate-800 text-slate-400">
                   <th className="pb-2.5 font-medium">Run ID</th>
                   <th className="pb-2.5 font-medium">Workflow</th>
-                  <th className="pb-2.5 font-medium">Trạng thái</th>
-                  <th className="pb-2.5 font-medium">Bắt đầu</th>
-                  <th className="pb-2.5 font-medium text-right">Thao tác</th>
+                  <th className="pb-2.5 font-medium">Status</th>
+                  <th className="pb-2.5 font-medium">Started</th>
+                  <th className="pb-2.5 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -144,7 +144,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <StatusBadge status={r.status} size="sm" />
                     </td>
                     <td className="py-2.5 text-slate-400 font-sans text-[11px]">
-                      {new Date(r.created_at).toLocaleTimeString('vi-VN')}
+                      {new Date(r.created_at).toLocaleTimeString('en-US')}
                     </td>
                     <td className="py-2.5 text-right font-sans">
                       <button
@@ -169,7 +169,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-sm text-slate-200 flex items-center gap-2">
               <CalendarDays className="w-4 h-4 text-purple-400" />
-              Lịch Cron (APScheduler)
+              Cron Triggers (APScheduler)
             </h3>
             <span className="text-[10px] px-2 py-0.5 bg-purple-500/10 text-purple-300 rounded font-mono font-bold">
               6 active
@@ -183,7 +183,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="font-mono text-emerald-400 text-[11px]">*/15 * * * *</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
-                <span>Next run: in 4 phút</span>
+                <span>Next run: in 4 mins</span>
                 <span className="text-slate-400">Asia/Ho_Chi_Minh</span>
               </div>
             </div>
@@ -194,8 +194,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="font-mono text-purple-400 text-[11px]">0 */2 * * *</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
-                <span>Next run: lúc 12:00 PM</span>
-                <span className="text-slate-400">Mỗi 2 tiếng</span>
+                <span>Next run: at 12:00 PM</span>
+                <span className="text-slate-400">Every 2 hours</span>
               </div>
             </div>
 
@@ -205,8 +205,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="font-mono text-blue-400 text-[11px]">0 2 * * *</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
-                <span>Next run: 02:00 AM ngày mai</span>
-                <span className="text-slate-400">Chạy đêm hàng ngày</span>
+                <span>Next run: 02:00 AM tomorrow</span>
+                <span className="text-slate-400">Nightly batch</span>
               </div>
             </div>
           </div>
@@ -215,4 +215,3 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     </div>
   );
 };
-

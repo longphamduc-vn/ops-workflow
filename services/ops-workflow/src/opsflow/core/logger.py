@@ -80,7 +80,13 @@ def get_log_file_path() -> Path | None:
 
 def get_run_log_path(run_id: str) -> Path:
     """Return specific log file path for a given run ID."""
-    return _RUN_LOGS_DIR / f"{run_id}.log"
+    primary = _RUN_LOGS_DIR / f"{run_id}.log"
+    if primary.exists():
+        return primary
+    alt = Path("services/ops-workflow/logs/runs") / f"{run_id}.log"
+    if alt.exists():
+        return alt
+    return primary
 
 
 def _safe_str(obj: Any, max_len: int = 500) -> str:

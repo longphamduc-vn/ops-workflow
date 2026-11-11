@@ -36,16 +36,31 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Sync selected workflow when modal opens or defaults change
+  React.useEffect(() => {
+    if (isOpen && workflows.length > 0) {
+      const match = defaultWorkflowName && workflows.some((w) => w.name === defaultWorkflowName)
+        ? defaultWorkflowName
+        : (workflows[0]?.name ?? '');
+      setSelectedWorkflow(match);
+      setIdempotencyKey(`req-${Math.random().toString(36).substring(2, 9)}`);
+      setErrorMsg(null);
+    }
+  }, [isOpen, defaultWorkflowName, workflows]);
+
   // Sync inputs when workflow changes
   React.useEffect(() => {
     const wf = workflows.find((w) => w.name === selectedWorkflow);
     if (wf) {
       const defaults: Record<string, any> = {};
-      Object.entries(wf.inputs).forEach(([k, v]) => {
+      Object.entries(wf.inputs || {}).forEach(([k, v]) => {
         defaults[k] = v.default ?? '';
       });
       setInputValues(defaults);
       setRawJson(JSON.stringify(defaults, null, 2));
+    } else {
+      setInputValues({});
+      setRawJson('{}');
     }
   }, [selectedWorkflow, workflows]);
 
@@ -66,7 +81,7 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
       setInputValues(parsed);
       setErrorMsg(null);
     } catch (_) {
-      setErrorMsg('JSON không hợp lệ');
+      setErrorMsg('Invalid JSON syntax');
     }
   };
 
@@ -86,7 +101,7 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
       onRunStarted(res.run_id);
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi khi kích hoạt workflow');
+      setErrorMsg(err.message || 'Failed to trigger workflow run');
     } finally {
       setIsSubmitting(false);
     }
@@ -102,8 +117,8 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
               <Play className="w-4 h-4 fill-current" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">Kích hoạt Workflow Execution</h3>
-              <p className="text-[11px] text-slate-400">Gửi lệnh chạy qua REST API v1 với Idempotency Key</p>
+              <h3 className="font-bold text-slate-100 text-sm">Trigger Workflow Execution</h3>
+              <p className="text-[11px] text-slate-400">Dispatch run via REST API v1 with Idempotency Key protection</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
@@ -121,24 +136,29 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
 
           {/* Workflow Selector */}
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">Chọn Workflow mục tiêu:</label>
+            <label className="block font-semibold text-slate-300 mb-1">Target Workflow:</label>
             <select
               value={selectedWorkflow}
               onChange={(e) => setSelectedWorkflow(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono text-xs"
+              disabled={workflows.length === 0}
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono text-xs disabled:opacity-60"
             >
-              {workflows.map((w) => (
-                <option key={w.name} value={w.name}>
-                  {w.name} (v{w.version}) — {w.trigger_type}
-                </option>
-              ))}
+              {workflows.length === 0 ? (
+                <option value="">No workflows available</option>
+              ) : (
+                workflows.map((w) => (
+                  <option key={w.name} value={w.name}>
+                    {w.name} (v{w.version}) — {w.trigger_type}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
           {/* Idempotency Key */}
           <div>
             <label className="block font-semibold text-slate-300 mb-1">
-              Idempotency-Key (Chống gọi trùng lặp):
+              Idempotency-Key (Duplicate Prevention):
             </label>
             <div className="flex gap-2">
               <input
@@ -152,7 +172,7 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
                 onClick={generateUuid}
                 className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <RotateCw className="w-3.5 h-3.5" /> Tạo mới
+                <RotateCw className="w-3.5 h-3.5" /> Generate
               </button>
             </div>
           </div>
@@ -160,7 +180,7 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
           {/* Form vs Raw JSON Switcher */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="font-semibold text-slate-300">Tham số đầu vào (Inputs):</label>
+              <label className="font-semibold text-slate-300">Input Parameters:</label>
               <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded border border-slate-800">
                 <button
                   type="button"
@@ -200,13 +220,13 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
                         type="text"
                         value={inputValues[key] ?? ''}
                         onChange={(e) => handleInputChange(key, e.target.value)}
-                        placeholder={schema.description || `Nhập ${key}...`}
+                        placeholder={schema.description || `Enter ${key}...`}
                         className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200 text-xs focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   ))
                 ) : (
-                  <div className="text-slate-500 text-center py-2">Workflow này không yêu cầu tham số đầu vào.</div>
+                  <div className="text-slate-500 text-center py-2">This workflow does not require input parameters.</div>
                 )}
               </div>
             ) : (
@@ -226,7 +246,7 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold text-xs transition"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -234,11 +254,10 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm transition disabled:opacity-50"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            {isSubmitting ? 'Đang kích hoạt...' : 'Kích hoạt Run'}
+            {isSubmitting ? 'Dispatching...' : 'Dispatch Run'}
           </button>
         </div>
       </div>
     </div>
   );
 };
-
