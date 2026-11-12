@@ -54,7 +54,11 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
     if (wf) {
       const defaults: Record<string, any> = {};
       Object.entries(wf.inputs || {}).forEach(([k, v]) => {
-        defaults[k] = v.default ?? '';
+        if (v.type === 'list' && Array.isArray(v.default)) {
+          defaults[k] = v.default.join('\n');
+        } else {
+          defaults[k] = v.default ?? '';
+        }
       });
       setInputValues(defaults);
       setRawJson(JSON.stringify(defaults, null, 2));
@@ -93,10 +97,35 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
     setIsSubmitting(true);
     setErrorMsg(null);
     try {
-      let inputsToSubmit = inputValues;
-      if (rawJsonMode) {
-        inputsToSubmit = JSON.parse(rawJson);
+      let inputsToSubmit = rawJsonMode ? JSON.parse(rawJson) : { ...inputValues };
+
+      // Normalize list inputs from Form mode
+      if (!rawJsonMode && currentWf?.inputs) {
+        for (const [k, s] of Object.entries(currentWf.inputs)) {
+          if (s.type === 'list') {
+            if (typeof inputsToSubmit[k] === 'string') {
+              const raw = inputsToSubmit[k].trim();
+              if (raw.startsWith('[') && raw.endsWith(']')) {
+                try {
+                  inputsToSubmit[k] = JSON.parse(raw);
+                } catch (_) {
+                  inputsToSubmit[k] = [raw];
+                }
+              } else {
+                // Split by comma or newline (e.g. pasted list from Excel / multiline)
+                inputsToSubmit[k] = raw
+                  .split(/[,\r\n]+/)
+                  .map((x: string) => x.trim())
+                  .filter(Boolean);
+              }
+            }
+            if (Array.isArray(inputsToSubmit[k])) {
+              inputsToSubmit[k] = (inputsToSubmit[k] as any[]).flat(Infinity);
+            }
+          }
+        }
       }
+
       const res = await opsClient.triggerRun(selectedWorkflow, inputsToSubmit, idempotencyKey);
       onRunStarted(res.run_id);
       onClose();
@@ -216,13 +245,31 @@ export const TriggerRunModal: React.FC<TriggerRunModalProps> = ({
                           {schema.type}
                         </span>
                       </div>
-                      <input
-                        type="text"
-                        value={inputValues[key] ?? ''}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        placeholder={schema.description || `Enter ${key}...`}
-                        className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200 text-xs focus:outline-none focus:border-blue-500"
-                      />
+                      {schema.type === 'list' ? (
+                        <textarea
+                          rows={3}
+                          value={
+                            Array.isArray(inputValues[key])
+                              ? inputValues[key].join('\n')
+                              : inputValues[key] ?? ''
+                          }
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          placeholder={
+                            schema.description
+                              ? `${schema.description} (split by comma or newline)`
+                              : `Enter items separated by comma or new line...`
+                          }
+                          className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200 text-xs focus:outline-none focus:border-blue-500 custom-scrollbar resize-y"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={inputValues[key] ?? ''}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          placeholder={schema.description || `Enter ${key}...`}
+                          className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 font-mono text-slate-200 text-xs focus:outline-none focus:border-blue-500"
+                        />
+                      )}
                     </div>
                   ))
                 ) : (

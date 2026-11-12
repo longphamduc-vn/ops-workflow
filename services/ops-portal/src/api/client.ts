@@ -137,6 +137,19 @@ export const opsClient = {
     return MOCK_WORKFLOWS;
   },
 
+  async reloadWorkflows(): Promise<{ status: string; message: string; count: number; workflows: any[]; errors: any[] }> {
+    try {
+      const res = await fetch(`${API_BASE}/workflows/reload`, {
+        method: 'POST',
+        headers: defaultHeaders,
+      });
+      if (res.ok) return await res.json();
+      return { status: 'error', message: `Server returned status ${res.status}`, count: 0, workflows: [], errors: [] };
+    } catch (err: any) {
+      return { status: 'error', message: err.message || 'Connection error', count: 0, workflows: [], errors: [] };
+    }
+  },
+
   async listRuns(params?: { status?: string; workflow_name?: string; limit?: number; offset?: number }): Promise<RunListResponse> {
     try {
       const url = new URL(`${window.location.origin}${API_BASE}/runs`);

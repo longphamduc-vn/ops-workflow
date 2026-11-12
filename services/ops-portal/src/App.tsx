@@ -139,6 +139,13 @@ export const App: React.FC = () => {
     await loadData();
   };
 
+  const handleReloadWorkflows = async () => {
+    const res = await opsClient.reloadWorkflows();
+    const wfList = await opsClient.listWorkflows();
+    setWorkflows(wfList);
+    return res;
+  };
+
   const failedRunsCount = runs.filter((r) => r.status === 'failed').length;
 
   return (
@@ -150,6 +157,7 @@ export const App: React.FC = () => {
           setIsTriggerModalOpen(true);
         }}
         onOpenReplay={() => setIsReplayModalOpen(true)}
+        onReloadWorkflows={handleReloadWorkflows}
         serverOnline={serverOnline}
       />
 
@@ -182,6 +190,7 @@ export const App: React.FC = () => {
               logs={currentLogs}
               onOpenReplay={() => setIsReplayModalOpen(true)}
               onClearLogs={handleClearLogs}
+              onReloadWorkflows={handleReloadWorkflows}
             />
           )}
 
@@ -204,6 +213,7 @@ export const App: React.FC = () => {
             <WorkflowCatalogView
               workflows={workflows}
               onTriggerWorkflow={handleTriggerFromCatalog}
+              onReloadWorkflows={handleReloadWorkflows}
             />
           )}
 

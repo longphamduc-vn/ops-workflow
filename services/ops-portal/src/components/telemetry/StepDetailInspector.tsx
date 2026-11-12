@@ -12,6 +12,8 @@ import {
   Terminal,
   Settings,
   AlertTriangle,
+  Table as TableIcon,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { StepRunRecord } from '../../types';
 
@@ -28,8 +30,10 @@ export const StepDetailInspector: React.FC<StepDetailInspectorProps> = ({
   logs = '',
 }) => {
   const [copiedOutputs, setCopiedOutputs] = useState(false);
+  const [copiedTsv, setCopiedTsv] = useState(false);
   const [copiedParams, setCopiedParams] = useState(false);
   const [copiedLogs, setCopiedLogs] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'json'>('table');
 
   // Extract step-specific logs and execution parameters
   const { stepLogs, stepParams, stepType } = useMemo(() => {
@@ -102,6 +106,94 @@ export const StepDetailInspector: React.FC<StepDetailInspectorProps> = ({
       stepType: type,
     };
   }, [stepId, logs]);
+
+  // Normalize outputs into tabular structure (columns & rows) if possible
+  const tabularData = useMemo(() => {
+    if (!step?.outputs) return null;
+    let data = step.outputs;
+
+    // Recursively unwrap nested single-key wrapper objects (e.g. { data: { catalog_items: [...] } })
+    while (
+      typeof data === 'object' &&
+      !Array.isArray(data) &&
+      data !== null &&
+      Object.keys(data).length === 1
+    ) {
+      const singleKey = Object.keys(data)[0];
+      const val = data[singleKey];
+      if (Array.isArray(val) || (typeof val === 'object' && val !== null)) {
+        data = val;
+      } else {
+        break;
+      }
+    }
+
+    if (Array.isArray(data) && data.length > 0) {
+      // Check if items are objects or primitives
+      const isObjectList = typeof data[0] === 'object' && data[0] !== null;
+      if (isObjectList) {
+        // Collect all unique keys
+        const colSet = new Set<string>();
+        data.forEach((row) => {
+          if (row && typeof row === 'object') {
+            Object.keys(row).forEach((k) => colSet.add(k));
+          }
+        });
+        const columns = Array.from(colSet);
+        return { columns, rows: data, isSingleObj: false };
+      } else {
+        return { columns: ['value'], rows: data.map((v) => ({ value: v })), isSingleObj: false };
+      }
+    } else if (typeof data === 'object' && data !== null && Object.keys(data).length > 0) {
+      // If object has an array field (e.g. { items: [...], total: 10 }), extract the array if present
+      const arrayKey = Object.keys(data).find((k) => Array.isArray(data[k]) && data[k].length > 0);
+      if (arrayKey && Array.isArray(data[arrayKey])) {
+        const arr = data[arrayKey];
+        if (typeof arr[0] === 'object' && arr[0] !== null) {
+          const colSet = new Set<string>();
+          arr.forEach((row: any) => {
+            if (row && typeof row === 'object') {
+              Object.keys(row).forEach((k) => colSet.add(k));
+            }
+          });
+          return { columns: Array.from(colSet), rows: arr, isSingleObj: false };
+        }
+      }
+
+      // Key-value pairs as a 2-column table: [parameter, value]
+      const rows = Object.entries(data).map(([k, v]) => ({
+        parameter: k,
+        value: typeof v === 'object' ? JSON.stringify(v) : String(v ?? ''),
+      }));
+      return { columns: ['parameter', 'value'], rows, isSingleObj: true };
+    }
+
+    return null;
+  }, [step?.outputs]);
+
+  // Convert tabular data to tab-separated values (TSV) for direct paste into Excel / Google Sheets
+  const copyAsTsv = () => {
+    if (!tabularData) return;
+    const { columns, rows } = tabularData;
+    const headerLine = columns.join('\t');
+    const rowLines = rows.map((r) =>
+      columns
+        .map((c) => {
+          const val = r[c];
+          if (val === null || val === undefined) return '';
+          if (typeof val === 'object') return JSON.stringify(val);
+          const str = String(val);
+          // Escape quotes or newlines if present
+          if (str.includes('\t') || str.includes('\n') || str.includes('"')) {
+            return `"${str.replace(/"/g, '""')}"`;
+          }
+          return str;
+        })
+        .join('\t')
+    );
+    const tsvText = [headerLine, ...rowLines].join('\n');
+    copyToClipboard(tsvText, setCopiedTsv);
+  };
 
   const copyToClipboard = (text: string, setter: (v: boolean) => void) => {
     navigator.clipboard.writeText(text);
@@ -207,19 +299,62 @@ export const StepDetailInspector: React.FC<StepDetailInspectorProps> = ({
                 Step Execution Outputs
               </span>
               <div className="flex items-center gap-2">
+                {tabularData && (
+                  <div className="flex items-center bg-slate-900 p-0.5 rounded border border-slate-800">
+                    <button
+                      onClick={() => setViewMode('table')}
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 ${
+                        viewMode === 'table' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                      title="View outputs as Table"
+                    >
+                      <TableIcon className="w-3 h-3" /> Table
+                    </button>
+                    <button
+                      onClick={() => setViewMode('json')}
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 ${
+                        viewMode === 'json' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                      title="View outputs as Raw JSON"
+                    >
+                      <Code2 className="w-3 h-3" /> JSON
+                    </button>
+                  </div>
+                )}
                 {step.outputs && (
                   <span className="px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-mono text-[10px] font-bold">
-                    {Array.isArray(step.outputs)
+                    {tabularData
+                      ? `${tabularData.rows.length} rows`
+                      : Array.isArray(step.outputs)
                       ? `${step.outputs.length} rows`
                       : typeof step.outputs === 'object'
                       ? `${Object.keys(step.outputs).length} keys`
                       : 'Result'}
                   </span>
                 )}
+                {tabularData && (
+                  <button
+                    onClick={copyAsTsv}
+                    className="px-2 py-1 bg-emerald-950/60 border border-emerald-800/80 hover:bg-emerald-900/60 text-emerald-300 rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-sm"
+                    title="Copy table to clipboard for pasting into Excel / Google Sheets"
+                  >
+                    {copiedTsv ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span>Copied TSV!</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileSpreadsheet className="w-3 h-3 text-emerald-400" />
+                        <span>Copy for Excel</span>
+                      </>
+                    )}
+                  </button>
+                )}
                 {step.outputs && (
                   <button
                     onClick={() => copyToClipboard(JSON.stringify(step.outputs, null, 2), setCopiedOutputs)}
-                    className="text-slate-400 hover:text-slate-200 text-xs"
+                    className="text-slate-400 hover:text-slate-200 text-xs p-1"
                     title="Copy step outputs JSON"
                   >
                     {copiedOutputs ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -230,9 +365,52 @@ export const StepDetailInspector: React.FC<StepDetailInspectorProps> = ({
 
             <div className="mt-2.5">
               {step.outputs ? (
-                <pre className="p-3 bg-slate-900 rounded-lg border border-slate-800 font-mono text-[11px] text-emerald-300 overflow-x-auto custom-scrollbar max-h-80 whitespace-pre-wrap">
-                  {JSON.stringify(step.outputs, null, 2)}
-                </pre>
+                viewMode === 'table' && tabularData ? (
+                  <div className="overflow-x-auto border border-slate-800 rounded-lg bg-slate-900 max-h-80 custom-scrollbar">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead className="bg-slate-950 border-b border-slate-800 text-[10px] font-semibold text-slate-400 font-mono sticky top-0">
+                        <tr>
+                          <th className="px-2.5 py-1.5 text-slate-500 w-10 text-center">#</th>
+                          {tabularData.columns.map((col) => (
+                            <th key={col} className="px-2.5 py-1.5 whitespace-nowrap text-emerald-400">
+                              {col}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                        {tabularData.rows.map((row, rIdx) => (
+                          <tr key={rIdx} className="hover:bg-slate-800/40 transition">
+                            <td className="px-2.5 py-1.5 text-slate-600 text-center font-mono text-[10px]">
+                              {rIdx + 1}
+                            </td>
+                            {tabularData.columns.map((col) => {
+                              const val = row[col];
+                              const isObj = val !== null && typeof val === 'object';
+                              return (
+                                <td key={col} className="px-2.5 py-1.5 text-slate-200 max-w-xs truncate">
+                                  {isObj ? (
+                                    <span className="text-amber-300 font-mono text-[10px] bg-amber-950/30 px-1 py-0.5 rounded border border-amber-900/50">
+                                      {JSON.stringify(val)}
+                                    </span>
+                                  ) : val === null || val === undefined ? (
+                                    <span className="text-slate-600 italic">null</span>
+                                  ) : (
+                                    <span title={String(val)}>{String(val)}</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <pre className="p-3 bg-slate-900 rounded-lg border border-slate-800 font-mono text-[11px] text-emerald-300 overflow-x-auto custom-scrollbar max-h-80 whitespace-pre-wrap">
+                    {JSON.stringify(step.outputs, null, 2)}
+                  </pre>
+                )
               ) : (
                 <div className="p-6 bg-slate-900/50 rounded-lg border border-slate-800/80 text-center text-slate-500 text-xs font-sans">
                   {isSkipped

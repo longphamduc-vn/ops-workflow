@@ -1,23 +1,38 @@
-import React from 'react';
+  import React, { useState } from 'react';
 import {
   Workflow,
   Play,
   RotateCcw,
   CheckCircle2,
   Clock,
+  RefreshCw,
 } from 'lucide-react';
 
 interface HeaderProps {
   onOpenTrigger: () => void;
   onOpenReplay?: () => void;
+  onReloadWorkflows?: () => Promise<any> | void;
   serverOnline?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenTrigger,
   onOpenReplay,
+  onReloadWorkflows,
   serverOnline = true,
 }) => {
+  const [isReloading, setIsReloading] = useState(false);
+
+  const handleReload = async () => {
+    if (!onReloadWorkflows || isReloading) return;
+    setIsReloading(true);
+    try {
+      await onReloadWorkflows();
+    } finally {
+      setIsReloading(false);
+    }
+  };
+
   return (
     <header className="h-14 bg-slate-900 border-b border-slate-800 px-5 flex items-center justify-between z-30 flex-shrink-0">
       {/* Brand & Connection State */}
@@ -52,6 +67,18 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Quick Action Toolbar */}
       <div className="flex items-center gap-2">
+        {onReloadWorkflows && (
+          <button
+            onClick={handleReload}
+            disabled={isReloading}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+            title="Reload all YAML workflow definitions from disk without server restart"
+          >
+            <RefreshCw className={`w-3 h-3 text-cyan-400 ${isReloading ? 'animate-spin' : ''}`} />
+            {isReloading ? 'Reloading...' : 'Reload Workflows'}
+          </button>
+        )}
+
         <button
           onClick={onOpenTrigger}
           className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"

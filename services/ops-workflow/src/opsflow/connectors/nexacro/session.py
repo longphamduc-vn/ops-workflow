@@ -114,6 +114,7 @@ class NexacroSession:
             headers=headers,
             cookies=_safe_cookies_dict(self.client.cookies),
             body=login_payload,
+            op="login",
         )
 
         start_t = time.monotonic()
@@ -138,6 +139,8 @@ class NexacroSession:
             headers=dict(response.headers),
             body=response.text,
             latency_ms=latency_ms,
+            op="login",
+            url=full_login_url,
         )
 
         if response.status_code >= 400:

@@ -68,6 +68,62 @@ async def list_workflows(
     return summaries
 
 
+@router.post("/reload", summary="Reload workflow definitions from disk")
+async def reload_workflows(
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("workflows:read"))],
+) -> dict[str, Any]:
+    """Reload all workflow definitions from disk into the runtime registry."""
+    import os
+    from pathlib import Path
+    from opsflow.core.parser import load_workflow_from_file
+
+    reloaded = []
+    errors = []
+
+    candidate_dirs = [
+        Path(os.getenv("WORKFLOWS_DIR", "workflows")),
+        Path("services/ops-workflow/workflows"),
+        Path(__file__).resolve().parents[6] / "services" / "ops-workflow" / "workflows",
+        Path(__file__).resolve().parents[5] / "services" / "ops-workflow" / "workflows",
+    ]
+
+    found_dir = None
+    for d in candidate_dirs:
+        if d.exists() and d.is_dir():
+            found_dir = d
+            break
+
+    if not found_dir:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Workflow definitions directory not found",
+        )
+
+    for yml_file in sorted(found_dir.glob("*.yml")) + sorted(found_dir.glob("*.yaml")):
+        try:
+            wf = load_workflow_from_file(yml_file)
+            WORKFLOW_REGISTRY[wf.name] = wf
+            reloaded.append(
+                {
+                    "name": wf.name,
+                    "version": wf.version,
+                    "file": yml_file.name,
+                    "trigger_type": wf.trigger.type,
+                    "steps_count": len(wf.steps),
+                }
+            )
+        except Exception as exc:
+            errors.append({"file": yml_file.name, "error": str(exc)})
+
+    return {
+        "status": "ok",
+        "message": f"Successfully reloaded {len(reloaded)} workflow(s) from disk ({found_dir.name})",
+        "count": len(reloaded),
+        "workflows": reloaded,
+        "errors": errors,
+    }
+
+
 @router.get("/{name}", response_model=WorkflowDetail, summary="Get workflow metadata")
 async def get_workflow(
     name: str,

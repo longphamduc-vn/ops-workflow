@@ -291,16 +291,18 @@ def dev_log_wire_request(
     headers: dict[str, Any] | None = None,
     cookies: dict[str, Any] | None = None,
     body: str | None = None,
+    op: str | None = None,
 ) -> None:
     """Log low-level wire HTTP request sent to external system."""
     safe_headers = _safe_str(headers, max_len=500) if headers else "{}"
     safe_cookies = _safe_str(cookies, max_len=200) if cookies else "{}"
-    safe_body = _safe_str(body, max_len=2000) if body else ""
+    safe_body = _safe_str(body, max_len=15000) if body else ""
+    op_tag = f"op={op} " if op else ""
 
     _write_file_log(
         "DEBUG",
         "WIRE: REQ",
-        f"connector={connector} {method} {url} headers={safe_headers} cookies={safe_cookies} body={safe_body}",
+        f"connector={connector} {op_tag}{method} {url} headers={safe_headers} cookies={safe_cookies} body={safe_body}",
     )
 
     if not _DEV_MODE:
@@ -321,15 +323,19 @@ def dev_log_wire_response(
     headers: dict[str, Any] | None = None,
     body: str | None = None,
     latency_ms: int = 0,
+    op: str | None = None,
+    url: str | None = None,
 ) -> None:
     """Log low-level wire HTTP response received from external system."""
     safe_headers = _safe_str(headers, max_len=500) if headers else "{}"
-    safe_body = _safe_str(body, max_len=2000) if body else ""
+    safe_body = _safe_str(body, max_len=15000) if body else ""
+    op_tag = f"op={op} " if op else ""
+    url_tag = f"url={url} " if url else ""
 
     _write_file_log(
         "DEBUG",
         "WIRE: RESP",
-        f"connector={connector} status={status_code} latency={latency_ms}ms headers={safe_headers} body={safe_body}",
+        f"connector={connector} {op_tag}{url_tag}status={status_code} latency={latency_ms}ms headers={safe_headers} body={safe_body}",
     )
 
     if not _DEV_MODE:

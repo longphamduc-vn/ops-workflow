@@ -38,9 +38,11 @@ inputs:
     default: "EN"
     description: User language preference
   item_code:
-    type: string
-    default: "QDAB03583"
-    description: Primary spare part item code for optimization & RFQ analysis
+    type: list
+    default:
+      - "QDAB03583"
+      - "QDAB03585"
+    description: Primary spare part item code list for optimization & RFQ analysis
   optimize_flag:
     type: string
     default: "Y"

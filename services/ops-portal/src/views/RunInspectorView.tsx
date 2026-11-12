@@ -9,6 +9,7 @@ import {
   XCircle,
   Trash2,
   Layers,
+  RefreshCw,
 } from 'lucide-react';
 import { RunRecord, StepRunRecord } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -16,6 +17,7 @@ import { DagVisualizer } from '../components/dag/DagVisualizer';
 import { WireDebugger } from '../components/telemetry/WireDebugger';
 import { LogConsole } from '../components/telemetry/LogConsole';
 import { StepDetailInspector } from '../components/telemetry/StepDetailInspector';
+import { opsClient } from '../api/client';
 
 interface RunInspectorViewProps {
   run: RunRecord;
@@ -25,6 +27,7 @@ interface RunInspectorViewProps {
   logs: string;
   onOpenReplay: () => void;
   onClearLogs?: () => Promise<void> | void;
+  onReloadWorkflows?: () => Promise<any> | void;
 }
 
 export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
@@ -35,6 +38,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
   logs,
   onOpenReplay,
   onClearLogs,
+  onReloadWorkflows,
 }) => {
   const [selectedStepId, setSelectedStepId] = useState<string>(
     steps.find((s) => s.status === 'failed')?.step_id || steps[0]?.step_id || ''
@@ -42,6 +46,27 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
   const [activeTab, setActiveTab] = useState<'step_details' | 'wire' | 'logs' | 'context' | 'retries'>('step_details');
   const [isConfirmingClearHeader, setIsConfirmingClearHeader] = useState<boolean>(false);
   const [isClearingHeader, setIsClearingHeader] = useState<boolean>(false);
+  const [isReloadingWorkflows, setIsReloadingWorkflows] = useState<boolean>(false);
+  const [localLogs, setLocalLogs] = useState<string>('');
+
+  // Fallback: auto-fetch logs if parent passed empty string
+  useEffect(() => {
+    if (!logs && run.run_id) {
+      opsClient.getRunLogs(run.run_id).then((l) => setLocalLogs(l)).catch(() => {});
+    }
+  }, [logs, run.run_id]);
+
+  const effectiveLogs = logs || localLogs;
+
+  const handleReload = async () => {
+    if (!onReloadWorkflows || isReloadingWorkflows) return;
+    setIsReloadingWorkflows(true);
+    try {
+      await onReloadWorkflows();
+    } finally {
+      setIsReloadingWorkflows(false);
+    }
+  };
 
   // Automatically switch selected step ONLY when active run ID changes (prevents snap-back on polling)
   const prevRunIdRef = useRef<string>(run.run_id);
@@ -128,6 +153,18 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {onReloadWorkflows && (
+            <button
+              onClick={handleReload}
+              disabled={isReloadingWorkflows}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+              title="Reload all YAML workflow definitions from disk without server restart"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isReloadingWorkflows ? 'animate-spin' : ''}`} />
+              {isReloadingWorkflows ? 'Reloading...' : 'Reload Workflows'}
+            </button>
+          )}
+
           {onClearLogs && (
             isConfirmingClearHeader ? (
               <div className="flex items-center gap-1.5 bg-red-950/80 border border-red-800 px-2.5 py-1 rounded-lg">
@@ -276,7 +313,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
             <StepDetailInspector
               stepId={selectedStepId}
               step={selectedStep}
-              logs={logs}
+              logs={effectiveLogs}
               isFailed={isFailed}
             />
           )}
@@ -285,13 +322,13 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
             <WireDebugger
               stepId={selectedStepId}
               step={selectedStep}
-              logs={logs}
+              logs={effectiveLogs}
               isFailed={isFailed}
             />
           )}
 
           {activeTab === 'logs' && (
-            <LogConsole logs={logs} runId={run.run_id} onClearLogs={onClearLogs} />
+            <LogConsole logs={effectiveLogs} runId={run.run_id} onClearLogs={onClearLogs} />
           )}
 
           {activeTab === 'context' && (

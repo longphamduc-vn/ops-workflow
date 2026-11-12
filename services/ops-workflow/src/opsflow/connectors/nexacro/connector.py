@@ -176,6 +176,7 @@ class NexacroConnector(Connector):
             headers=headers,
             cookies=_safe_cookies_dict(self.client.cookies),
             body=payload,
+            op=operation,
         )
 
         start_t = time.monotonic()
@@ -194,6 +195,8 @@ class NexacroConnector(Connector):
                 headers=dict(response.headers),
                 body=response.text,
                 latency_ms=latency_ms,
+                op=operation,
+                url=url,
             )
 
             # Check transport/HTTP-level error

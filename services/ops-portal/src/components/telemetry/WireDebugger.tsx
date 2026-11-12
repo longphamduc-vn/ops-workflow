@@ -10,6 +10,7 @@ import {
   Bell,
   Cpu,
   Info,
+  Sparkles,
 } from 'lucide-react';
 import { StepRunRecord } from '../../types';
 
@@ -29,10 +30,12 @@ interface ParsedWireData {
   reqHeaders?: string;
   reqCookies?: string;
   reqBody?: string;
+  isReqSynthesized?: boolean;
   status?: string;
   latency?: string;
   respHeaders?: string;
   respBody?: string;
+  isRespSynthesized?: boolean;
   errorDetail?: string;
   internalInfo?: {
     engine?: string;
@@ -42,6 +45,189 @@ interface ParsedWireData {
     summary?: string;
     rawLines?: string[];
   };
+}
+
+/**
+ * Format raw unindented XML into clean, properly indented multi-line XML.
+ */
+function formatXml(xml: string): string {
+  if (!xml || !xml.includes('<')) return xml;
+  // If already cleanly formatted with indentation, preserve it
+  if (xml.includes('\n  <')) return xml.trim();
+
+  let formatted = '';
+  let indent = 0;
+  const pad = (n: number) => '  '.repeat(n);
+  const cleanXml = xml.replace(/>\s*</g, '><').trim();
+  const tokens = cleanXml.split(/(<[^>]+>)/g).filter(Boolean);
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    if (token.startsWith('</')) {
+      indent = Math.max(0, indent - 1);
+      if (!formatted.endsWith('\n') && !formatted.endsWith('>')) {
+        formatted += token + '\n';
+      } else {
+        formatted += (formatted.endsWith('\n') ? '' : '\n') + pad(indent) + token + '\n';
+      }
+    } else if (token.startsWith('<') && token.endsWith('/>')) {
+      formatted += (formatted.endsWith('\n') ? '' : '\n') + pad(indent) + token + '\n';
+    } else if (token.startsWith('<?') || token.startsWith('<!')) {
+      formatted += token + '\n';
+    } else if (token.startsWith('<')) {
+      // Check if next token is text and the one after is matching closing tag: <Col id="x">value</Col>
+      const tagNameMatch = token.match(/^<([a-zA-Z0-9_:]+)/);
+      const tagName = tagNameMatch ? tagNameMatch[1] : '';
+      if (
+        i + 2 < tokens.length &&
+        !tokens[i + 1].startsWith('<') &&
+        tokens[i + 2] === `</${tagName}>`
+      ) {
+        formatted += (formatted.endsWith('\n') ? '' : '\n') + pad(indent) + token + tokens[i + 1] + tokens[i + 2] + '\n';
+        i += 2;
+      } else {
+        formatted += (formatted.endsWith('\n') ? '' : '\n') + pad(indent) + token + '\n';
+        indent++;
+      }
+    } else {
+      formatted += token;
+    }
+  }
+  return formatted.trim();
+}
+
+/**
+ * Synthesize Nexacro XML request from step params and in_datasets when raw wire log is not captured.
+ */
+function synthesizeRequestXml(params?: any, inDatasets?: any): string {
+  if (!params && !inDatasets) return '';
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<Root xmlns="http://www.nexacroplatform.com/platform/dataset">\n';
+
+  if (params && typeof params === 'object') {
+    xml += '  <Parameters>\n';
+    for (const [key, val] of Object.entries(params)) {
+      const v = val !== null && val !== undefined ? String(val) : '';
+      xml += `    <Parameter id="${key}" type="string">${v}</Parameter>\n`;
+    }
+    xml += '  </Parameters>\n';
+  }
+
+  if (inDatasets && typeof inDatasets === 'object') {
+    for (const [dsId, rawRows] of Object.entries(inDatasets)) {
+      const rowList = Array.isArray(rawRows) ? rawRows : [rawRows];
+      const expandedRows: any[] = [];
+      for (const r of rowList) {
+        if (!r || typeof r !== 'object') continue;
+        let listCol = '';
+        let listItems: any[] = [];
+        for (const [k, v] of Object.entries(r)) {
+          if (Array.isArray(v)) {
+            listCol = k;
+            listItems = (v as any[]).flat(Infinity);
+            break;
+          } else if (typeof v === 'string' && v.trim().startsWith('[') && v.trim().endsWith(']')) {
+            try {
+              const parsed = JSON.parse(v.replace(/'/g, '"'));
+              if (Array.isArray(parsed)) {
+                listCol = k;
+                listItems = parsed.flat(Infinity);
+                break;
+              }
+            } catch (_) {}
+          }
+        }
+        if (listCol && listItems.length > 0) {
+          for (const item of listItems) {
+            expandedRows.push({ ...r, [listCol]: item });
+          }
+        } else {
+          expandedRows.push(r);
+        }
+      }
+
+      const cols = expandedRows.length > 0 && typeof expandedRows[0] === 'object' ? Object.keys(expandedRows[0]) : [];
+      xml += `  <Dataset id="${dsId}">\n`;
+      if (cols.length > 0) {
+        xml += '    <ColumnInfo>\n';
+        for (const col of cols) {
+          xml += `      <Column id="${col}" type="STRING" size="256" />\n`;
+        }
+        xml += '    </ColumnInfo>\n';
+        xml += '    <Rows>\n';
+        for (const row of expandedRows) {
+          xml += '      <Row>\n';
+          for (const col of cols) {
+            const v = (row as any)[col] !== null && (row as any)[col] !== undefined ? String((row as any)[col]) : '';
+            xml += `        <Col id="${col}">${v}</Col>\n`;
+          }
+          xml += '      </Row>\n';
+        }
+        xml += '    </Rows>\n';
+      }
+      xml += '  </Dataset>\n';
+    }
+  }
+
+  xml += '</Root>';
+  return xml;
+}
+
+/**
+ * Synthesize Nexacro XML response from step outputs when raw wire log is not captured.
+ */
+function synthesizeResponseXml(outputs?: any, defaultDatasetId = 'ds_List'): string {
+  if (!outputs) return '';
+  const data = outputs.data !== undefined ? outputs.data : outputs;
+  if (!data || typeof data !== 'object') return '';
+
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<Root xmlns="http://www.nexacroplatform.com/platform/dataset">\n';
+  xml += '  <Parameters>\n';
+  xml += '    <Parameter id="errorCode" type="string">1</Parameter>\n';
+  xml += '    <Parameter id="errorMsg" type="string" />\n';
+  xml += '  </Parameters>\n';
+
+  let hasDataset = false;
+  for (const [key, val] of Object.entries(data)) {
+    if (Array.isArray(val)) {
+      hasDataset = true;
+      const rowList = val;
+      const cols = rowList.length > 0 && typeof rowList[0] === 'object' && rowList[0] !== null ? Object.keys(rowList[0]) : [];
+      xml += `  <Dataset id="${key}">\n`;
+      if (cols.length > 0) {
+        xml += '    <ColumnInfo>\n';
+        for (const col of cols) {
+          xml += `      <Column id="${col}" type="STRING" size="256" />\n`;
+        }
+        xml += '    </ColumnInfo>\n';
+        xml += '    <Rows>\n';
+        for (const row of rowList) {
+          xml += '      <Row>\n';
+          for (const col of cols) {
+            const v = (row as any)[col] !== null && (row as any)[col] !== undefined ? String((row as any)[col]) : '';
+            xml += `        <Col id="${col}">${v}</Col>\n`;
+          }
+          xml += '      </Row>\n';
+        }
+        xml += '    </Rows>\n';
+      } else {
+        xml += '    <ColumnInfo />\n';
+        xml += '    <Rows />\n';
+      }
+      xml += '  </Dataset>\n';
+    }
+  }
+
+  if (!hasDataset) {
+    xml += `  <Dataset id="${defaultDatasetId}">\n`;
+    xml += '    <ColumnInfo />\n';
+    xml += '    <Rows />\n';
+    xml += '  </Dataset>\n';
+  }
+
+  xml += '</Root>';
+  return xml;
 }
 
 export const WireDebugger: React.FC<WireDebuggerProps> = ({
@@ -65,94 +251,98 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
 
     const logLines = (logs || '').split('\n');
 
-    // 1. Identify target operation for this step
+    // 1. Identify target operation and step parameters
+    const knownOps: Record<string, string> = {
+      fetch_item_master: '/emscom/popupNav/retrieveItem.lgdn',
+      fetch_target_stock: '/emsspareparts/sp302/sp330Nav/TargetStockSearchList.lgdn',
+      fetch_item_details: '/emsspareparts/sp102/sp135Nav/retrieveItemInfoDetail.lgdn',
+      fetch_po_interlocks: '/emscom/popupNav/retrieveItemPoStatusList.lgdn',
+      get_wip_entity: '/emsquality/qc100/qc110Nav/retrieveWipEntity.lgdn',
+      get_wo_master: '/emsquality/qc100/qc110Nav/WoMasterRetInit.lgdn',
+      get_status_history: '/emsquality/qc100/qc110Nav/statusHistory.lgdn',
+    };
+
     let targetOp = '';
+    let stepType = 'call';
+    let stepParams: any = null;
+
     const startLine = logLines.find(
       (l) => (l.includes(`id=${stepId} `) || l.includes(`id=${stepId}]`)) &&
         (l.includes('[STEP: START]') || l.includes('[STEP:START]'))
     );
+
     if (startLine) {
       const opMatch = startLine.match(/"operation":\s*"([^"]+)"/);
       if (opMatch) targetOp = opMatch[1];
+      const typeMatch = startLine.match(/type=(\w+)/);
+      if (typeMatch) stepType = typeMatch[1];
+      const paramMatch = startLine.match(/with_params=(.*)$/);
+      if (paramMatch) {
+        try {
+          stepParams = JSON.parse(paramMatch[1]);
+        } catch (_) {}
+      }
     }
+
     if (!targetOp) {
-      const knownOps: Record<string, string> = {
-        fetch_item_master: 'retrieveItem',
-        fetch_target_stock: 'TargetStockSearchList',
-        fetch_item_details: 'retrieveItemInfoDetail',
-        fetch_po_interlocks: 'retrieveItemPoStatusList',
-        get_wip_entity: 'retrieveWipEntity',
-        get_wo_master: 'WoMasterRetInit',
-        get_status_history: 'statusHistory',
-      };
       targetOp = knownOps[stepId] || '';
     }
 
-    // 2. Locate step slice in log
-    let inStep = false;
-    const stepLines: string[] = [];
-
-    for (let i = 0; i < logLines.length; i++) {
-      const line = logLines[i];
-      if (line.includes(`id=${stepId}`) && (line.includes('[STEP: START]') || line.includes('[STEP:START]'))) {
-        inStep = true;
+    // Determine Step Type if not inferred from start line
+    if (stepType === 'call') {
+      if (stepId.includes('transform') || stepId.includes('normalize') || stepId.includes('evaluate')) {
+        stepType = 'transform';
+      } else if (stepId.includes('join')) {
+        stepType = 'join';
+      } else if (stepId.includes('db') || stepId.includes('upsert') || stepId.includes('save')) {
+        stepType = 'db_upsert';
+      } else if (stepId.includes('notify') || stepId.includes('alert') || stepId.includes('slack')) {
+        stepType = 'notify';
       }
-      if (inStep) {
-        stepLines.push(line);
-        if (
-          (line.includes(`id=${stepId}`) || line.includes(`step_id='${stepId}'`)) &&
-          (line.includes('[STEP: DONE]') ||
-            line.includes('[STEP: FAILED]') ||
-            line.includes('[STEP:DONE]') ||
-            line.includes('[STEP:FAILED]'))
-        ) {
-          inStep = false;
+    }
+
+    const opKeyword = targetOp.split('/').filter(Boolean).pop() || targetOp;
+
+    // 2. Locate WIRE REQ line in logLines
+    let reqIndex = -1;
+    if (targetOp) {
+      // First priority: Match WIRE: REQ with full targetOp or keyword
+      reqIndex = logLines.findIndex(
+        (l) => l.includes('[WIRE: REQ]') && (l.includes(targetOp) || (opKeyword && l.includes(opKeyword)))
+      );
+      // Second priority: Look for [CALL] mentioning targetOp, then take following [WIRE: REQ]
+      if (reqIndex === -1) {
+        const callIdx = logLines.findIndex(
+          (l) => l.includes('[CALL]') && (l.includes(targetOp) || (opKeyword && l.includes(opKeyword)))
+        );
+        if (callIdx !== -1) {
+          for (let i = callIdx + 1; i < Math.min(callIdx + 10, logLines.length); i++) {
+            if (logLines[i].includes('[WIRE: REQ]')) {
+              reqIndex = i;
+              break;
+            }
+          }
         }
       }
     }
 
-    // Fallback: If not bounded by STEP: START, search lines that mention stepId or relevant WIRE lines
-    const activeLines = stepLines.length > 0 ? stepLines : logLines.filter((l) => l.includes(stepId));
-
-    // Determine Step Type
-    let stepType = 'call';
-    let internalInfo: ParsedWireData['internalInfo'] = undefined;
-
-    if (startLine) {
-      const typeMatch = startLine.match(/type=(\w+)/);
-      if (typeMatch) stepType = typeMatch[1];
-    } else if (stepId.includes('transform') || stepId.includes('normalize') || stepId.includes('evaluate')) {
-      stepType = 'transform';
-    } else if (stepId.includes('join')) {
-      stepType = 'join';
-    } else if (stepId.includes('db') || stepId.includes('upsert') || stepId.includes('save')) {
-      stepType = 'db_upsert';
-    } else if (stepId.includes('notify') || stepId.includes('alert') || stepId.includes('slack')) {
-      stepType = 'notify';
+    // Third priority: fallback search by stepId
+    if (reqIndex === -1) {
+      reqIndex = logLines.findIndex(
+        (l) => (l.includes('[WIRE: REQ]') || l.includes('[WIRE:REQ]')) && l.includes(stepId)
+      );
     }
 
-    // 3. Locate WIRE REQ (search in activeLines first, then search whole logLines with targetOp)
     let connector = 'ems';
     let method = 'POST';
-    let url = '';
-    let reqHeaders = '';
-    let reqCookies = '';
+    let url = targetOp ? `http://localhost:9000${targetOp}` : '';
+    let reqHeaders = '{"Content-Type": "text/xml; charset=UTF-8"}';
+    let reqCookies = '{}';
     let reqBody = '';
+    let isReqSynthesized = false;
 
-    const linesToSearch = activeLines.length > 0 ? activeLines : logLines;
-    let reqIndex = -1;
-
-    // Search with targetOp priority
-    if (targetOp) {
-      reqIndex = logLines.findIndex((l) => l.includes('[WIRE: REQ]') && l.includes(targetOp));
-    }
-    if (reqIndex === -1) {
-      reqIndex = linesToSearch.findIndex((l) => l.includes('[WIRE: REQ]') || l.includes('[WIRE:REQ]'));
-    }
-
-    const sourceLinesForReq = reqIndex !== -1 && linesToSearch === activeLines ? logLines : linesToSearch;
     if (reqIndex !== -1) {
-      const reqLine = sourceLinesForReq[reqIndex];
+      const reqLine = logLines[reqIndex];
       const connMatch = reqLine.match(/connector=(\w+)/);
       if (connMatch) connector = connMatch[1];
 
@@ -173,43 +363,61 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       if (bodyMatch && bodyMatch[1]) {
         reqBodyParts.push(bodyMatch[1]);
       }
-      for (let j = reqIndex + 1; j < sourceLinesForReq.length; j++) {
-        if (/^\[\d{4}-\d{2}-\d{2}/.test(sourceLinesForReq[j])) break;
-        reqBodyParts.push(sourceLinesForReq[j]);
+      for (let j = reqIndex + 1; j < logLines.length; j++) {
+        if (/^\[\d{4}-\d{2}-\d{2}/.test(logLines[j])) break;
+        reqBodyParts.push(logLines[j]);
       }
       reqBody = reqBodyParts.join('\n').trim();
     }
 
-    // 4. Locate WIRE RESP corresponding to targetOp
-    let status = '';
-    let latency = '';
-    let respHeaders = '';
+    // Fallback if reqBody was not captured in logs: synthesize from stepParams
+    if (!reqBody && stepParams) {
+      reqBody = synthesizeRequestXml(stepParams.params, stepParams.in_datasets);
+      if (reqBody) isReqSynthesized = true;
+    }
+
+    // Prettify XML
+    if (reqBody) {
+      reqBody = formatXml(reqBody);
+    }
+
+    // 3. Locate WIRE RESP line in logLines
+    let status = step?.status === 'success' ? '200' : isFailed ? '500' : '200';
+    let latency = step?.latency_ms !== undefined ? `${step.latency_ms}ms` : '';
+    let respHeaders = '{"content-type": "application/xml; charset=utf-8"}';
     let respBody = '';
+    let isRespSynthesized = false;
     let respIndex = -1;
 
     if (targetOp) {
-      const respOpIdx = logLines.findIndex((l) => l.includes('[RESP]') && l.includes(targetOp));
-      if (respOpIdx !== -1) {
-        for (let k = respOpIdx - 1; k >= 0; k--) {
-          if (logLines[k].includes('[WIRE: RESP]')) {
-            respIndex = k;
-            break;
+      // First priority: [WIRE: RESP] containing op or opKeyword
+      respIndex = logLines.findIndex(
+        (l) => l.includes('[WIRE: RESP]') && (l.includes(targetOp) || (opKeyword && l.includes(opKeyword)))
+      );
+      // Second priority: find [RESP] line containing op, take [WIRE: RESP] immediately before it
+      if (respIndex === -1) {
+        const respOpIdx = logLines.findIndex(
+          (l) => l.includes('[RESP]') && (l.includes(targetOp) || (opKeyword && l.includes(opKeyword)))
+        );
+        if (respOpIdx !== -1) {
+          for (let k = respOpIdx - 1; k >= Math.max(0, respOpIdx - 15); k--) {
+            if (logLines[k].includes('[WIRE: RESP]')) {
+              respIndex = k;
+              break;
+            }
           }
         }
       }
     }
+
+    // Third priority: scan forwards from reqIndex for the matching response
     if (respIndex === -1 && reqIndex !== -1) {
-      for (let k = reqIndex + 1; k < logLines.length; k++) {
+      for (let k = reqIndex + 1; k < Math.min(reqIndex + 15, logLines.length); k++) {
         if (logLines[k].includes('[WIRE: RESP]')) {
           respIndex = k;
           break;
         }
       }
-    }
-    if (respIndex === -1) {
-      respIndex = linesToSearch.findIndex(
-        (l) => l.includes('[WIRE: RESP]') || l.includes('[WIRE:RESP]') || l.includes('[RESP]')
-      );
     }
 
     if (respIndex !== -1) {
@@ -235,10 +443,24 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       respBody = respBodyParts.join('\n').trim();
     }
 
+    // Fallback if respBody was not captured: synthesize from step.outputs
+    if (!respBody && step?.outputs) {
+      respBody = synthesizeResponseXml(step.outputs);
+      if (respBody) isRespSynthesized = true;
+    }
+
+    // Prettify XML
+    if (respBody) {
+      respBody = formatXml(respBody);
+    }
+
     // Check error details
     let errorDetail = step?.error?.message;
     if (!errorDetail) {
-      const errLine = activeLines.find((l) => l.includes('[ERROR]') || l.includes('error='));
+      const errLine = logLines.find(
+        (l) => (l.includes(`id=${stepId}`) || (targetOp && l.includes(targetOp))) &&
+          (l.includes('[ERROR]') || l.includes('status=500') || l.includes('error='))
+      );
       if (errLine) {
         const errMatch = errLine.match(/error=(.*)/);
         errorDetail = errMatch ? errMatch[1] : errLine;
@@ -246,54 +468,53 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
     }
 
     // Internal operation info (for non-wire steps)
+    let internalInfo: ParsedWireData['internalInfo'] = undefined;
+    const activeStepLines = logLines.filter((l) => l.includes(stepId));
+
     if (stepType === 'transform') {
-      const tfLine = activeLines.find((l) => l.includes('[TRANSFORM]'));
+      const tfLine = activeStepLines.find((l) => l.includes('[TRANSFORM]'));
       if (tfLine) {
         const exprMatch = tfLine.match(/expr="(.*?)"/);
         internalInfo = {
           engine: 'jmespath',
           expression: exprMatch ? exprMatch[1] : 'JMESPath Transform Expression',
-          summary: activeLines.find((l) => l.includes('[STEP: DONE]')) || 'Transform executed',
+          summary: activeStepLines.find((l) => l.includes('[STEP: DONE]')) || 'Transform executed',
         };
       }
     } else if (stepType === 'join') {
-      const joinLine = activeLines.find((l) => l.includes('[JOIN]'));
+      const joinLine = activeStepLines.find((l) => l.includes('[JOIN]'));
       if (joinLine) {
-        internalInfo = {
-          summary: joinLine,
-        };
+        internalInfo = { summary: joinLine };
       }
     } else if (stepType === 'db_upsert') {
-      const dbLine = activeLines.find((l) => l.includes('[DB_UPSERT]'));
+      const dbLine = activeStepLines.find((l) => l.includes('[DB_UPSERT]'));
       if (dbLine) {
-        internalInfo = {
-          summary: dbLine,
-        };
+        internalInfo = { summary: dbLine };
       }
     } else if (stepType === 'notify') {
-      const notLine = activeLines.find((l) => l.includes('[NOTIFY]'));
+      const notLine = activeStepLines.find((l) => l.includes('[NOTIFY]'));
       if (notLine) {
-        internalInfo = {
-          summary: notLine,
-        };
+        internalInfo = { summary: notLine };
       }
     }
 
-    const hasWireCall = Boolean(url || reqBody || respBody);
+    const hasWireCall = Boolean(url || reqBody || respBody || targetOp);
 
     return {
       hasWireCall,
       stepType,
       connector,
       method,
-      url,
+      url: url || (targetOp ? `http://localhost:9000${targetOp}` : ''),
       reqHeaders,
       reqCookies,
       reqBody,
+      isReqSynthesized,
       status: status || (step?.status === 'success' ? '200' : isFailed ? '500' : '200'),
-      latency: latency || (step?.latency_ms ? `${step.latency_ms}ms` : '--'),
+      latency: latency || (step?.latency_ms !== undefined ? `${step.latency_ms}ms` : '--'),
       respHeaders,
       respBody,
+      isRespSynthesized,
       errorDetail,
       internalInfo,
     };
@@ -349,7 +570,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
           {wireData.internalInfo?.expression && (
             <div className="mt-2">
               <span className="text-[11px] text-slate-400 font-mono">Engine: {wireData.internalInfo.engine}</span>
-              <pre className="p-2.5 bg-slate-950 rounded border border-slate-800 font-mono text-purple-300 text-[11px] overflow-x-auto mt-1">
+              <pre className="p-2.5 bg-slate-950 rounded border border-slate-800 font-mono text-purple-300 text-[11px] overflow-x-auto mt-1 custom-scrollbar">
                 {wireData.internalInfo.expression}
               </pre>
             </div>
@@ -402,13 +623,19 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
                 [WIRE: REQ] Outbound Request ({stepId})
               </span>
               <div className="flex items-center gap-2">
+                {wireData.isReqSynthesized && (
+                  <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-mono text-[10px] flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    Dataset Params
+                  </span>
+                )}
                 <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded font-mono text-[10px] font-bold">
                   {wireData.method || 'POST'}
                 </span>
                 {wireData.reqBody && (
                   <button
                     onClick={() => copyText(wireData.reqBody || '', true)}
-                    className="text-slate-400 hover:text-slate-200 text-xs"
+                    className="text-slate-400 hover:text-slate-200 text-xs transition"
                     title="Copy request payload"
                   >
                     {copiedReq ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -420,7 +647,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
             <div className="mt-2 text-xs font-mono text-slate-300 break-all space-y-1">
               <div>
                 <span className="text-slate-400">Endpoint:</span>{' '}
-                <span className="text-slate-200">{wireData.url || '(Internal connector call)'}</span>
+                <span className="text-cyan-300 font-semibold">{wireData.url || '(Internal connector call)'}</span>
               </div>
               {wireData.reqHeaders && (
                 <div className="text-[11px] text-slate-400">
@@ -435,8 +662,15 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
             </div>
 
             <div className="mt-3">
-              <div className="text-[11px] font-mono text-slate-400 mb-1">Request Payload Body:</div>
-              <pre className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar max-h-60">
+              <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+                <span>Request Payload Body (Nexacro XML):</span>
+                {wireData.reqBody && (
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {wireData.reqBody.length} characters
+                  </span>
+                )}
+              </div>
+              <pre className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar max-h-72 leading-relaxed">
                 {wireData.reqBody || '(No outbound request body captured)'}
               </pre>
             </div>
@@ -460,6 +694,12 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
                 [WIRE: RESP] Server Response
               </span>
               <div className="flex items-center gap-2">
+                {wireData.isRespSynthesized && (
+                  <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-mono text-[10px] flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    Dataset Outputs
+                  </span>
+                )}
                 <span
                   className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold ${
                     isCallFailed ? 'bg-red-500/20 text-red-300' : 'bg-emerald-500/20 text-emerald-300'
@@ -470,7 +710,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
                 {wireData.respBody && (
                   <button
                     onClick={() => copyText(wireData.respBody || '', false)}
-                    className="text-slate-400 hover:text-slate-200 text-xs"
+                    className="text-slate-400 hover:text-slate-200 text-xs transition"
                     title="Copy response payload"
                   >
                     {copiedRes ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -486,7 +726,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
                 {wireData.respBody && (
                   <>
                     <span className="text-slate-700 mx-2">•</span>
-                    <span className="text-slate-400">Bytes:</span> {wireData.respBody.length} B
+                    <span className="text-slate-400">Length:</span> {wireData.respBody.length} characters
                   </>
                 )}
               </div>
@@ -498,9 +738,16 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
             </div>
 
             <div className="mt-3">
-              <div className="text-[11px] font-mono text-slate-400 mb-1">Response Payload:</div>
+              <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+                <span>Response Payload (Nexacro XML Dataset):</span>
+                {wireData.respBody && (
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {wireData.respBody.length} characters
+                  </span>
+                )}
+              </div>
               <pre
-                className={`p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono overflow-x-auto custom-scrollbar max-h-60 ${
+                className={`p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono overflow-x-auto custom-scrollbar max-h-72 leading-relaxed ${
                   isCallFailed ? 'text-red-300' : 'text-blue-300'
                 }`}
               >
