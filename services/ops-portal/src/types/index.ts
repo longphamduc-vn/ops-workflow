@@ -46,9 +46,28 @@ export interface StepRunRecord {
   status: 'pending' | 'running' | 'success' | 'failed' | 'skipped';
   attempt: number;
   latency_ms: number;
+  outputs?: any;
   started_at?: string | null;
   completed_at?: string | null;
   error?: Record<string, any> | null;
+}
+
+export interface DatabaseTableMeta {
+  db: 'opsflow' | 'ems_sim';
+  table: string;
+  description: string;
+  row_count: number;
+  columns: string[];
+}
+
+export interface DatabaseQueryResult {
+  db: string;
+  table: string;
+  columns: string[];
+  rows: Record<string, any>[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface WireTelemetryItem {

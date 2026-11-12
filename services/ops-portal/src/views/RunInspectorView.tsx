@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   RotateCcw,
   Bolt,
@@ -8,12 +8,14 @@ import {
   CheckCircle2,
   XCircle,
   Trash2,
+  Layers,
 } from 'lucide-react';
 import { RunRecord, StepRunRecord } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { DagVisualizer } from '../components/dag/DagVisualizer';
 import { WireDebugger } from '../components/telemetry/WireDebugger';
 import { LogConsole } from '../components/telemetry/LogConsole';
+import { StepDetailInspector } from '../components/telemetry/StepDetailInspector';
 
 interface RunInspectorViewProps {
   run: RunRecord;
@@ -37,17 +39,24 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
   const [selectedStepId, setSelectedStepId] = useState<string>(
     steps.find((s) => s.status === 'failed')?.step_id || steps[0]?.step_id || ''
   );
-  const [activeTab, setActiveTab] = useState<'wire' | 'logs' | 'context' | 'retries'>('wire');
+  const [activeTab, setActiveTab] = useState<'step_details' | 'wire' | 'logs' | 'context' | 'retries'>('step_details');
   const [isConfirmingClearHeader, setIsConfirmingClearHeader] = useState<boolean>(false);
   const [isClearingHeader, setIsClearingHeader] = useState<boolean>(false);
 
-  // Automatically switch selected step when active run changes
-  React.useEffect(() => {
-    if (steps.length > 0) {
+  // Automatically switch selected step ONLY when active run ID changes (prevents snap-back on polling)
+  const prevRunIdRef = useRef<string>(run.run_id);
+  useEffect(() => {
+    if (prevRunIdRef.current !== run.run_id) {
+      prevRunIdRef.current = run.run_id;
+      if (steps.length > 0) {
+        const failed = steps.find((s) => s.status === 'failed');
+        setSelectedStepId(failed ? failed.step_id : steps[0].step_id);
+      }
+    } else if (!selectedStepId && steps.length > 0) {
       const failed = steps.find((s) => s.status === 'failed');
       setSelectedStepId(failed ? failed.step_id : steps[0].step_id);
     }
-  }, [run.run_id, steps]);
+  }, [run.run_id, steps, selectedStepId]);
 
   const selectedStep = steps.find((s) => s.step_id === selectedStepId);
   const isFailed = selectedStep?.status === 'failed' || run.status === 'failed';
@@ -196,6 +205,18 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
         <div className="bg-slate-950 px-4 py-2 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <button
+              onClick={() => setActiveTab('step_details')}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition ${
+                activeTab === 'step_details'
+                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-blue-400" />
+              Step Details & Outputs
+            </button>
+
+            <button
               onClick={() => setActiveTab('wire')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition ${
                 activeTab === 'wire'
@@ -228,7 +249,7 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               }`}
             >
               <Code2 className="w-3.5 h-3.5" />
-              Inputs & Outputs JSON
+              Run Global Inputs/Outputs
             </button>
 
             <button
@@ -245,12 +266,21 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
           </div>
 
           <span className="text-xs font-mono text-slate-400">
-            Step: <span className="text-slate-200 font-bold">{selectedStepId || '--'}</span>
+            Selected: <span className="text-slate-200 font-bold">{selectedStepId || '--'}</span>
           </span>
         </div>
 
         {/* Tab Content */}
         <div className="p-4">
+          {activeTab === 'step_details' && (
+            <StepDetailInspector
+              stepId={selectedStepId}
+              step={selectedStep}
+              logs={logs}
+              isFailed={isFailed}
+            />
+          )}
+
           {activeTab === 'wire' && (
             <WireDebugger
               stepId={selectedStepId}

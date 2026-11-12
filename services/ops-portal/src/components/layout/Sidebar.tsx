@@ -6,9 +6,10 @@ import {
   FileCode2,
   Network,
   ShieldCheck,
+  Database,
 } from 'lucide-react';
 
-export type PortalTab = 'dashboard' | 'inspector' | 'runs' | 'workflows' | 'connectors';
+export type PortalTab = 'dashboard' | 'inspector' | 'runs' | 'workflows' | 'connectors' | 'database';
 
 interface SidebarProps {
   currentTab: PortalTab;
@@ -38,6 +39,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'runs' as PortalTab,
       label: 'Execution Runs',
       icon: ListTree,
+    },
+    {
+      id: 'database' as PortalTab,
+      label: 'Database & Datasets',
+      icon: Database,
     },
     {
       id: 'workflows' as PortalTab,

@@ -11,7 +11,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from opsflow.api.routes import datasets, health, metrics, runs, webhooks, workflows
+from opsflow.api.routes import database, datasets, health, metrics, runs, webhooks, workflows
 from opsflow.core.errors import OpsflowError
 from opsflow.core.parser import load_workflow_from_file
 from opsflow.read_models.storage import ReadModelStorage
@@ -132,6 +132,7 @@ def create_app() -> FastAPI:
     app.include_router(workflows.router)
     app.include_router(runs.router)
     app.include_router(datasets.router)
+    app.include_router(database.router)
     app.include_router(webhooks.router)
     app.include_router(metrics.router)
 

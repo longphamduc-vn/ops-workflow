@@ -108,6 +108,7 @@ class StepRunResponse(BaseModel):
     status: str
     attempt: int
     latency_ms: int
+    outputs: Any = None
     started_at: str | None = None
     completed_at: str | None = None
     error: dict[str, Any] | None = None

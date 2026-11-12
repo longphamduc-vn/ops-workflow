@@ -6,6 +6,7 @@ import { RunInspectorView } from './views/RunInspectorView';
 import { RunsExplorerView } from './views/RunsExplorerView';
 import { WorkflowCatalogView } from './views/WorkflowCatalogView';
 import { ConnectorsView } from './views/ConnectorsView';
+import { DatabaseView } from './views/DatabaseView';
 import { TriggerRunModal } from './components/modals/TriggerRunModal';
 import { ReplayModal } from './components/modals/ReplayModal';
 import { opsClient } from './api/client';
@@ -27,13 +28,18 @@ export const App: React.FC = () => {
   const [triggerWorkflowDefault, setTriggerWorkflowDefault] = useState<string>('');
 
   // Initial Data Fetching
-  const loadData = async () => {
+  const loadData = async (forceRefreshDetails = false) => {
     try {
       const health = await opsClient.getHealth();
       setServerOnline(health.status === 'ok');
 
-      const wfList = await opsClient.listWorkflows();
-      setWorkflows(wfList);
+      // Only fetch workflows list if not already loaded or forced
+      setWorkflows(prev => {
+        if (prev.length === 0 || forceRefreshDetails) {
+          opsClient.listWorkflows().then(setWorkflows).catch(() => {});
+        }
+        return prev;
+      });
 
       const runList = await opsClient.listRuns();
       setRuns(runList.items);
@@ -43,25 +49,38 @@ export const App: React.FC = () => {
         if (!selectedRunId) {
           setSelectedRunId(activeId);
         }
-        const runDetail = await opsClient.getRun(activeId);
-        setCurrentRun(runDetail);
 
-        const steps = await opsClient.getRunSteps(activeId);
-        setCurrentSteps(steps);
+        // Check if run is still in progress or not loaded yet
+        const isRunActive = !currentRun || currentRun.run_id !== activeId || currentRun.status === 'running' || currentRun.status === 'pending';
+        
+        if (isRunActive || forceRefreshDetails) {
+          const runDetail = await opsClient.getRun(activeId);
+          setCurrentRun(runDetail);
 
-        const logs = await opsClient.getRunLogs(activeId);
-        setCurrentLogs(logs);
+          const steps = await opsClient.getRunSteps(activeId);
+          setCurrentSteps(steps);
+
+          const logs = await opsClient.getRunLogs(activeId);
+          setCurrentLogs(logs);
+        }
       }
     } catch (err) {
       console.error('Error fetching opsflow data:', err);
     }
   };
 
+  // Initial load
   useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 5000);
-    return () => clearInterval(interval);
+    loadData(true);
   }, [selectedRunId]);
+
+  // Periodic polling only for active runs / run list updates (every 8s)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadData(false);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [selectedRunId, currentRun?.status]);
 
   const handleSelectRun = async (runId: string) => {
     setSelectedRunId(runId);
@@ -187,6 +206,8 @@ export const App: React.FC = () => {
               onTriggerWorkflow={handleTriggerFromCatalog}
             />
           )}
+
+          {currentTab === 'database' && <DatabaseView />}
 
           {currentTab === 'connectors' && <ConnectorsView />}
         </main>

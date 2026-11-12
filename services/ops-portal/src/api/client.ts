@@ -3,6 +3,8 @@ import {
   RunListResponse,
   RunRecord,
   StepRunRecord,
+  DatabaseTableMeta,
+  DatabaseQueryResult,
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
@@ -308,6 +310,42 @@ export const opsClient = {
     } catch (err: any) {
       return { success: false, deleted_count: 0, message: err.message || 'Connection error' };
     }
+  },
+
+  async listDatabaseTables(): Promise<DatabaseTableMeta[]> {
+    try {
+      const res = await fetch(`${API_BASE}/database/tables`, { headers: defaultHeaders });
+      if (res.ok) return await res.json();
+    } catch (_) {}
+    return [];
+  },
+
+  async queryDatabaseTable(params: {
+    db: string;
+    table: string;
+    limit?: number;
+    offset?: number;
+    search?: string;
+    order_by?: string;
+    order_dir?: string;
+  }): Promise<DatabaseQueryResult | null> {
+    try {
+      const query = new URLSearchParams({
+        db: params.db,
+        table: params.table,
+        limit: String(params.limit ?? 50),
+        offset: String(params.offset ?? 0),
+        order_dir: params.order_dir ?? 'desc',
+      });
+      if (params.search) query.append('search', params.search);
+      if (params.order_by) query.append('order_by', params.order_by);
+
+      const res = await fetch(`${API_BASE}/database/query?${query.toString()}`, {
+        headers: defaultHeaders,
+      });
+      if (res.ok) return await res.json();
+    } catch (_) {}
+    return null;
   },
 };
 

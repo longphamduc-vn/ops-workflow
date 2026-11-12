@@ -55,7 +55,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
 
   // Parse wire telemetry dynamically from real execution logs for this step
   const wireData: ParsedWireData = useMemo(() => {
-    if (!logs || !stepId) {
+    if (!stepId) {
       return {
         hasWireCall: false,
         stepType: 'call',
@@ -63,9 +63,32 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       };
     }
 
-    const logLines = logs.split('\n');
+    const logLines = (logs || '').split('\n');
 
-    // 1. Locate step slice in log
+    // 1. Identify target operation for this step
+    let targetOp = '';
+    const startLine = logLines.find(
+      (l) => (l.includes(`id=${stepId} `) || l.includes(`id=${stepId}]`)) &&
+        (l.includes('[STEP: START]') || l.includes('[STEP:START]'))
+    );
+    if (startLine) {
+      const opMatch = startLine.match(/"operation":\s*"([^"]+)"/);
+      if (opMatch) targetOp = opMatch[1];
+    }
+    if (!targetOp) {
+      const knownOps: Record<string, string> = {
+        fetch_item_master: 'retrieveItem',
+        fetch_target_stock: 'TargetStockSearchList',
+        fetch_item_details: 'retrieveItemInfoDetail',
+        fetch_po_interlocks: 'retrieveItemPoStatusList',
+        get_wip_entity: 'retrieveWipEntity',
+        get_wo_master: 'WoMasterRetInit',
+        get_status_history: 'statusHistory',
+      };
+      targetOp = knownOps[stepId] || '';
+    }
+
+    // 2. Locate step slice in log
     let inStep = false;
     const stepLines: string[] = [];
 
@@ -95,7 +118,6 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
     let stepType = 'call';
     let internalInfo: ParsedWireData['internalInfo'] = undefined;
 
-    const startLine = activeLines.find((l) => l.includes('[STEP: START]') || l.includes('[STEP:START]'));
     if (startLine) {
       const typeMatch = startLine.match(/type=(\w+)/);
       if (typeMatch) stepType = typeMatch[1];
@@ -109,7 +131,7 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       stepType = 'notify';
     }
 
-    // Parse Wire Request
+    // 3. Locate WIRE REQ (search in activeLines first, then search whole logLines with targetOp)
     let connector = 'ems';
     let method = 'POST';
     let url = '';
@@ -117,9 +139,20 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
     let reqCookies = '';
     let reqBody = '';
 
-    const reqIndex = activeLines.findIndex((l) => l.includes('[WIRE: REQ]') || l.includes('[WIRE:REQ]'));
+    const linesToSearch = activeLines.length > 0 ? activeLines : logLines;
+    let reqIndex = -1;
+
+    // Search with targetOp priority
+    if (targetOp) {
+      reqIndex = logLines.findIndex((l) => l.includes('[WIRE: REQ]') && l.includes(targetOp));
+    }
+    if (reqIndex === -1) {
+      reqIndex = linesToSearch.findIndex((l) => l.includes('[WIRE: REQ]') || l.includes('[WIRE:REQ]'));
+    }
+
+    const sourceLinesForReq = reqIndex !== -1 && linesToSearch === activeLines ? logLines : linesToSearch;
     if (reqIndex !== -1) {
-      const reqLine = activeLines[reqIndex];
+      const reqLine = sourceLinesForReq[reqIndex];
       const connMatch = reqLine.match(/connector=(\w+)/);
       if (connMatch) connector = connMatch[1];
 
@@ -140,25 +173,47 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       if (bodyMatch && bodyMatch[1]) {
         reqBodyParts.push(bodyMatch[1]);
       }
-      // Collect multi-line body until next log timestamp
-      for (let j = reqIndex + 1; j < activeLines.length; j++) {
-        if (/^\[\d{4}-\d{2}-\d{2}/.test(activeLines[j])) break;
-        reqBodyParts.push(activeLines[j]);
+      for (let j = reqIndex + 1; j < sourceLinesForReq.length; j++) {
+        if (/^\[\d{4}-\d{2}-\d{2}/.test(sourceLinesForReq[j])) break;
+        reqBodyParts.push(sourceLinesForReq[j]);
       }
       reqBody = reqBodyParts.join('\n').trim();
     }
 
-    // Parse Wire Response
+    // 4. Locate WIRE RESP corresponding to targetOp
     let status = '';
     let latency = '';
     let respHeaders = '';
     let respBody = '';
+    let respIndex = -1;
 
-    const respIndex = activeLines.findIndex(
-      (l) => l.includes('[WIRE: RESP]') || l.includes('[WIRE:RESP]') || l.includes('[RESP]')
-    );
+    if (targetOp) {
+      const respOpIdx = logLines.findIndex((l) => l.includes('[RESP]') && l.includes(targetOp));
+      if (respOpIdx !== -1) {
+        for (let k = respOpIdx - 1; k >= 0; k--) {
+          if (logLines[k].includes('[WIRE: RESP]')) {
+            respIndex = k;
+            break;
+          }
+        }
+      }
+    }
+    if (respIndex === -1 && reqIndex !== -1) {
+      for (let k = reqIndex + 1; k < logLines.length; k++) {
+        if (logLines[k].includes('[WIRE: RESP]')) {
+          respIndex = k;
+          break;
+        }
+      }
+    }
+    if (respIndex === -1) {
+      respIndex = linesToSearch.findIndex(
+        (l) => l.includes('[WIRE: RESP]') || l.includes('[WIRE:RESP]') || l.includes('[RESP]')
+      );
+    }
+
     if (respIndex !== -1) {
-      const respLine = activeLines[respIndex];
+      const respLine = logLines[respIndex];
       const statusMatch = respLine.match(/status=(\w+|\d+)/);
       if (statusMatch) status = statusMatch[1];
 
@@ -173,9 +228,9 @@ export const WireDebugger: React.FC<WireDebuggerProps> = ({
       if (bodyMatch && bodyMatch[1]) {
         respBodyParts.push(bodyMatch[1]);
       }
-      for (let k = respIndex + 1; k < activeLines.length; k++) {
-        if (/^\[\d{4}-\d{2}-\d{2}/.test(activeLines[k])) break;
-        respBodyParts.push(activeLines[k]);
+      for (let k = respIndex + 1; k < logLines.length; k++) {
+        if (/^\[\d{4}-\d{2}-\d{2}/.test(logLines[k])) break;
+        respBodyParts.push(logLines[k]);
       }
       respBody = respBodyParts.join('\n').trim();
     }

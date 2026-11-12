@@ -109,6 +109,7 @@ async def get_run_steps(
             status=sr.status,
             attempt=sr.attempt,
             latency_ms=sr.latency_ms,
+            outputs=sr.outputs,
             started_at=sr.started_at.isoformat() if sr.started_at else None,
             completed_at=sr.completed_at.isoformat() if sr.completed_at else None,
             error=sr.error,
@@ -146,16 +147,54 @@ async def get_run_logs(
     _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:read"))],
 ) -> Response:
     """Retrieve detailed execution log text for a specific run."""
+    import re
+    from pathlib import Path
     from opsflow.core.logger import get_run_log_path
 
     log_path = get_run_log_path(run_id)
-    if not log_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No execution log file found for run '{run_id}'. (Ensure dev mode or log_file is active)",
-        )
-    content = log_path.read_text(encoding="utf-8")
-    return Response(content=content, media_type="text/plain; charset=utf-8")
+    if log_path.exists():
+        content = log_path.read_text(encoding="utf-8")
+        if content.strip():
+            return Response(content=content, media_type="text/plain; charset=utf-8")
+
+    # Fallback: Recover run log entries from global dev log files
+    candidates = [
+        Path("services/ops-workflow/logs/opsflow_dev.log"),
+        Path("logs/opsflow_dev.log"),
+        Path("../logs/opsflow_dev.log"),
+        Path("services/ops-workflow/logs/opsflow.log"),
+        Path("logs/opsflow.log"),
+    ]
+    for p in candidates:
+        if not p.exists():
+            continue
+        try:
+            lines = p.read_text(encoding="utf-8").splitlines()
+            matched = []
+            in_run_line = False
+            for line in lines:
+                if f"[run_id={run_id}]" in line:
+                    matched.append(line)
+                    in_run_line = True
+                elif in_run_line and not re.match(r"^\[\d{4}-\d{2}-\d{2}", line):
+                    matched.append(line)
+                else:
+                    in_run_line = False
+            if matched:
+                recovered_content = "\n".join(matched)
+                try:
+                    log_path.parent.mkdir(parents=True, exist_ok=True)
+                    log_path.write_text(recovered_content, encoding="utf-8")
+                except Exception:
+                    pass
+                return Response(content=recovered_content, media_type="text/plain; charset=utf-8")
+        except Exception:
+            continue
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"No execution log file found for run '{run_id}'. (Ensure dev mode or log_file is active)",
+    )
 
 
 @router.delete("/{run_id}/logs", summary="Delete execution log file for a run")
