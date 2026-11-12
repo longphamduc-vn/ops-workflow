@@ -25,16 +25,25 @@ export const DagVisualizer: React.FC<DagVisualizerProps> = ({
 }) => {
   // Step icons helper
   const getStepIcon = (stepId: string) => {
-    if (stepId.includes('wip') || stepId.includes('master') || stepId.includes('stock')) {
+    if (
+      stepId.includes('fetch') ||
+      stepId.includes('wip') ||
+      stepId.includes('master') ||
+      stepId.includes('stock') ||
+      stepId.includes('query')
+    ) {
       return <Server className="w-3.5 h-3.5 text-blue-400" />;
     }
-    if (stepId.includes('transform') || stepId.includes('normalize')) {
+    if (stepId.includes('transform') || stepId.includes('normalize') || stepId.includes('evaluate')) {
       return <Code2 className="w-3.5 h-3.5 text-purple-400" />;
     }
-    if (stepId.includes('db') || stepId.includes('upsert')) {
+    if (stepId.includes('join')) {
+      return <Code2 className="w-3.5 h-3.5 text-indigo-400" />;
+    }
+    if (stepId.includes('db') || stepId.includes('upsert') || stepId.includes('save')) {
       return <Database className="w-3.5 h-3.5 text-emerald-400" />;
     }
-    if (stepId.includes('notify') || stepId.includes('slack')) {
+    if (stepId.includes('notify') || stepId.includes('slack') || stepId.includes('alert')) {
       return <Bell className="w-3.5 h-3.5 text-amber-400" />;
     }
     if (stepId.includes('approval')) {
@@ -44,13 +53,33 @@ export const DagVisualizer: React.FC<DagVisualizerProps> = ({
   };
 
   const getStepType = (stepId: string) => {
-    if (stepId.includes('wip') || stepId.includes('master')) return 'call: ems';
-    if (stepId.includes('transform')) return 'transform';
-    if (stepId.includes('notify')) return 'call: http';
-    if (stepId.includes('db')) return 'db_upsert';
+    if (stepId.includes('join')) return 'join';
+    if (stepId.includes('transform') || stepId.includes('normalize') || stepId.includes('evaluate'))
+      return 'transform';
+    if (stepId.includes('notify') || stepId.includes('alert') || stepId.includes('slack')) return 'notify';
+    if (stepId.includes('db') || stepId.includes('upsert') || stepId.includes('save')) return 'db_upsert';
     if (stepId.includes('approval')) return 'approval';
+    if (
+      stepId.includes('fetch') ||
+      stepId.includes('query') ||
+      stepId.includes('wip') ||
+      stepId.includes('stock') ||
+      stepId.includes('master')
+    ) {
+      return 'call: ems';
+    }
     return 'call';
   };
+
+  if (steps.length === 0) {
+    return (
+      <div className="bg-slate-950 rounded-xl border border-slate-800 p-5 overflow-x-auto custom-scrollbar">
+        <div className="py-6 text-center text-slate-500 font-sans text-xs">
+          No execution step nodes recorded for this workflow run.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-950 rounded-xl border border-slate-800 p-5 overflow-x-auto custom-scrollbar">
@@ -99,18 +128,22 @@ export const DagVisualizer: React.FC<DagVisualizerProps> = ({
                 <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
                   <div className="flex items-center gap-1">
                     {isSuccess && (
-                      <span className="text-emerald-400 font-medium flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Success
+                      <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                        <CheckCircle2 className="w-3 h-3" /> Succeeded
                       </span>
                     )}
                     {isFailed && (
-                      <span className="text-red-400 font-medium flex items-center gap-1">
-                        <XCircle className="w-3 h-3" /> Failed (Attempt {step.attempt})
+                      <span className="flex items-center gap-1 text-red-400 font-medium">
+                        <XCircle className="w-3 h-3" /> Failed
                       </span>
                     )}
-                    {isSkipped && <span className="text-slate-400">Skipped</span>}
+                    {isSkipped && (
+                      <span className="flex items-center gap-1 text-slate-500">
+                        <Clock className="w-3 h-3" /> Skipped
+                      </span>
+                    )}
                     {isRunning && (
-                      <span className="text-blue-400 font-medium flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-blue-400">
                         <Clock className="w-3 h-3 animate-spin" /> Running...
                       </span>
                     )}
@@ -137,4 +170,3 @@ export const DagVisualizer: React.FC<DagVisualizerProps> = ({
     </div>
   );
 };
-

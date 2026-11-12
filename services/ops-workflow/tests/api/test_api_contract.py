@@ -249,3 +249,39 @@ async def test_delete_run_logs_endpoint(api_client: httpx.AsyncClient) -> None:
     assert res.status_code == 200
     assert res.json()["status"] == "cleared"
     assert not log_file.exists()
+
+
+@pytest.mark.asyncio
+async def test_delete_run_and_delete_all_runs_endpoints(api_client: httpx.AsyncClient) -> None:
+    headers = {"X-API-Key": "test_api_key"}
+
+    # 1. Trigger a run
+    res = await api_client.post(
+        "/api/v1/workflows/equipment-status-lookup/runs",
+        headers=headers,
+        json={"inputs": {"wip_entity_id": "999"}},
+    )
+    assert res.status_code == 202
+    run_id = res.json()["run_id"]
+
+    # 2. Delete single run
+    del_res = await api_client.delete(f"/api/v1/runs/{run_id}", headers=headers)
+    assert del_res.status_code == 200
+    assert del_res.json()["status"] == "deleted"
+
+    # Verify run is gone
+    get_res = await api_client.get(f"/api/v1/runs/{run_id}", headers=headers)
+    assert get_res.status_code == 404
+
+    # 3. Trigger another run and test delete all runs
+    res2 = await api_client.post(
+        "/api/v1/workflows/equipment-status-lookup/runs",
+        headers=headers,
+        json={"inputs": {"wip_entity_id": "888"}},
+    )
+    assert res2.status_code == 202
+
+    del_all_res = await api_client.delete("/api/v1/runs", headers=headers)
+    assert del_all_res.status_code == 200
+    assert del_all_res.json()["status"] == "cleared"
+    assert del_all_res.json()["deleted_count"] >= 1

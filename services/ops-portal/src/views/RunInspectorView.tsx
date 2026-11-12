@@ -17,6 +17,8 @@ import { LogConsole } from '../components/telemetry/LogConsole';
 
 interface RunInspectorViewProps {
   run: RunRecord;
+  runs?: RunRecord[];
+  onSelectRun?: (runId: string) => void;
   steps: StepRunRecord[];
   logs: string;
   onOpenReplay: () => void;
@@ -25,20 +27,39 @@ interface RunInspectorViewProps {
 
 export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
   run,
+  runs = [],
+  onSelectRun,
   steps,
   logs,
   onOpenReplay,
   onClearLogs,
 }) => {
   const [selectedStepId, setSelectedStepId] = useState<string>(
-    steps.find((s) => s.status === 'failed')?.step_id || steps[0]?.step_id || 'get_wip_entity'
+    steps.find((s) => s.status === 'failed')?.step_id || steps[0]?.step_id || ''
   );
   const [activeTab, setActiveTab] = useState<'wire' | 'logs' | 'context' | 'retries'>('wire');
   const [isConfirmingClearHeader, setIsConfirmingClearHeader] = useState<boolean>(false);
   const [isClearingHeader, setIsClearingHeader] = useState<boolean>(false);
 
+  // Automatically switch selected step when active run changes
+  React.useEffect(() => {
+    if (steps.length > 0) {
+      const failed = steps.find((s) => s.status === 'failed');
+      setSelectedStepId(failed ? failed.step_id : steps[0].step_id);
+    }
+  }, [run.run_id, steps]);
+
   const selectedStep = steps.find((s) => s.step_id === selectedStepId);
   const isFailed = selectedStep?.status === 'failed' || run.status === 'failed';
+
+  // Compute real execution duration
+  const durationMs =
+    run.started_at && run.completed_at
+      ? Math.max(0, new Date(run.completed_at).getTime() - new Date(run.started_at).getTime())
+      : null;
+
+  // Determine trigger type dynamically
+  const triggerType = run.inputs?._trigger || (run.workflow_name?.includes('sync') || run.workflow_name?.includes('lookup') ? 'cron' : 'api');
 
   return (
     <div className="space-y-4">
@@ -55,17 +76,43 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
             )}
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-bold text-slate-100 font-mono">{run.run_id}</span>
               <StatusBadge status={run.status} />
-              <span className="text-xs text-slate-400 font-mono">wf: {run.workflow_name}</span>
+              <span className="text-xs text-slate-400 font-mono">
+                wf: <strong className="text-blue-300">{run.workflow_name}</strong>
+              </span>
+
+              {runs && runs.length > 1 && onSelectRun && (
+                <div className="ml-2 flex items-center gap-1.5 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-800">
+                  <span className="text-[11px] text-slate-500 font-sans">Switch Run:</span>
+                  <select
+                    value={run.run_id}
+                    onChange={(e) => onSelectRun(e.target.value)}
+                    className="bg-transparent text-slate-200 font-mono text-xs focus:outline-none cursor-pointer max-w-[280px] truncate"
+                  >
+                    {runs.map((r) => (
+                      <option key={r.run_id} value={r.run_id} className="bg-slate-900 text-slate-200">
+                        {r.run_id} — {r.workflow_name} ({r.status})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-2">
               <span>Started: {run.started_at ? new Date(run.started_at).toLocaleTimeString('en-US') : '--'}</span>
               <span className="text-slate-700">•</span>
-              <span>Trigger: <code className="bg-slate-800 px-1 py-0.2 rounded font-mono text-slate-300">cron</code></span>
+              <span>
+                Trigger: <code className="bg-slate-800 px-1 py-0.2 rounded font-mono text-slate-300">{triggerType}</code>
+              </span>
               <span className="text-slate-700">•</span>
-              <span>Duration: <span className="text-amber-400 font-mono font-bold">1,250 ms</span></span>
+              <span>
+                Duration:{' '}
+                <span className="text-amber-400 font-mono font-bold">
+                  {durationMs !== null ? `${durationMs.toLocaleString()} ms` : '--'}
+                </span>
+              </span>
             </div>
           </div>
         </div>
@@ -193,19 +240,24 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
-              Retry History (3 attempts)
+              Step Execution & Retries ({selectedStep?.attempt ?? 1} attempt{selectedStep?.attempt !== 1 ? 's' : ''})
             </button>
           </div>
 
           <span className="text-xs font-mono text-slate-400">
-            Step: <span className="text-slate-200 font-bold">{selectedStepId}</span>
+            Step: <span className="text-slate-200 font-bold">{selectedStepId || '--'}</span>
           </span>
         </div>
 
         {/* Tab Content */}
         <div className="p-4">
           {activeTab === 'wire' && (
-            <WireDebugger stepId={selectedStepId} isFailed={isFailed} />
+            <WireDebugger
+              stepId={selectedStepId}
+              step={selectedStep}
+              logs={logs}
+              isFailed={isFailed}
+            />
           )}
 
           {activeTab === 'logs' && (
@@ -235,36 +287,84 @@ export const RunInspectorView: React.FC<RunInspectorViewProps> = ({
           )}
 
           {activeTab === 'retries' && (
-            <div className="space-y-2.5 text-xs">
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center">
-                <div>
-                  <span className="font-bold text-red-400">Attempt 1:</span>{' '}
-                  <span className="text-slate-300">Nexacro HTTP 500 (Session Expired)</span>
+            <div className="space-y-3 text-xs">
+              {!selectedStep ? (
+                <div className="p-6 text-center text-slate-500">
+                  Select a step in the DAG flowchart above to view step retry history and error telemetry.
                 </div>
-                <div className="text-slate-400 font-mono text-[11px]">
-                  Latency: 385ms • Backoff: 2.0s
-                </div>
-              </div>
+              ) : selectedStep.error ? (
+                <div className="space-y-3">
+                  <div className="p-4 bg-red-950/40 border border-red-800/80 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 text-red-300 font-bold text-sm">
+                      <XCircle className="w-4 h-4 text-red-400" />
+                      Step Execution Failed: [{selectedStep.step_id}]
+                    </div>
+                    <div className="text-slate-300 font-mono text-[11px] bg-red-950/60 p-2.5 rounded border border-red-900/50 break-all">
+                      {typeof selectedStep.error === 'object'
+                        ? selectedStep.error.message || JSON.stringify(selectedStep.error, null, 2)
+                        : String(selectedStep.error)}
+                    </div>
+                    <div className="text-[11px] text-red-400 flex items-center gap-2">
+                      <span>Total Attempts: <strong className="text-red-200">{selectedStep.attempt}</strong></span>
+                      <span>•</span>
+                      <span>Execution Latency: <strong className="text-red-200">{selectedStep.latency_ms} ms</strong></span>
+                    </div>
+                  </div>
 
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center">
-                <div>
-                  <span className="font-bold text-red-400">Attempt 2:</span>{' '}
-                  <span className="text-slate-300">Auto-relogin to /login.do failed</span>
+                  {Array.from({ length: selectedStep.attempt }).map((_, idx) => {
+                    const attemptNum = idx + 1;
+                    const isLast = attemptNum === selectedStep.attempt;
+                    return (
+                      <div
+                        key={attemptNum}
+                        className={`p-3 rounded-lg border flex justify-between items-center ${
+                          isLast
+                            ? 'bg-red-950/20 border-red-800/60'
+                            : 'bg-slate-950 border-slate-800'
+                        }`}
+                      >
+                        <div>
+                          <span className={`font-bold ${isLast ? 'text-red-400' : 'text-amber-400'}`}>
+                            Attempt {attemptNum}:
+                          </span>{' '}
+                          <span className="text-slate-300">
+                            {isLast
+                              ? 'Max attempts reached. Step execution failed with error.'
+                              : `Attempt ${attemptNum} failed. Backing off before retry...`}
+                          </span>
+                        </div>
+                        <div className="text-slate-400 font-mono text-[11px]">
+                          Status: {isLast ? 'FAILED' : 'RETRYING'}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="text-slate-400 font-mono text-[11px]">
-                  Latency: 430ms • Backoff: 4.0s
+              ) : selectedStep.status === 'skipped' ? (
+                <div className="p-5 bg-slate-950 border border-slate-800 rounded-xl text-center space-y-1">
+                  <div className="font-semibold text-slate-300">Step Skipped</div>
+                  <div className="text-slate-500 text-[11px]">
+                    Step [{selectedStep.step_id}] was skipped because a prior dependent step failed.
+                  </div>
                 </div>
-              </div>
-
-              <div className="p-3 bg-red-950/20 border border-red-800/60 rounded-lg flex justify-between items-center">
-                <div>
-                  <span className="font-bold text-red-400">Attempt 3:</span>{' '}
-                  <span className="text-red-300 font-semibold">Max attempts reached (3/3). Step aborted.</span>
+              ) : (
+                <div className="p-4 bg-emerald-950/30 border border-emerald-800/60 rounded-xl space-y-2">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    Step [{selectedStep.step_id}] Succeeded Cleanly
+                  </div>
+                  <div className="text-slate-300 text-[11px] space-y-1">
+                    <div>
+                      Executed in <strong className="text-emerald-300 font-mono">{selectedStep.latency_ms} ms</strong> on attempt {selectedStep.attempt || 1} with zero retries.
+                    </div>
+                    {selectedStep.completed_at && (
+                      <div className="text-slate-500 text-[10px]">
+                        Completed at: {new Date(selectedStep.completed_at).toLocaleString('en-US')}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-slate-400 font-mono text-[11px]">
-                  Latency: 435ms • Status: FAILED
-                </div>
-              </div>
+              )}
             </div>
           )}
         </div>

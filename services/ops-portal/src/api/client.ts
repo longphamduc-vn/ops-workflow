@@ -281,5 +281,33 @@ export const opsClient = {
       return false;
     }
   },
+
+  async deleteRun(runId: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/runs/${runId}`, {
+        method: 'DELETE',
+        headers: defaultHeaders,
+      });
+      return res.ok;
+    } catch (_) {
+      return false;
+    }
+  },
+
+  async deleteAllRuns(): Promise<{ success: boolean; deleted_count: number; message?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/runs`, {
+        method: 'DELETE',
+        headers: defaultHeaders,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { success: true, deleted_count: data.deleted_count ?? 0, message: data.message };
+      }
+      return { success: false, deleted_count: 0, message: `Failed with status ${res.status}` };
+    } catch (err: any) {
+      return { success: false, deleted_count: 0, message: err.message || 'Connection error' };
+    }
+  },
 };
 

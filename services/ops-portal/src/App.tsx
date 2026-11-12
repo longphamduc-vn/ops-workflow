@@ -100,6 +100,26 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleDeleteRun = async (runId: string) => {
+    await opsClient.deleteRun(runId);
+    if (runId === selectedRunId) {
+      setSelectedRunId('');
+      setCurrentRun(null);
+      setCurrentSteps([]);
+      setCurrentLogs('');
+    }
+    await loadData();
+  };
+
+  const handleDeleteAllRuns = async () => {
+    await opsClient.deleteAllRuns();
+    setSelectedRunId('');
+    setCurrentRun(null);
+    setCurrentSteps([]);
+    setCurrentLogs('');
+    await loadData();
+  };
+
   const failedRunsCount = runs.filter((r) => r.status === 'failed').length;
 
   return (
@@ -128,6 +148,7 @@ export const App: React.FC = () => {
           {currentTab === 'dashboard' && (
             <DashboardView
               runs={runs}
+              workflows={workflows}
               onSelectRun={handleSelectRun}
               onNavigateTab={(tab) => setCurrentTab(tab)}
             />
@@ -136,6 +157,8 @@ export const App: React.FC = () => {
           {currentTab === 'inspector' && currentRun && (
             <RunInspectorView
               run={currentRun}
+              runs={runs}
+              onSelectRun={handleSelectRun}
               steps={currentSteps}
               logs={currentLogs}
               onOpenReplay={() => setIsReplayModalOpen(true)}
@@ -153,6 +176,8 @@ export const App: React.FC = () => {
               }}
               onNavigateInspector={() => setCurrentTab('inspector')}
               onClearRunLogs={handleClearLogs}
+              onDeleteRun={handleDeleteRun}
+              onDeleteAllRuns={handleDeleteAllRuns}
             />
           )}
 

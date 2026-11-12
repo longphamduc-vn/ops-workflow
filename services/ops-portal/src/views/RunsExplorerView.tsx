@@ -5,6 +5,7 @@ import {
   Bug,
   RotateCcw,
   Trash2,
+  AlertOctagon,
 } from 'lucide-react';
 import { RunRecord } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -15,6 +16,8 @@ interface RunsExplorerViewProps {
   onOpenReplayForRun: (runId: string) => void;
   onNavigateInspector: () => void;
   onClearRunLogs?: (runId: string) => Promise<boolean | void>;
+  onDeleteRun?: (runId: string) => Promise<boolean | void>;
+  onDeleteAllRuns?: () => Promise<void>;
 }
 
 export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
@@ -23,12 +26,18 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
   onOpenReplayForRun,
   onNavigateInspector,
   onClearRunLogs,
+  onDeleteRun,
+  onDeleteAllRuns,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [wfFilter, setWfFilter] = useState<string>('all');
   const [confirmClearRunId, setConfirmClearRunId] = useState<string | null>(null);
   const [clearingRunId, setClearingRunId] = useState<string | null>(null);
+  const [confirmDeleteRunId, setConfirmDeleteRunId] = useState<string | null>(null);
+  const [deletingRunId, setDeletingRunId] = useState<string | null>(null);
+  const [isConfirmingDeleteAll, setIsConfirmingDeleteAll] = useState<boolean>(false);
+  const [isDeletingAll, setIsDeletingAll] = useState<boolean>(false);
 
   const filteredRuns = runs.filter((r) => {
     if (statusFilter !== 'all' && r.status !== statusFilter) return false;
@@ -90,8 +99,51 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
           </select>
         </div>
 
-        <div className="text-xs text-slate-400">
-          Showing <span className="text-slate-200 font-bold">{filteredRuns.length}</span> of {runs.length} runs
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-slate-400">
+            Showing <span className="text-slate-200 font-bold">{filteredRuns.length}</span> of {runs.length} runs
+          </div>
+
+          {onDeleteAllRuns && runs.length > 0 && (
+            isConfirmingDeleteAll ? (
+              <div className="flex items-center gap-1.5 bg-red-950/90 border border-red-800 px-2.5 py-1 rounded-lg">
+                <span className="text-xs text-red-300 font-bold flex items-center gap-1">
+                  <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
+                  Purge ALL {runs.length} runs?
+                </span>
+                <button
+                  onClick={async () => {
+                    setIsDeletingAll(true);
+                    try {
+                      await onDeleteAllRuns();
+                    } finally {
+                      setIsDeletingAll(false);
+                      setIsConfirmingDeleteAll(false);
+                    }
+                  }}
+                  disabled={isDeletingAll}
+                  className="px-2 py-0.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-bold transition disabled:opacity-50"
+                >
+                  {isDeletingAll ? 'Purging...' : 'Yes, Delete All'}
+                </button>
+                <button
+                  onClick={() => setIsConfirmingDeleteAll(false)}
+                  className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsConfirmingDeleteAll(true)}
+                className="px-3 py-1.5 bg-slate-950 hover:bg-red-950/80 hover:text-red-300 text-slate-400 rounded-lg border border-slate-800 hover:border-red-800 text-xs font-semibold flex items-center gap-1.5 transition"
+                title="Permanently delete all execution runs and their logs from database"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                Clear All Runs
+              </button>
+            )
+          )}
         </div>
       </div>
 
@@ -112,7 +164,7 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
             {filteredRuns.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-8 text-slate-500 font-sans">
-                  No workflow execution runs match the current filter.
+                  No workflow execution runs found. Click "Trigger Workflow" to dispatch a new run.
                 </td>
               </tr>
             ) : (
@@ -132,13 +184,13 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
                     <StatusBadge status={r.status} />
                   </td>
                   <td className="p-3.5 text-slate-400 font-sans text-[11px]">
-                    {new Date(r.created_at).toLocaleString('en-US')}
+                    {r.started_at ? new Date(r.started_at).toLocaleString('en-US') : '--'}
                   </td>
                   <td className="p-3.5 text-slate-400 font-sans text-[11px]">
                     {r.completed_at ? new Date(r.completed_at).toLocaleTimeString('en-US') : '--'}
                   </td>
                   <td className="p-3.5 text-right font-sans">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => {
                           onSelectRun(r.run_id);
@@ -159,7 +211,7 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
                       {onClearRunLogs && (
                         confirmClearRunId === r.run_id ? (
                           <div className="flex items-center gap-1 bg-red-950/90 border border-red-800 px-2 py-0.5 rounded ml-1">
-                            <span className="text-[10px] text-red-300 font-medium">Clear?</span>
+                            <span className="text-[10px] text-red-300 font-medium">Log?</span>
                             <button
                               onClick={async () => {
                                 setClearingRunId(r.run_id);
@@ -186,9 +238,46 @@ export const RunsExplorerView: React.FC<RunsExplorerViewProps> = ({
                           <button
                             onClick={() => setConfirmClearRunId(r.run_id)}
                             className="text-slate-400 hover:text-red-400 flex items-center gap-1 font-semibold text-xs ml-1 transition"
-                            title="Clear execution log"
+                            title="Clear execution log text"
                           >
-                            <Trash2 className="w-3.5 h-3.5 text-red-400/80" /> Clear Log
+                            <Trash2 className="w-3 h-3 text-red-400/70" /> Clear Log
+                          </button>
+                        )
+                      )}
+
+                      {onDeleteRun && (
+                        confirmDeleteRunId === r.run_id ? (
+                          <div className="flex items-center gap-1 bg-red-950/90 border border-red-800 px-2 py-0.5 rounded ml-1">
+                            <span className="text-[10px] text-red-300 font-bold">Delete?</span>
+                            <button
+                              onClick={async () => {
+                                setDeletingRunId(r.run_id);
+                                try {
+                                  await onDeleteRun(r.run_id);
+                                } finally {
+                                  setDeletingRunId(null);
+                                  setConfirmDeleteRunId(null);
+                                }
+                              }}
+                              disabled={deletingRunId === r.run_id}
+                              className="px-1.5 py-0.5 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-bold"
+                            >
+                              {deletingRunId === r.run_id ? '...' : 'Del'}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteRunId(null)}
+                              className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]"
+                            >
+                              No
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteRunId(r.run_id)}
+                            className="text-slate-500 hover:text-red-400 p-1 rounded hover:bg-red-950/40 transition ml-0.5"
+                            title="Delete this run record permanently"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
                           </button>
                         )
                       )}

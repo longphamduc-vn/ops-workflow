@@ -149,3 +149,23 @@ class RunRepository:
             stmt = select(StepRunRecord).where(StepRunRecord.run_id == run_id)
             result = await session.execute(stmt)
             return list(result.scalars().all())
+
+    async def delete_run(self, run_id: str) -> bool:
+        """Delete a specific run and its associated step runs."""
+        from sqlalchemy import delete
+
+        async with self.session_factory() as session:
+            await session.execute(delete(StepRunRecord).where(StepRunRecord.run_id == run_id))
+            result = await session.execute(delete(RunRecord).where(RunRecord.id == run_id))
+            await session.commit()
+            return (result.rowcount or 0) > 0
+
+    async def delete_all_runs(self) -> int:
+        """Delete all workflow runs and all associated step runs."""
+        from sqlalchemy import delete
+
+        async with self.session_factory() as session:
+            await session.execute(delete(StepRunRecord))
+            result = await session.execute(delete(RunRecord))
+            await session.commit()
+            return result.rowcount or 0

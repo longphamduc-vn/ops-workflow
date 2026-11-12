@@ -181,6 +181,65 @@ async def delete_run_logs(
     }
 
 
+@router.delete("", summary="Delete all workflow runs and their execution logs")
+async def delete_all_runs(
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:trigger"))],
+    repo: Annotated[RunRepository, Depends(get_repository)],
+) -> dict[str, Any]:
+    """Permanently delete all workflow runs, step runs, and associated execution log files."""
+    deleted_count = await repo.delete_all_runs()
+
+    # Clean up all log files in candidate log directories
+    log_dirs = [Path("logs/runs"), Path("services/ops-workflow/logs/runs")]
+    deleted_logs_count = 0
+    for d in log_dirs:
+        if d.exists() and d.is_dir():
+            for f in d.glob("run_*.log"):
+                try:
+                    f.unlink()
+                    deleted_logs_count += 1
+                except Exception:
+                    pass
+
+    return {
+        "status": "cleared",
+        "deleted_count": deleted_count,
+        "deleted_logs_count": deleted_logs_count,
+        "message": f"Successfully purged {deleted_count} execution runs and {deleted_logs_count} log files",
+    }
+
+
+@router.delete("/{run_id}", summary="Delete a single workflow run")
+async def delete_run(
+    run_id: str,
+    _: Annotated[AuthenticatedConsumer, Depends(require_scope("runs:trigger"))],
+    repo: Annotated[RunRepository, Depends(get_repository)],
+) -> dict[str, Any]:
+    """Delete a specific run, its step runs, and its log file."""
+    deleted = await repo.delete_run(run_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Run '{run_id}' not found",
+        )
+
+    # Clean up log file if exists
+    from opsflow.core.logger import get_run_log_path
+
+    log_path = get_run_log_path(run_id)
+    if log_path.exists():
+        try:
+            log_path.unlink()
+        except Exception:
+            pass
+
+    return {
+        "run_id": run_id,
+        "status": "deleted",
+        "message": f"Run '{run_id}' has been permanently deleted",
+    }
+
+
 @router.post("/{run_id}/cancel", summary="Cancel a running run")
 async def cancel_run(
     run_id: str,
